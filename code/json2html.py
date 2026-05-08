@@ -307,7 +307,42 @@ def json_to_html():
             border: none;
             padding: 0;
         }}
-        
+        .copy-btn {{
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            width: 2rem;
+            height: 2rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--bg-card-inner);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.5;
+            transition: opacity 0.2s, background 0.2s, border-color 0.2s;
+            z-index: 2;
+        }}
+        .text-card:hover .copy-btn {{
+            opacity: 1;
+        }}
+        .copy-btn:hover {{
+            background: var(--accent);
+            border-color: var(--accent);
+            color: var(--bg-body);
+        }}
+        .copy-btn.copied {{
+            background: #2ecc71;
+            border-color: #2ecc71;
+            color: white;
+        }}
+        .card-body {{
+            position: relative;
+        }}
+
         .card-footer {{
             padding: 1rem 1.5rem;
             background: var(--bg-card-inner);
@@ -503,6 +538,28 @@ def json_to_html():
         }});
 
         applyTheme('system');
+
+        // Copy button logic
+        document.querySelectorAll('.copy-btn').forEach(btn => {{
+            btn.addEventListener('click', async function(e) {{
+                e.stopPropagation();
+                const content = this.getAttribute('data-content');
+                try {{
+                    await navigator.clipboard.writeText(content);
+                    this.textContent = '✓';
+                    this.classList.add('copied');
+                    this.title = '已复制';
+                    setTimeout(() => {{
+                        this.textContent = '📋';
+                        this.classList.remove('copied');
+                        this.title = '复制全文';
+                    }}, 1500);
+                }} catch (err) {{
+                    console.error('Copy failed:', err);
+                    this.title = '复制失败';
+                }}
+            }});
+        }});
     </script>
     <script>
         // Precomputed token counts for open-source models (generated at build time)
