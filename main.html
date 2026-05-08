@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>12×4 多语言语料库阅读器</title>
+    <title>用文言，可省词元乎？</title>
     <style>
         :root {
             --bg-body: #f8f9fa;
@@ -214,6 +214,20 @@
             background: var(--bg-card);
             transition: background 0.3s;
         }
+        .footer-links {
+            margin-top: 1rem;
+            font-size: 0.85rem;
+        }
+        .footer-links a {
+            color: var(--accent);
+            text-decoration: none;
+            margin: 0 0.6rem;
+            transition: opacity 0.2s;
+        }
+        .footer-links a:hover {
+            text-decoration: underline;
+            opacity: 0.8;
+        }
         
         /* Language colors */
         .lang-classical { border-top-color: #ffd700 !important; }
@@ -228,24 +242,90 @@
         .lang-spanish { border-top-color: #ff7b72 !important; }
         .lang-spanish .lang-name { color: #ff7b72; }
         [data-theme="light"] .lang-spanish .lang-name { color: #dc2626; }
+        
+        /* Tokenizer selector */
+        .tokenizer-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-left: auto;
+            padding-left: 1.5rem;
+            border-left: 1px solid var(--border);
+        }
+        .tokenizer-bar label {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+        .tokenizer-select {
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .tokenizer-select:hover, .tokenizer-select:focus {
+            border-color: var(--accent);
+        }
+        .token-col-header .tokenizer-name {
+            font-weight: 400;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+        .token-count {
+            font-variant-numeric: tabular-nums;
+            transition: color 0.2s;
+        }
+        .token-count.loading {
+            color: var(--text-secondary);
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
     <header>
         <button class="theme-toggle" onclick="toggleTheme()" title="切换主题"></button>
-        <h1>12×4 多语言语料库阅读器</h1>
-        <p>Token Consumption Analysis Corpus | 四种语言 · 12篇文章 · 平行对照</p>
+        <h1>用文言，可省词元乎？</h1>
+        <p>Token Consumption Analysis Corpus | 四种语言 · 12篇文章</p>
     </header>
     
     <nav>
-        <button class="nav-btn active" data-id="allende">阿连德最后的演讲</button> <button class="nav-btn " data-id="assassination_qin">荆轲刺秦王</button> <button class="nav-btn " data-id="bird_migration">夜间鸟类迁徙监测网络</button> <button class="nav-btn " data-id="dark_matter_galaxies">暗物质缺失星系如何对抗巨人并幸存</button> <button class="nav-btn " data-id="duke_huan_qi">齐桓公葵丘会盟受胙不逾礼</button> <button class="nav-btn " data-id="duke_xi_28th_year">春秋·僖公二十八年</button> <button class="nav-btn " data-id="ju_lu_battle">钜鹿之战</button> <button class="nav-btn " data-id="paulgraham">会写的人与不会写的人</button> <button class="nav-btn " data-id="science_revolution_dl">深度学习与科学革命</button> <button class="nav-btn " data-id="yangzhenning">中国今天不宜建造超大对撞机</button> <button class="nav-btn " data-id="yau_collider_opinions">丘成桐：对中国建设高能对撞机的意见</button> <button class="nav-btn " data-id="zuozhuan">左传·晋文公流亡</button>
+        <button class="nav-btn active" data-id="allende">阿连德绝命书</button> <button class="nav-btn " data-id="assassination_qin">荆轲刺秦王</button> <button class="nav-btn " data-id="bird_migration">夜鸟迁徙之监</button> <button class="nav-btn " data-id="dark_matter_galaxies">暗质缺失之星系何以抗巨灵而存</button> <button class="nav-btn " data-id="duke_huan_qi">齐桓公葵丘会盟受胙不逾礼</button> <button class="nav-btn " data-id="duke_xi_28th_year">春秋·僖公二十八年</button> <button class="nav-btn " data-id="ju_lu_battle">钜鹿之战</button> <button class="nav-btn " data-id="paulgraham">能书者与不能书者</button> <button class="nav-btn " data-id="science_revolution_dl">深度学习与科学革命论</button> <button class="nav-btn " data-id="yangzhenning">谏罢建造超大对撞机疏</button> <button class="nav-btn " data-id="yau_collider_opinions">丘成桐议中国建高能对撞机</button> <button class="nav-btn " data-id="exile_of_duke_wen_of_jin">左传·晋文公流亡</button>
+        <div class="tokenizer-bar">
+            <label for="tokenizer-select">分词器：</label>
+            <select id="tokenizer-select" class="tokenizer-select">
+                <optgroup label="OpenAI（实时）">
+                    <option value="gpt-4o" selected>gpt-4o (o200k_base)</option>
+                    <option value="gpt-4.1">gpt-4.1</option>
+                    <option value="gpt-4">gpt-4 / gpt-3.5-turbo (cl100k_base)</option>
+                    <option value="text-davinci-003">text-davinci-003 (p50k_base)</option>
+                    <option value="davinci">davinci (r50k_base)</option>
+                    <option value="o200k_base">o200k_base (编码)</option>
+                    <option value="cl100k_base">cl100k_base (编码)</option>
+                    <option value="p50k_base">p50k_base (编码)</option>
+                    <option value="r50k_base">r50k_base (编码)</option>
+                </optgroup>
+                <optgroup label="开源模型（预计算）">
+                    <option value="Qwen2.5-72B">Qwen2.5-72B</option>
+                    <option value="Phi-2">Phi-2</option>
+                    <option value="Gemma-7B">Gemma-7B</option>
+                    <option value="DeepSeek-R1">DeepSeek-R1</option>
+                    <option value="Llama-3-8B">Llama-3-8B</option>
+                    <option value="Llama-3-70B">Llama-3-70B</option>
+                </optgroup>
+            </select>
+        </div>
     </nav>
     
     <main>
         
         <section id="allende" class="article-section active">
             <div class="metadata">
-                <h2>阿连德最后的演讲</h2>
+                <h2>阿连德绝命书</h2>
                 <div class="meta-grid">
                     <div><span class="meta-label">English Title</span><span class="meta-value">Last Speech of Salvador Allende</span></div>
                     <div><span class="meta-label">Título en Español</span><span class="meta-value">Último discurso de Salvador Allende</span></div>
@@ -253,56 +333,26 @@
                     <div><span class="meta-label">来源 / Source</span><span class="meta-value">Radio Magallanes, 11 de septiembre de 1973</span></div>
                     <div><span class="meta-label">时代 / Period</span><span class="meta-value">当代 (1973年)</span></div>
                     <div><span class="meta-label">体裁 / Genre</span><span class="meta-value">政治演讲/绝命书</span></div>
-                    <div><span class="meta-label">原文语言</span><span class="meta-value">spanish</span></div>
+                     <div><span class="meta-label">原文语言 / ORIGINAL LANGUAGE</span><span class="meta-value">spanish</span></div>
                 </div>
             </div>
             
             <div class="comparison">
                 <table>
-                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>字符数</th></tr></thead>
+                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>Unicode 字符数</th><th class="token-col-header">词元数 <span class="tokenizer-name"></span></th></tr></thead>
                     <tbody>
-                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>原文</td><td>Último discurso de Salvador Allende</td><td>3,792</td></tr>
+                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>译文</td><td>阿连德绝命书</td><td>888</td><td class="token-count" data-article="allende" data-lang="classical_chinese">—</td></tr>
             
-                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>译文</td><td>阿连德绝命书</td><td>888</td></tr>
+                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>译文</td><td>萨尔瓦多·阿连德的最后一次演讲</td><td>1,138</td><td class="token-count" data-article="allende" data-lang="modern_chinese">—</td></tr>
             
-                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>译文</td><td>萨尔瓦多·阿连德的最后一次演讲</td><td>1,138</td></tr>
+                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>译文</td><td>Last Speech of Salvador Allende</td><td>3,809</td><td class="token-count" data-article="allende" data-lang="english">—</td></tr>
             
-                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>译文</td><td>Last Speech of Salvador Allende</td><td>3,809</td></tr>
+                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>原文</td><td>Último discurso de Salvador Allende</td><td>3,792</td><td class="token-count" data-article="allende" data-lang="spanish">—</td></tr>
             </tbody>
                 </table>
             </div>
             
             <div class="text-grid">
-                <div class="text-card lang-spanish">
-                    <div class="card-header"><span class="lang-name">Español</span><span class="role-badge original">原文</span></div>
-                    <div class="card-body"><h4>Último discurso de Salvador Allende</h4><pre>Santiago de Chile, martes 11 de septiembre de 1973, 9:10 hora local.
-
-Compatriotas:
-
-Esta será seguramente la última oportunidad en que me pueda dirigir a ustedes. La Fuerza Aérea ha bombardeado las torres de Radio Portales y Radio Corporación.
-
-Mis palabras no tienen amargura, sino decepción, y serán ellas el castigo moral para los que han traicionado el juramento que hicieron: soldados de Chile, comandantes en jefe titulares, el almirante Merino que se ha autodesignado, más el señor Mendoza, general rastrero que sólo ayer manifestara su fidelidad y lealtad al gobierno, y que también se ha autodenominado director general de Carabineros.
-
-Ante estos hechos, sólo me cabe decirle a los trabajadores: ¡Yo no voy a renunciar! Colocado en un tránsito histórico, pagaré con mi vida la lealtad del pueblo. Y les digo que tengo la certeza de que la semilla que entregáramos a la conciencia digna de miles y miles de chilenos, no podrá ser segada definitivamente.
-
-Tienen la fuerza, podrán avasallarnos, pero no se detienen los procesos sociales ni con el crimen ni con la fuerza. La historia es nuestra y la hacen los pueblos.
-
-Trabajadores de mi patria: Quiero agradecerles la lealtad que siempre tuvieron, la confianza que depositaron en un hombre que sólo fue intérprete de grandes anhelos de justicia, que empeñó su palabra en que respetaría la Constitución y la ley y así lo hizo. En este momento definitivo, el último en que yo pueda dirigirme a ustedes, quiero que aprovechen la lección. El capital foráneo, el imperialismo, unido a la reacción, creó el clima para que las Fuerzas Armadas rompieran su tradición, la que les enseñara Schneider y que reafirmara el comandante Araya, víctimas del mismo sector social que hoy estará en sus casas, esperando con mano ajena reconquistar el poder para seguir defendiendo sus granjerías y sus privilegios.
-
-Me dirijo, sobre todo, a la modesta mujer de nuestra tierra, a la campesina que creyó en nosotros; a la obrera que trabajó más, a la madre que supo de nuestra preocupación por los niños. Me dirijo a los profesionales de la patria, a los profesionales patriotas, a los que hace días estuvieron trabajando contra la sedición auspiciada por los Colegios profesionales, colegios de clase para defender también las ventajas que una sociedad capitalista da a unos pocos. Me dirijo a la juventud, a aquellos que cantaron, entregaron su alegría y su espíritu de lucha. Me dirijo al hombre de Chile, al obrero, al campesino, al intelectual, a aquellos que serán perseguidos, porque en nuestro país el fascismo ya estuvo hace muchas horas presente en los atentados terroristas, volando los puentes, cortando la línea férrea, destruyendo los oleoductos y los gaseoductos, frente al silencio de los que tenían la obligación de proceder: estaban comprometidos. La historia los juzgará.
-
-Seguramente Radio Magallanes será callada y el metal tranquilo de mi voz no llegará a ustedes. No importa, lo seguirán oyendo. Siempre estaré junto a ustedes. Por lo menos, mi recuerdo será el de un hombre digno que fue leal a la lealtad de los trabajadores.
-
-El pueblo debe defenderse, pero no sacrificarse. El pueblo no debe dejarse arrasar ni acribillar, pero tampoco puede humillarse.
-
-Trabajadores de mi patria: tengo fe en Chile y su destino. Superarán otros hombres este momento gris y amargo, donde la traición pretende imponerse. Sigan ustedes sabiendo que, mucho más temprano que tarde, de nuevo abrirán las grandes alamedas por donde pase el hombre libre para construir una sociedad mejor.
-
-¡Viva Chile! ¡Viva el pueblo! ¡Vivan los trabajadores!
-
-Éstas son mis últimas palabras y tengo la certeza de que mi sacrificio no será en vano. Tengo la certeza de que, por lo menos, habrá una lección moral que castigará la felonía, la cobardía y la traición.</pre></div>
-                    <div class="card-footer">3,792 字符</div>
-                </div>
-            
                 <div class="text-card lang-classical">
                     <div class="card-header"><span class="lang-name">文言</span><span class="role-badge translation">译文</span></div>
                     <div class="card-body"><h4>阿连德绝命书</h4><pre>智利圣地亚哥，一九七三年九月十一日，九时十分。
@@ -390,6 +440,36 @@ Long live Chile! Long live the people! Long live the workers!
 These are my last words, and I am certain that my sacrifice will not be in vain. I am certain that, at the very least, there will be a moral lesson that will punish felony, cowardice, and treason.</pre></div>
                     <div class="card-footer">3,809 字符</div>
                 </div>
+            
+                <div class="text-card lang-spanish">
+                    <div class="card-header"><span class="lang-name">Español</span><span class="role-badge original">原文</span></div>
+                    <div class="card-body"><h4>Último discurso de Salvador Allende</h4><pre>Santiago de Chile, martes 11 de septiembre de 1973, 9:10 hora local.
+
+Compatriotas:
+
+Esta será seguramente la última oportunidad en que me pueda dirigir a ustedes. La Fuerza Aérea ha bombardeado las torres de Radio Portales y Radio Corporación.
+
+Mis palabras no tienen amargura, sino decepción, y serán ellas el castigo moral para los que han traicionado el juramento que hicieron: soldados de Chile, comandantes en jefe titulares, el almirante Merino que se ha autodesignado, más el señor Mendoza, general rastrero que sólo ayer manifestara su fidelidad y lealtad al gobierno, y que también se ha autodenominado director general de Carabineros.
+
+Ante estos hechos, sólo me cabe decirle a los trabajadores: ¡Yo no voy a renunciar! Colocado en un tránsito histórico, pagaré con mi vida la lealtad del pueblo. Y les digo que tengo la certeza de que la semilla que entregáramos a la conciencia digna de miles y miles de chilenos, no podrá ser segada definitivamente.
+
+Tienen la fuerza, podrán avasallarnos, pero no se detienen los procesos sociales ni con el crimen ni con la fuerza. La historia es nuestra y la hacen los pueblos.
+
+Trabajadores de mi patria: Quiero agradecerles la lealtad que siempre tuvieron, la confianza que depositaron en un hombre que sólo fue intérprete de grandes anhelos de justicia, que empeñó su palabra en que respetaría la Constitución y la ley y así lo hizo. En este momento definitivo, el último en que yo pueda dirigirme a ustedes, quiero que aprovechen la lección. El capital foráneo, el imperialismo, unido a la reacción, creó el clima para que las Fuerzas Armadas rompieran su tradición, la que les enseñara Schneider y que reafirmara el comandante Araya, víctimas del mismo sector social que hoy estará en sus casas, esperando con mano ajena reconquistar el poder para seguir defendiendo sus granjerías y sus privilegios.
+
+Me dirijo, sobre todo, a la modesta mujer de nuestra tierra, a la campesina que creyó en nosotros; a la obrera que trabajó más, a la madre que supo de nuestra preocupación por los niños. Me dirijo a los profesionales de la patria, a los profesionales patriotas, a los que hace días estuvieron trabajando contra la sedición auspiciada por los Colegios profesionales, colegios de clase para defender también las ventajas que una sociedad capitalista da a unos pocos. Me dirijo a la juventud, a aquellos que cantaron, entregaron su alegría y su espíritu de lucha. Me dirijo al hombre de Chile, al obrero, al campesino, al intelectual, a aquellos que serán perseguidos, porque en nuestro país el fascismo ya estuvo hace muchas horas presente en los atentados terroristas, volando los puentes, cortando la línea férrea, destruyendo los oleoductos y los gaseoductos, frente al silencio de los que tenían la obligación de proceder: estaban comprometidos. La historia los juzgará.
+
+Seguramente Radio Magallanes será callada y el metal tranquilo de mi voz no llegará a ustedes. No importa, lo seguirán oyendo. Siempre estaré junto a ustedes. Por lo menos, mi recuerdo será el de un hombre digno que fue leal a la lealtad de los trabajadores.
+
+El pueblo debe defenderse, pero no sacrificarse. El pueblo no debe dejarse arrasar ni acribillar, pero tampoco puede humillarse.
+
+Trabajadores de mi patria: tengo fe en Chile y su destino. Superarán otros hombres este momento gris y amargo, donde la traición pretende imponerse. Sigan ustedes sabiendo que, mucho más temprano que tarde, de nuevo abrirán las grandes alamedas por donde pase el hombre libre para construir una sociedad mejor.
+
+¡Viva Chile! ¡Viva el pueblo! ¡Vivan los trabajadores!
+
+Éstas son mis últimas palabras y tengo la certeza de que mi sacrificio no será en vano. Tengo la certeza de que, por lo menos, habrá una lección moral que castigará la felonía, la cobardía y la traición.</pre></div>
+                    <div class="card-footer">3,792 字符</div>
+                </div>
             </div>
         </section>
          
@@ -399,25 +479,25 @@ These are my last words, and I am certain that my sacrifice will not be in vain.
                 <div class="meta-grid">
                     <div><span class="meta-label">English Title</span><span class="meta-value">The Assassination Attempt on the King of Qin</span></div>
                     <div><span class="meta-label">Título en Español</span><span class="meta-value">El Intento de Asesinato contra el Rey de Qin</span></div>
-                    <div><span class="meta-label">作者 / Author</span><span class="meta-value">司马迁</span></div>
-                    <div><span class="meta-label">来源 / Source</span><span class="meta-value">《史记·刺客列传》</span></div>
+                    <div><span class="meta-label">作者 / Author</span><span class="meta-value">刘向</span></div>
+                    <div><span class="meta-label">来源 / Source</span><span class="meta-value">《战国策》</span></div>
                     <div><span class="meta-label">时代 / Period</span><span class="meta-value">战国末期 (公元前227年)</span></div>
                     <div><span class="meta-label">体裁 / Genre</span><span class="meta-value">历史叙事</span></div>
-                    <div><span class="meta-label">原文语言</span><span class="meta-value">classical_chinese</span></div>
+                     <div><span class="meta-label">原文语言 / ORIGINAL LANGUAGE</span><span class="meta-value">classical_chinese</span></div>
                 </div>
             </div>
             
             <div class="comparison">
                 <table>
-                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>字符数</th></tr></thead>
+                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>Unicode 字符数</th><th class="token-col-header">词元数 <span class="tokenizer-name"></span></th></tr></thead>
                     <tbody>
-                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>原文</td><td>荆轲刺秦王</td><td>463</td></tr>
+                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>原文</td><td>荆轲刺秦王</td><td>463</td><td class="token-count" data-article="assassination_qin" data-lang="classical_chinese">—</td></tr>
             
-                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>译文</td><td>荆轲刺秦王</td><td>714</td></tr>
+                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>译文</td><td>荆轲刺秦王</td><td>714</td><td class="token-count" data-article="assassination_qin" data-lang="modern_chinese">—</td></tr>
             
-                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>译文</td><td>The Assassination Attempt on the King of Qin</td><td>2,876</td></tr>
+                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>译文</td><td>The Assassination Attempt on the King of Qin</td><td>2,876</td><td class="token-count" data-article="assassination_qin" data-lang="english">—</td></tr>
             
-                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>El Intento de Asesinato contra el Rey de Qin</td><td>2,959</td></tr>
+                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>El Intento de Asesinato contra el Rey de Qin</td><td>2,959</td><td class="token-count" data-article="assassination_qin" data-lang="spanish">—</td></tr>
             </tbody>
                 </table>
             </div>
@@ -437,13 +517,21 @@ These are my last words, and I am certain that my sacrifice will not be in vain.
             
                 <div class="text-card lang-english">
                     <div class="card-header"><span class="lang-name">English</span><span class="role-badge translation">译文</span></div>
-                    <div class="card-body"><h4>The Assassination Attempt on the King of Qin</h4><pre>Jing Ke presented the box containing Fan Yuqi's head, while Qin Wuyang presented the case containing the map; they advanced in order. When they reached the steps below the throne, Qin Wuyang's complexion changed and he trembled with fear. The ministers found this strange. Jing Ke turned back and smiled at Wuyang, then stepped forward to apologize on his behalf: "This is a coarse man from the northern barbarian lands who has never seen the Son of Heaven, and therefore trembles with fear. I beg Your Majesty to show him some tolerance and allow him to complete his mission before you." The King of Qin said to Jing Ke: "Rise, and bring the map that Wuyang holds!" Jing Ke took the map and presented it. As he unrolled the map, when it reached the end, the dagger was revealed. Seizing the opportunity, Jing Ke grasped the King's sleeve with his left hand and stabbed at him with the dagger in his right. Before it reached his body, the King was startled and pulled himself up, tearing off his sleeve. He tried to draw his sword, but it was too long; he only grasped the scabbard. In the panic and haste of the moment, the sword was stuck fast and could not be drawn immediately. Jing Ke pursued the King, who ran around a pillar. The ministers were all aghast; caught by surprise, they completely lost their composure.\n\nAccording to Qin law, the ministers attending upon the throne could not carry any weapons. Those guards who did bear arms were arrayed below the hall and could not ascend without an imperial command. In the urgency of the moment, there was no time to summon the guards below, so Jing Ke pursued the King while the ministers, in their panic, had nothing with which to strike him, and could only fight him with their bare hands. At this moment, the physician Xia Wuju struck at Jing Ke with the medicine bag he was carrying. The King was running around the pillar, bewildered by the sudden panic. Those around him cried: "Your Majesty, put the sword on your back! Put the sword on your back!" Thus the King drew his sword and struck at Jing Ke, severing his left thigh. Jing Ke fell, then raised his dagger and threw it at the King, but missed, hitting the pillar instead. The King struck Jing Ke again, inflicting eight wounds.\n\nJing Ke knew that his mission had failed. Leaning against the pillar, he laughed, and sitting with legs spread wide like a dustpan, he cursed: "The reason I failed was because I wanted to capture you alive, so that I could obtain a treaty to repay the Crown Prince." The attendants stepped forward and killed Jing Ke. The King's vision was blurred for a long time afterward. He rewarded the ministers according to their merits and punished those who were at fault, each according to their degree. He also bestowed upon Xia Wuju two hundred yi of gold, saying: "Wuju loves me, for he struck Jing Ke with his medicine bag."</pre></div>
+                    <div class="card-body"><h4>The Assassination Attempt on the King of Qin</h4><pre>Jing Ke presented the box containing Fan Yuqi's head, while Qin Wuyang presented the case containing the map; they advanced in order. When they reached the steps below the throne, Qin Wuyang's complexion changed and he trembled with fear. The ministers found this strange. Jing Ke turned back and smiled at Wuyang, then stepped forward to apologize on his behalf: "This is a coarse man from the northern barbarian lands who has never seen the Son of Heaven, and therefore trembles with fear. I beg Your Majesty to show him some tolerance and allow him to complete his mission before you." The King of Qin said to Jing Ke: "Rise, and bring the map that Wuyang holds!" Jing Ke took the map and presented it. As he unrolled the map, when it reached the end, the dagger was revealed. Seizing the opportunity, Jing Ke grasped the King's sleeve with his left hand and stabbed at him with the dagger in his right. Before it reached his body, the King was startled and pulled himself up, tearing off his sleeve. He tried to draw his sword, but it was too long; he only grasped the scabbard. In the panic and haste of the moment, the sword was stuck fast and could not be drawn immediately. Jing Ke pursued the King, who ran around a pillar. The ministers were all aghast; caught by surprise, they completely lost their composure.
+
+According to Qin law, the ministers attending upon the throne could not carry any weapons. Those guards who did bear arms were arrayed below the hall and could not ascend without an imperial command. In the urgency of the moment, there was no time to summon the guards below, so Jing Ke pursued the King while the ministers, in their panic, had nothing with which to strike him, and could only fight him with their bare hands. At this moment, the physician Xia Wuju struck at Jing Ke with the medicine bag he was carrying. The King was running around the pillar, bewildered by the sudden panic. Those around him cried: "Your Majesty, put the sword on your back! Put the sword on your back!" Thus the King drew his sword and struck at Jing Ke, severing his left thigh. Jing Ke fell, then raised his dagger and threw it at the King, but missed, hitting the pillar instead. The King struck Jing Ke again, inflicting eight wounds.
+
+Jing Ke knew that his mission had failed. Leaning against the pillar, he laughed, and sitting with legs spread wide like a dustpan, he cursed: "The reason I failed was because I wanted to capture you alive, so that I could obtain a treaty to repay the Crown Prince." The attendants stepped forward and killed Jing Ke. The King's vision was blurred for a long time afterward. He rewarded the ministers according to their merits and punished those who were at fault, each according to their degree. He also bestowed upon Xia Wuju two hundred yi of gold, saying: "Wuju loves me, for he struck Jing Ke with his medicine bag."</pre></div>
                     <div class="card-footer">2,876 字符</div>
                 </div>
             
                 <div class="text-card lang-spanish">
                     <div class="card-header"><span class="lang-name">Español</span><span class="role-badge translation">译文</span></div>
-                    <div class="card-body"><h4>El Intento de Asesinato contra el Rey de Qin</h4><pre>Jing Ke presentó la caja que contenía la cabeza de Fan Yuqi, mientras que Qin Wuyang presentó el estuche que contenía el mapa; avanzaron en orden. Cuando llegaron a los escalones bajo el trono, el cutis de Qin Wuyang cambió y tembló de miedo. Los ministros encontraron esto extraño. Jing Ke se volvió y sonrió a Wuyang, luego dio un paso adelante para disculparse en su nombre: "Este es un hombre rudo de las tierras bárbaras del norte que nunca ha visto al Hijo del Cielo, y por lo tanto tiembla de miedo. Ruego a Su Majestad mostrarle algo de tolerancia y permitirle completar su misión ante usted." El Rey de Qin le dijo a Jing Ke: "Levántate, y trae el mapa que Wuyang sostiene!" Jing Ke tomó el mapa y lo presentó. Mientras lo desenrollaba, cuando llegó al final, la daga fue revelada. Aprovechando la oportunidad, Jing Ke agarró la manga del Rey con su mano izquierda y apuñaló hacia él con la daga en su derecha. Antes de que llegara a su cuerpo, el Rey se sobresaltó y se levantó, desgarrando su manga. Intentó desenvainar su espada, pero era demasiado larga; solo agarró la vaina. En el pánico y la prisa del momento, la espada estaba atascada y no podía ser desenvainada inmediatamente. Jing Ke persiguió al Rey, quien corrió alrededor de un pilar. Los ministros estaban todos aterrorizados; sorprendidos, perdieron completamente la compostura.\n\nSegún la ley de Qin, los ministros que atendían al trono no podían llevar armas. Aquellos guardias que sí portaban armas estaban formados bajo el salón y no podían ascender sin una orden imperial. En la urgencia del momento, no había tiempo para convocar a los guardias de abajo, así que Jing Ke persiguió al Rey mientras los ministros, en su pánico, no tenían nada con qué golpearlo, y solo podían pelear con él con sus manos desnudas. En este momento, el médico Xia Wuju golpeó a Jing Ke con la bolsa de medicinas que llevaba. El Rey corría alrededor del pilar, desconcertado por el súbito pánico. Los que estaban a su alrededor gritaron: "¡Su Majestad, ponga la espada en su espalda! ¡Ponga la espada en su espalda!" Así el Rey desenvainó su espada y golpeó a Jing Ke, cercenándole el muslo izquierdo. Jing Ke cayó, luego levantó su daga y la lanzó contra el Rey, pero erró, golpeando el pilar en su lugar. El Rey golpeó a Jing Ke de nuevo, infligiéndole ocho heridas.\n\nJing Ke supo que su misión había fracasado. Apoyado contra el pilar, se rió, y sentándose con las piernas abiertas como un bieldo, maldijo: "La razón por la que fracasé fue porque quería capturarlo vivo, para poder obtener un tratado para recompensar al Príncipe Heredero." Los asistentes dieron un paso adelante y mataron a Jing Ke. La visión del Rey estuvo nublada durante mucho tiempo después. Recompensó a los ministros según sus méritos y castigó a los que estaban en falta, cada uno según su grado. También otorgó a Xia Wuju doscientos yi de oro, diciendo: "Wuju me ama, pues golpeó a Jing Ke con su bolsa de medicinas."</pre></div>
+                    <div class="card-body"><h4>El Intento de Asesinato contra el Rey de Qin</h4><pre>Jing Ke presentó la caja que contenía la cabeza de Fan Yuqi, mientras que Qin Wuyang presentó el estuche que contenía el mapa; avanzaron en orden. Cuando llegaron a los escalones bajo el trono, el cutis de Qin Wuyang cambió y tembló de miedo. Los ministros encontraron esto extraño. Jing Ke se volvió y sonrió a Wuyang, luego dio un paso adelante para disculparse en su nombre: "Este es un hombre rudo de las tierras bárbaras del norte que nunca ha visto al Hijo del Cielo, y por lo tanto tiembla de miedo. Ruego a Su Majestad mostrarle algo de tolerancia y permitirle completar su misión ante usted." El Rey de Qin le dijo a Jing Ke: "Levántate, y trae el mapa que Wuyang sostiene!" Jing Ke tomó el mapa y lo presentó. Mientras lo desenrollaba, cuando llegó al final, la daga fue revelada. Aprovechando la oportunidad, Jing Ke agarró la manga del Rey con su mano izquierda y apuñaló hacia él con la daga en su derecha. Antes de que llegara a su cuerpo, el Rey se sobresaltó y se levantó, desgarrando su manga. Intentó desenvainar su espada, pero era demasiado larga; solo agarró la vaina. En el pánico y la prisa del momento, la espada estaba atascada y no podía ser desenvainada inmediatamente. Jing Ke persiguió al Rey, quien corrió alrededor de un pilar. Los ministros estaban todos aterrorizados; sorprendidos, perdieron completamente la compostura.
+
+Según la ley de Qin, los ministros que atendían al trono no podían llevar armas. Aquellos guardias que sí portaban armas estaban formados bajo el salón y no podían ascender sin una orden imperial. En la urgencia del momento, no había tiempo para convocar a los guardias de abajo, así que Jing Ke persiguió al Rey mientras los ministros, en su pánico, no tenían nada con qué golpearlo, y solo podían pelear con él con sus manos desnudas. En este momento, el médico Xia Wuju golpeó a Jing Ke con la bolsa de medicinas que llevaba. El Rey corría alrededor del pilar, desconcertado por el súbito pánico. Los que estaban a su alrededor gritaron: "¡Su Majestad, ponga la espada en su espalda! ¡Ponga la espada en su espalda!" Así el Rey desenvainó su espada y golpeó a Jing Ke, cercenándole el muslo izquierdo. Jing Ke cayó, luego levantó su daga y la lanzó contra el Rey, pero erró, golpeando el pilar en su lugar. El Rey golpeó a Jing Ke de nuevo, infligiéndole ocho heridas.
+
+Jing Ke supo que su misión había fracasado. Apoyado contra el pilar, se rió, y sentándose con las piernas abiertas como un bieldo, maldijo: "La razón por la que fracasé fue porque quería capturarlo vivo, para poder obtener un tratado para recompensar al Príncipe Heredero." Los asistentes dieron un paso adelante y mataron a Jing Ke. La visión del Rey estuvo nublada durante mucho tiempo después. Recompensó a los ministros según sus méritos y castigó a los que estaban en falta, cada uno según su grado. También otorgó a Xia Wuju doscientos yi de oro, diciendo: "Wuju me ama, pues golpeó a Jing Ke con su bolsa de medicinas."</pre></div>
                     <div class="card-footer">2,959 字符</div>
                 </div>
             </div>
@@ -451,7 +539,7 @@ These are my last words, and I am certain that my sacrifice will not be in vain.
          
         <section id="bird_migration" class="article-section ">
             <div class="metadata">
-                <h2>夜间鸟类迁徙监测网络</h2>
+                <h2>夜鸟迁徙之监</h2>
                 <div class="meta-grid">
                     <div><span class="meta-label">English Title</span><span class="meta-value">The Nighttime Bird Surveillance Network</span></div>
                     <div><span class="meta-label">Título en Español</span><span class="meta-value">La Red de Vigilancia de Aves Nocturnas</span></div>
@@ -459,74 +547,26 @@ These are my last words, and I am certain that my sacrifice will not be in vain.
                     <div><span class="meta-label">来源 / Source</span><span class="meta-value">Scientific American, Science Quickly Podcast</span></div>
                     <div><span class="meta-label">时代 / Period</span><span class="meta-value">当代</span></div>
                     <div><span class="meta-label">体裁 / Genre</span><span class="meta-value">科学报道/播客文稿</span></div>
-                    <div><span class="meta-label">原文语言</span><span class="meta-value">english</span></div>
+                     <div><span class="meta-label">原文语言 / ORIGINAL LANGUAGE</span><span class="meta-value">english</span></div>
                 </div>
             </div>
             
             <div class="comparison">
                 <table>
-                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>字符数</th></tr></thead>
+                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>Unicode 字符数</th><th class="token-col-header">词元数 <span class="tokenizer-name"></span></th></tr></thead>
                     <tbody>
-                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>原文</td><td>They Tap Into the Magical, Hidden Pulse of the Planet, but What is the Nighttime Bird Surveillance Network?</td><td>5,694</td></tr>
+                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>译文</td><td>夜鸟迁徙之监</td><td>741</td><td class="token-count" data-article="bird_migration" data-lang="classical_chinese">—</td></tr>
             
-                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>译文</td><td>夜鸟迁徙之监</td><td>741</td></tr>
+                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>译文</td><td>夜间鸟类迁徙监测网络</td><td>1,120</td><td class="token-count" data-article="bird_migration" data-lang="modern_chinese">—</td></tr>
             
-                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>译文</td><td>夜间鸟类迁徙监测网络</td><td>1,120</td></tr>
+                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>原文</td><td>They Tap Into the Magical, Hidden Pulse of the Planet, but What is the Nighttime Bird Surveillance Network?</td><td>5,694</td><td class="token-count" data-article="bird_migration" data-lang="english">—</td></tr>
             
-                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>La Red de Vigilancia de Aves Nocturnas</td><td>4,450</td></tr>
+                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>La Red de Vigilancia de Aves Nocturnas</td><td>4,450</td><td class="token-count" data-article="bird_migration" data-lang="spanish">—</td></tr>
             </tbody>
                 </table>
             </div>
             
             <div class="text-grid">
-                <div class="text-card lang-english">
-                    <div class="card-header"><span class="lang-name">English</span><span class="role-badge original">原文</span></div>
-                    <div class="card-body"><h4>They Tap Into the Magical, Hidden Pulse of the Planet, but What is the Nighttime Bird Surveillance Network?</h4><pre>On any given night, dense clouds of dark, ghostly figures pass over your head as you sleep. Maybe you never knew they were there, but there are people out there who are deciphering all the unseen movement that happens amid the darkness.
-
-Kyle Horton: Actually seeing migration is tough. I didn't see migration, but I heard it that night, and that'll always stay with me.
-
-Jacob Job: There's no denying it. We humans largely operate under the light of the sun. But as the sun sets and we go to bed, another shift begins. While we sleep, depending on the time of year, the skies come alive, and they have a story to tell. Are you ready to listen?
-
-Each spring billions of migratory birds take wing in an annual ritual that carries them from their wintering grounds to their breeding grounds. Come fall, adult birds with offspring reverse course and head back to their winter homes.
-
-Birds have been migrating for at least hundreds of thousands of years. Our understanding of this phenomenon is relatively recent, however.
-
-Early speculation suggested that the seasonal exodus of birds was best explained by some pretty far-out-there hypotheses. Dating back to at least the 11th century was the idea that some geese temporarily transformed themselves into barnacles that clung to the sides of ships.
-
-A 16th-century Swedish priest hypothesized that some birds dove down under water only to pass the winter in the relatively warm mud at the bottom of lakes.
-
-A century later, another member of the clergy even suggested that birds escaped the cold of winter by hitching a ride on the wind—to the moon.
-
-Over time and with slightly more careful observation, it became clear that birds were indeed seasonally hitching rides on the wind—but not to nose-dive into lake mud or escape Earth's gravity for far-off celestial bodies. They were instead traveling to other parts of the globe where it was warmer and, more importantly, where there was food to be found. They were migrating.
-
-We now know that in North America, around 70 percent of bird species migrate. Many of them spend weeks or months traveling thousands of miles across the Western Hemisphere twice a year. Birders know this and spend every spring and fall hopping from green space to green space with binoculars in hand, hoping to catch a glimpse of unfamiliar species they otherwise rarely have a chance to see the rest of the year.
-
-As waves of winged migrants move across the landscape, it's like a reshuffling of the deck. New species pop up each morning in your neighborhood. Those that were there just the day before are now gone. These daily discoveries can feel almost magical. And what most of us don't understand is that most of the magic happens at night.
-
-In this episode, and over the four more that follow it, we will embark on a Science, Quickly Fascination, diving deeply into the Nighttime Bird Surveillance Network. We'll hear from birders and researchers who got a glimpse of these moments.
-
-Joe Gyekis: I live in the State College borough [in Pennsylvania]. Right in the middle of a town. Nights of 20,000 calls is a normal thing on a yearly basis.... Bigger numbers than that can also happen.
-
-Benjamin Van Doren: Some of the best nights of nocturnal listening that I experienced were when I was in college in Ithaca, N.Y., upstate New York at Cornell University. And so I remember calls from birds every few seconds that were migrating overhead. I found really thrilling because it felt like I was tapping into this vast mysterious pulse of the planet phenomenon that was just so much bigger than me.
-
-Horton: And I remember going out to Tifft Nature Preserve, which is right in the heart of Buffalo, [N.Y.]. And I remember walking up the hill, dewy grass. Brought a blanket, laid it out and just stayed there for most of the night, and I was just so pumped to hear these flight calls.
-
-Bill Evans: And it all sort of came together when, one night at this campsite 30 miles east of Minneapolis, Saint Paul, I heard a large night migration of birds going over, all sorts of calls—one of these nights that there's just constant calling up there, birds in nocturnal migration.
-
-Job: The sounds they're describing and the ones you're currently hearing, the "chips," "cheeps," "zeeps," "whistles" and "trills,"—these are the sounds of birds migrating at night. Specifically you're hearing their nocturnal flight calls.
-
-Remember the 70 percent of North American birds that are migratory? It turns out that 80 percent of them migrate at night. Now there's a whole host of reasons why birds may choose to migrate at night. Migrants encounter fewer predators at night. The nighttime atmosphere is calmer and easier to fly through. And the moon and stars act as navigation beacons, guiding birds across continents.
-
-But navigating in the dark has its challenges. Birds get blown off course, get caught in storms, encounter hazardous pollutants and collide with objects in their way.
-
-Scientists think that one way birds offset these challenges is by talking to one another. But exactly what they're saying, why they say it and even who is doing the calling are still a bit of a mystery.
-
-In fact, it wasn't until the late 19th century that we had our first documented evidence of nocturnal flight calls. In 1896 amateur ornithologist Orin Libby tallied nearly 4,000 such calls near his home in Wisconsin.
-
-Ever since then, scientists have been working night and day to decode this sort of nocturnal Morse code. What they've learned so far is that the phenomenon of migration is happening on a scale far larger than we once thought. But also that scale is shrinking as migratory bird populations decline to record low numbers.</pre></div>
-                    <div class="card-footer">5,694 字符</div>
-                </div>
-            
                 <div class="text-card lang-classical">
                     <div class="card-header"><span class="lang-name">文言</span><span class="role-badge translation">译文</span></div>
                     <div class="card-body"><h4>夜鸟迁徙之监</h4><pre>每当夜幕低垂，世人入眠，鸟群云过。世人或不知其存在，然有人正解暗夜之动。
@@ -595,6 +635,54 @@ Jacob Job：不可否认。我们人类很大程度上在日光下活动。但�
                     <div class="card-footer">1,120 字符</div>
                 </div>
             
+                <div class="text-card lang-english">
+                    <div class="card-header"><span class="lang-name">English</span><span class="role-badge original">原文</span></div>
+                    <div class="card-body"><h4>They Tap Into the Magical, Hidden Pulse of the Planet, but What is the Nighttime Bird Surveillance Network?</h4><pre>On any given night, dense clouds of dark, ghostly figures pass over your head as you sleep. Maybe you never knew they were there, but there are people out there who are deciphering all the unseen movement that happens amid the darkness.
+
+Kyle Horton: Actually seeing migration is tough. I didn't see migration, but I heard it that night, and that'll always stay with me.
+
+Jacob Job: There's no denying it. We humans largely operate under the light of the sun. But as the sun sets and we go to bed, another shift begins. While we sleep, depending on the time of year, the skies come alive, and they have a story to tell. Are you ready to listen?
+
+Each spring billions of migratory birds take wing in an annual ritual that carries them from their wintering grounds to their breeding grounds. Come fall, adult birds with offspring reverse course and head back to their winter homes.
+
+Birds have been migrating for at least hundreds of thousands of years. Our understanding of this phenomenon is relatively recent, however.
+
+Early speculation suggested that the seasonal exodus of birds was best explained by some pretty far-out-there hypotheses. Dating back to at least the 11th century was the idea that some geese temporarily transformed themselves into barnacles that clung to the sides of ships.
+
+A 16th-century Swedish priest hypothesized that some birds dove down under water only to pass the winter in the relatively warm mud at the bottom of lakes.
+
+A century later, another member of the clergy even suggested that birds escaped the cold of winter by hitching a ride on the wind—to the moon.
+
+Over time and with slightly more careful observation, it became clear that birds were indeed seasonally hitching rides on the wind—but not to nose-dive into lake mud or escape Earth's gravity for far-off celestial bodies. They were instead traveling to other parts of the globe where it was warmer and, more importantly, where there was food to be found. They were migrating.
+
+We now know that in North America, around 70 percent of bird species migrate. Many of them spend weeks or months traveling thousands of miles across the Western Hemisphere twice a year. Birders know this and spend every spring and fall hopping from green space to green space with binoculars in hand, hoping to catch a glimpse of unfamiliar species they otherwise rarely have a chance to see the rest of the year.
+
+As waves of winged migrants move across the landscape, it's like a reshuffling of the deck. New species pop up each morning in your neighborhood. Those that were there just the day before are now gone. These daily discoveries can feel almost magical. And what most of us don't understand is that most of the magic happens at night.
+
+In this episode, and over the four more that follow it, we will embark on a Science, Quickly Fascination, diving deeply into the Nighttime Bird Surveillance Network. We'll hear from birders and researchers who got a glimpse of these moments.
+
+Joe Gyekis: I live in the State College borough [in Pennsylvania]. Right in the middle of a town. Nights of 20,000 calls is a normal thing on a yearly basis.... Bigger numbers than that can also happen.
+
+Benjamin Van Doren: Some of the best nights of nocturnal listening that I experienced were when I was in college in Ithaca, N.Y., upstate New York at Cornell University. And so I remember calls from birds every few seconds that were migrating overhead. I found really thrilling because it felt like I was tapping into this vast mysterious pulse of the planet phenomenon that was just so much bigger than me.
+
+Horton: And I remember going out to Tifft Nature Preserve, which is right in the heart of Buffalo, [N.Y.]. And I remember walking up the hill, dewy grass. Brought a blanket, laid it out and just stayed there for most of the night, and I was just so pumped to hear these flight calls.
+
+Bill Evans: And it all sort of came together when, one night at this campsite 30 miles east of Minneapolis, Saint Paul, I heard a large night migration of birds going over, all sorts of calls—one of these nights that there's just constant calling up there, birds in nocturnal migration.
+
+Job: The sounds they're describing and the ones you're currently hearing, the "chips," "cheeps," "zeeps," "whistles" and "trills,"—these are the sounds of birds migrating at night. Specifically you're hearing their nocturnal flight calls.
+
+Remember the 70 percent of North American birds that are migratory? It turns out that 80 percent of them migrate at night. Now there's a whole host of reasons why birds may choose to migrate at night. Migrants encounter fewer predators at night. The nighttime atmosphere is calmer and easier to fly through. And the moon and stars act as navigation beacons, guiding birds across continents.
+
+But navigating in the dark has its challenges. Birds get blown off course, get caught in storms, encounter hazardous pollutants and collide with objects in their way.
+
+Scientists think that one way birds offset these challenges is by talking to one another. But exactly what they're saying, why they say it and even who is doing the calling are still a bit of a mystery.
+
+In fact, it wasn't until the late 19th century that we had our first documented evidence of nocturnal flight calls. In 1896 amateur ornithologist Orin Libby tallied nearly 4,000 such calls near his home in Wisconsin.
+
+Ever since then, scientists have been working night and day to decode this sort of nocturnal Morse code. What they've learned so far is that the phenomenon of migration is happening on a scale far larger than we once thought. But also that scale is shrinking as migratory bird populations decline to record low numbers.</pre></div>
+                    <div class="card-footer">5,694 字符</div>
+                </div>
+            
                 <div class="text-card lang-spanish">
                     <div class="card-header"><span class="lang-name">Español</span><span class="role-badge translation">译文</span></div>
                     <div class="card-body"><h4>La Red de Vigilancia de Aves Nocturnas</h4><pre>En cualquier noche dada, densas nubes de figuras oscuras y fantasmales pasan sobre tu cabeza mientras duermes. Quizás nunca supiste que estaban allí, pero hay personas que están descifrando todo el movimiento invisible que ocurre en medio de la oscuridad.
@@ -635,7 +723,7 @@ Desde entonces, los científicos han estado trabajando día y noche para decodif
          
         <section id="dark_matter_galaxies" class="article-section ">
             <div class="metadata">
-                <h2>暗物质缺失星系如何对抗巨人并幸存</h2>
+                <h2>暗质缺失之星系何以抗巨灵而存</h2>
                 <div class="meta-grid">
                     <div><span class="meta-label">English Title</span><span class="meta-value">Cosmic Simulation Shows How Dark-Matter-Deficient Galaxies Confront Goliath and Survive</span></div>
                     <div><span class="meta-label">Título en Español</span><span class="meta-value">Simulación Cósmica Muestra Cómo Galaxias Deficientes en Materia Oscura Enfrentan a Goliat y Sobreviven</span></div>
@@ -643,47 +731,275 @@ Desde entonces, los científicos han estado trabajando día y noche para decodif
                     <div><span class="meta-label">来源 / Source</span><span class="meta-value">Scientific American, 60-Second Science</span></div>
                     <div><span class="meta-label">时代 / Period</span><span class="meta-value">当代</span></div>
                     <div><span class="meta-label">体裁 / Genre</span><span class="meta-value">科学报道</span></div>
-                    <div><span class="meta-label">原文语言</span><span class="meta-value">english</span></div>
+                     <div><span class="meta-label">原文语言 / ORIGINAL LANGUAGE</span><span class="meta-value">english</span></div>
                 </div>
             </div>
             
             <div class="comparison">
                 <table>
-                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>字符数</th></tr></thead>
+                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>Unicode 字符数</th><th class="token-col-header">词元数 <span class="tokenizer-name"></span></th></tr></thead>
                     <tbody>
-                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>原文</td><td>Cosmic Simulation Shows How Dark-Matter-Deficient Galaxies Confront Goliath and Survive</td><td>5,611</td></tr>
+                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>译文</td><td>暗质缺失之星系何以抗巨灵而存</td><td>1,518</td><td class="token-count" data-article="dark_matter_galaxies" data-lang="classical_chinese">—</td></tr>
             
-                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>译文</td><td>暗质缺失之星系何以抗巨灵而存</td><td>1,518</td></tr>
+                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>译文</td><td>暗物质缺失星系如何对抗巨人并幸存</td><td>1,880</td><td class="token-count" data-article="dark_matter_galaxies" data-lang="modern_chinese">—</td></tr>
             
-                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>译文</td><td>暗物质缺失星系如何对抗巨人并幸存</td><td>1,880</td></tr>
+                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>原文</td><td>Cosmic Simulation Shows How Dark-Matter-Deficient Galaxies Confront Goliath and Survive</td><td>5,611</td><td class="token-count" data-article="dark_matter_galaxies" data-lang="english">—</td></tr>
             
-                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>Simulación Cósmica Muestra Cómo Galaxias Deficientes en Materia Oscura Enfrentan a Goliat y Sobreviven</td><td>5,867</td></tr>
+                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>Simulación Cósmica Muestra Cómo Galaxias Deficientes en Materia Oscura Enfrentan a Goliat y Sobreviven</td><td>5,867</td><td class="token-count" data-article="dark_matter_galaxies" data-lang="spanish">—</td></tr>
             </tbody>
                 </table>
             </div>
             
             <div class="text-grid">
-                <div class="text-card lang-english">
-                    <div class="card-header"><span class="lang-name">English</span><span class="role-badge original">原文</span></div>
-                    <div class="card-body"><h4>Cosmic Simulation Shows How Dark-Matter-Deficient Galaxies Confront Goliath and Survive</h4><pre>A research team finds seven tiny dwarf galaxies stripped of their dark matter that nonetheless persisted despite the theft.\n\nJoanna Thompson: This is Scientific American's 60 second science. I'm Joanna Thompson.\n\nIn 2018, a group of astronomers from Yale discovered something odd: two galaxies that had almost no dark matter. The observation caused a commotion in scientific circles, because it seemed to fly in the face of everything that astrophysicists thought they knew about galaxy formation. But researchers may have just discovered the mechanism that makes these so-called "dark matter deficient galaxies" possible.\n\nIn astronomy, matter comes in two flavors: dark matter and baryons.\n\nAdams: Baryons is a fancy way of saying regular matter.\n\nThompson: That's Betsey Adams, an astronomer at Astron, the Netherlands's Institute for Radio Astronomy who was not involved in the research. Unlike baryonic matter, dark matter is invisible.\n\nAdams: The point of dark matter is that we can't see it, you know, there's no radiation from it, we don't observe it with our telescopes. What we observe is the baryons, the regular stuff. And so to infer the presence of Dark Matter, we look for its effects gravitationally.\n\nThompson: Dark matter acts like the invisible glue that holds galaxies together. Around 85% of an average galaxy consists of dark matter, and without it, astronomers think that most galaxies wouldn't have enough gravity to take shape.\n\nStumbling across a galaxy without dark matter is a little like finding a hurricane with no wind. So, where the heck did the Yale astronomers' dark matter-less galaxies come from? That question caught the attention of Jorge Moreno, an astronomer at Pomona College in Claremont, California.\n\nMoreno: Many of us were freaking out. It was like a major challenge to our paradigm.\n\nThompson: Moreno is part of a team working on an expansive, highly detailed computer program designed to simulate merging galaxies.\n\nMoreno: This is what we call a cosmological simulation. You simulate a big chunk of the universe, you create a mini-universe in your computer.\n\nThompson: The simulation he works with follows the standard model of physics, which is rich in dark matter. But not every physicist is convinced that the standard model is correct.\n\nMoreno: There was another camp of people who said, you know what, it's time to just get rid of this model, this dark matter. It's a nice idea, but it's not really consistent with observations, that it's time to put it in the bin and think about something else. Maybe we need to modify the laws of physics or something like that.\n\nThompson: Hai-Bo Yu, a theoretical particle physicist at the University of California, Riverside, fell into that camp.\n\nYu: My group also got interested in this, so we wrote a paper saying that maybe the new physics, which is beyond the standard kind of dark matter theory, is needed. It's better to explain these two galaxies.\n\nThompson: But Moreno's simulation offers a solution without throwing away conventional physics. Initially, his team was focused on massive galaxies. But when they looked more closely at the simulation's tiny dwarf galaxies, a surprise popped out: seven of them lacked dark matter.\n\nEach of these low-dark matter dwarves orbited a supermassive galaxy, the way a moon might orbit a planet. Moreno found that the seven galaxies hadn't formed without dark matter; instead, their dark matter had been gradually stripped away as they crossed paths with their supermassive counterpart.\n\nMoreno: We didn't design the simulation to find for these things. With it, they just appeared.\n\nIt preserves a paradigm. We, we basically say, you don't need to throw away the idea of dark matter, because we use a simulation with dark matter. And we were able to create galaxies without it.\n\nThompson: For Yu, it was an exciting find.\n\nYu: I would say, congratulations, to the authors. It's a remarkable [piece of] work. And also, their results actually do not exclude the possibility to have new physics.\n\nThompson: The next step, according to Adams of Astron, is to verify Moreno's results with observations.\n\nAdams: The authors of the paper, that's something that I very much liked, which is they made a prediction, they said: we think that up to 30% of central galaxies in this mass range should have dark matter deficient satellite galaxies. So it would be a lot of work observationally, but you could then go test that.\n\nThompson: And for Moreno, the research takes on a personal dimension.\n\nMoreno: I have indigenous roots, especially on the border of the U.S. and Mexico. And I have a friend, he's a professor of physics in Texas. And he's Cherokee. And he told me that the Cherokee tribe has seven clans. So I asked, Hey, can you ask the elders if they give me permission to use their names? And they said, Yes.\n\nThompson: He named the seven dark matter deficient galaxies after these clans: Bird, Deer, Long Hair, Paint, Wild Potato, Wolf, and Blue.\n\nMoreno: The reason this resonates with me and I think would resonate with any person of Indigenous ancestry is because that's basically what happened to us. Like, are we in the process of colonization, we lost our language, we lost our traditions. I don't know what my music is, I have a European name, I speak European languages.\n\nBut I'm still here. And we're still here. These galaxies felt like that. They didn't assimilate. And they weren't destroyed, they confronted the Goliath, and they're surviving.\n\nThompson: For 60-second Science, I'm Joanna Thompson.</pre></div>
-                    <div class="card-footer">5,611 字符</div>
-                </div>
-            
                 <div class="text-card lang-classical">
                     <div class="card-header"><span class="lang-name">文言</span><span class="role-badge translation">译文</span></div>
-                    <div class="card-body"><h4>暗质缺失之星系何以抗巨灵而存</h4><pre>研究团队发现七颗被剥去暗物质之矮星系，虽遭窃夺，依然存续。\n\nJoanna Thompson：此 Scientific American 之六十秒科学也。吾乃 Joanna Thompson。\n\n二零一八年，耶鲁大学一组天文学家发现异事：两星系几无暗物质。此观测于科学界引起骚动，因其似与天体物理学家关于星系形成之所有认知相悖。然研究者或已发现使此所谓"暗物质缺失星系"成为可能之机制。\n\n天文学中，物质分二类：暗物质与重子。\n\nBetsey Adams：重子乃普通物质之雅称。\n\nThompson：此乃荷兰射电天文研究所天文学家 Betsey Adams，未参与此研究。与重子物质不同，暗物质不可见。\n\nAdams：暗物质之要点在于不可见，无辐射，不以望远镜观测。吾辈所观测者乃重子，普通之物。故欲推断暗物质之存在，唯求其引力之效。\n\nThompson：暗物质如无形之胶，维系星系。普通星系约八成五为暗物质，天文学家以为无此则多数星系引力不足以成形。\n\n偶遇无暗物质之星系，如发现无风之飓风。然则耶鲁大学天文学家之无暗物质星系从何而来？此问题引起 Jorge Moreno 之注意，其为加州克莱蒙特波莫纳学院天文学家。\n\nMoreno：吾辈皆大惊。此诚对范式之重大挑战。\n\nThompson：Moreno 参与一团队，从事宏大精细之计算机程序，模拟并合星系。\n\nMoreno：此所谓宇宙学模拟。模拟宇宙之大块，于计算机中创造一迷你宇宙。\n\nThompson：其模拟遵循富含暗物质之标准物理模型。然非所有物理学家皆信标准模型正确。\n\nMoreno：另有一派曰，是时候弃此暗物质模型矣。其说甚美，然与观测不符，当入废纸篓，另思他法。或需修改物理定律。\n\nThompson：加州大学河滨分校理论粒子物理学家 Hai-Bo Yu 属此阵营。\n\nYu：吾组亦感兴趣，故撰文谓或需标准暗物质理论之外的新物理。以此解释此二星系为更佳。\n\nThompson：然 Moreno 之模拟提供一解，无需抛弃传统物理。初，其团队专注于大质量星系。然细察模拟中之矮星系，忽有惊现：七颗缺乏暗物质。\n\n此七颗低暗物质矮星各绕一超大质量星系运行，如月绕行星。Moreno 发现此七星系非无暗物质而生；乃其暗物质被渐剥，因与超大质量对应体交错而过。\n\nMoreno：吾辈非为此设计模拟。然其自现。\n\n此维护一范式。吾辈基本曰，无需弃暗物质之念，因吾辈以含暗物质之模拟，竟能创造无暗物质之星系。\n\nThompson：对 Yu 而言，此为激动人心之发现。\n\nYu：吾欲向作者道贺。此为非凡之作。且其结果实不排除新物理之可能。\n\nThompson：据 Astron 之 Adams 言，下一步以观测验证 Moreno 之结果。\n\nAdams：作者作一预言，谓此质量范围之中心星系，高达三成当有暗物质缺失之卫星星系。观测上将为大量工作，然可往验证之。\n\nThompson：对 Moreno 而言，此研究具个人维度。\n\nMoreno：吾有土著之根，尤于美墨边境。吾友为德州物理学教授，乃彻罗基人。彼谓彻罗基部落有七氏族。吾问能否请长老许可使用其名。彼等曰可。\n\nThompson：彼以七氏族之名名此七暗物质缺失星系：鸟、鹿、长发、颜料、野薯、狼与蓝。\n\nMoreno：此与吾共鸣，吾以为亦将与任何有土著祖先之人共鸣，因殖民过程中，吾辈失语言、失传统。吾不知吾乐为何，吾有欧洲名，说欧洲语。\n\n然吾仍在。吾辈仍在。此星系如彼。彼未同化，亦未被毁，彼对抗巨人，而幸存。</pre></div>
+                    <div class="card-body"><h4>暗质缺失之星系何以抗巨灵而存</h4><pre>研究团队发现七颗被剥去暗物质之矮星系，虽遭窃夺，依然存续。
+
+Joanna Thompson：此 Scientific American 之六十秒科学也。吾乃 Joanna Thompson。
+
+二零一八年，耶鲁大学一组天文学家发现异事：两星系几无暗物质。此观测于科学界引起骚动，因其似与天体物理学家关于星系形成之所有认知相悖。然研究者或已发现使此所谓"暗物质缺失星系"成为可能之机制。
+
+天文学中，物质分二类：暗物质与重子。
+
+Betsey Adams：重子乃普通物质之雅称。
+
+Thompson：此乃荷兰射电天文研究所天文学家 Betsey Adams，未参与此研究。与重子物质不同，暗物质不可见。
+
+Adams：暗物质之要点在于不可见，无辐射，不以望远镜观测。吾辈所观测者乃重子，普通之物。故欲推断暗物质之存在，唯求其引力之效。
+
+Thompson：暗物质如无形之胶，维系星系。普通星系约八成五为暗物质，天文学家以为无此则多数星系引力不足以成形。
+
+偶遇无暗物质之星系，如发现无风之飓风。然则耶鲁大学天文学家之无暗物质星系从何而来？此问题引起 Jorge Moreno 之注意，其为加州克莱蒙特波莫纳学院天文学家。
+
+Moreno：吾辈皆大惊。此诚对范式之重大挑战。
+
+Thompson：Moreno 参与一团队，从事宏大精细之计算机程序，模拟并合星系。
+
+Moreno：此所谓宇宙学模拟。模拟宇宙之大块，于计算机中创造一迷你宇宙。
+
+Thompson：其模拟遵循富含暗物质之标准物理模型。然非所有物理学家皆信标准模型正确。
+
+Moreno：另有一派曰，是时候弃此暗物质模型矣。其说甚美，然与观测不符，当入废纸篓，另思他法。或需修改物理定律。
+
+Thompson：加州大学河滨分校理论粒子物理学家 Hai-Bo Yu 属此阵营。
+
+Yu：吾组亦感兴趣，故撰文谓或需标准暗物质理论之外的新物理。以此解释此二星系为更佳。
+
+Thompson：然 Moreno 之模拟提供一解，无需抛弃传统物理。初，其团队专注于大质量星系。然细察模拟中之矮星系，忽有惊现：七颗缺乏暗物质。
+
+此七颗低暗物质矮星各绕一超大质量星系运行，如月绕行星。Moreno 发现此七星系非无暗物质而生；乃其暗物质被渐剥，因与超大质量对应体交错而过。
+
+Moreno：吾辈非为此设计模拟。然其自现。
+
+此维护一范式。吾辈基本曰，无需弃暗物质之念，因吾辈以含暗物质之模拟，竟能创造无暗物质之星系。
+
+Thompson：对 Yu 而言，此为激动人心之发现。
+
+Yu：吾欲向作者道贺。此为非凡之作。且其结果实不排除新物理之可能。
+
+Thompson：据 Astron 之 Adams 言，下一步以观测验证 Moreno 之结果。
+
+Adams：作者作一预言，谓此质量范围之中心星系，高达三成当有暗物质缺失之卫星星系。观测上将为大量工作，然可往验证之。
+
+Thompson：对 Moreno 而言，此研究具个人维度。
+
+Moreno：吾有土著之根，尤于美墨边境。吾友为德州物理学教授，乃彻罗基人。彼谓彻罗基部落有七氏族。吾问能否请长老许可使用其名。彼等曰可。
+
+Thompson：彼以七氏族之名名此七暗物质缺失星系：鸟、鹿、长发、颜料、野薯、狼与蓝。
+
+Moreno：此与吾共鸣，吾以为亦将与任何有土著祖先之人共鸣，因殖民过程中，吾辈失语言、失传统。吾不知吾乐为何，吾有欧洲名，说欧洲语。
+
+然吾仍在。吾辈仍在。此星系如彼。彼未同化，亦未被毁，彼对抗巨人，而幸存。</pre></div>
                     <div class="card-footer">1,518 字符</div>
                 </div>
             
                 <div class="text-card lang-modern">
                     <div class="card-header"><span class="lang-name">现代汉语</span><span class="role-badge translation">译文</span></div>
-                    <div class="card-body"><h4>暗物质缺失星系如何对抗巨人并幸存</h4><pre>一个研究团队发现了七颗被剥去暗物质的矮星系，尽管遭到窃取，它们依然存续了下来。\n\nJoanna Thompson：这里是《科学美国人》的60秒科学。我是Joanna Thompson。\n\n2018年，耶鲁大学的一组天文学家发现了一件奇怪的事：两个几乎没有暗物质的星系。这一观测在科学界引起了骚动，因为它似乎与天体物理学家关于星系形成的所有认知相矛盾。但研究人员可能刚刚发现了使这些所谓"暗物质缺失星系"成为可能的机制。\n\n在天文学中，物质分为两类：暗物质和重子。\n\nBetsey Adams：重子是普通物质的华丽说法。\n\nThompson：那是荷兰射电天文研究所的天文学家Betsey Adams，她没有参与这项研究。与重子物质不同，暗物质是不可见的。\n\nAdams：暗物质的要点是我们看不见它，没有来自它的辐射，我们不用望远镜观测它。我们观测的是重子，普通的东西。因此，为了推断暗物质的存在，我们寻找它的引力效应。\n\nThompson：暗物质就像无形的胶水，将星系维系在一起。一个普通星系约85%由暗物质组成，天文学家认为没有它，大多数星系将没有足够的引力来成形。\n\n偶然发现一个没有暗物质的星系，有点像发现一个没有风的飓风。那么，耶鲁大学天文学家的无暗物质星系是从哪里来的呢？这个问题引起了Jorge Moreno的注意，他是加利福尼亚州克莱蒙特波莫纳学院的天文学家。\n\nMoreno：我们很多人都吓坏了。这对我们的范式是一个重大挑战。\n\nThompson：Moreno是一个团队的成员，该团队正在开发一个宏大、高度精细的计算机程序，用于模拟合并星系。\n\nMoreno：这就是我们所说的宇宙学模拟。你模拟宇宙的一大块，在计算机中创造一个迷你宇宙。\n\nThompson：他使用的模拟遵循富含暗物质的标准物理模型。但并非每个物理学家都相信标准模型是正确的。\n\nMoreno：还有另一派人说，你知道吗，是时候抛弃这个模型了，这个暗物质。这是个好主意，但它与观测并不真正一致，是时候把它扔进垃圾桶，想想别的了。也许我们需要修改物理定律之类的东西。\n\nThompson：加州大学河滨分校的理论粒子物理学家Hai-Bo Yu属于那一派。\n\nYu：我的团队也对此感兴趣，所以我们写了一篇论文，说也许需要标准暗物质理论之外的新物理。用它来解释这两个星系更好。\n\nThompson：但Moreno的模拟提供了一个无需抛弃传统物理的解决方案。最初，他的团队专注于大质量星系。但当他们更仔细地观察模拟中的微小矮星系时，一个惊喜出现了：其中七个缺乏暗物质。\n\n这七颗低暗物质矮星各自绕着一颗超大质量星系运行，就像月亮绕行星一样。Moreno发现，这七个星系并非在没有暗物质的情况下形成；相反，当它们与超大质量对应体交叉路径时，它们的暗物质被逐渐剥离了。\n\nMoreno：我们没有设计模拟来寻找这些东西。但它们就这样出现了。\n\n这维护了一个范式。我们基本上说，你不需要抛弃暗物质的想法，因为我们使用了带有暗物质的模拟，我们能够创造出没有暗物质的星系。\n\nThompson：对Yu来说，这是一个令人兴奋的发现。\n\nYu：我想说，祝贺作者。这是一项非凡的工作。而且，他们的结果实际上并不排除新物理的可能性。\n\nThompson：据Astron的Adams说，下一步是用观测来验证Moreno的结果。\n\nAdams：论文作者，这是我很喜欢的一点，他们做了一个预测，他们说：我们认为在这个质量范围内，多达30%的中心星系应该有暗物质缺失的卫星星系。这在观测上将是大量的工作，但你可以去测试它。\n\nThompson：对Moreno来说，这项研究具有个人维度。\n\nMoreno：我有土著血统，特别是在美国和墨西哥边境。我有一个朋友，他是德克萨斯州的物理学教授。他是切罗基人。他告诉我切罗基部落有七个氏族。所以我问，嘿，你能问问长老们是否允许我使用他们的名字吗？他们说，可以。\n\nThompson：他以这些氏族的名字命名了七颗暗物质缺失的星系：鸟、鹿、长发、颜料、野薯、狼和蓝。\n\nMoreno：这引起我的共鸣，我认为也会引起任何有土著祖先的人的共鸣，因为在殖民过程中，我们失去了我们的语言，我们失去了我们的传统。我不知道我的音乐是什么，我有一个欧洲名字，我说欧洲语言。\n\n但我还在这里。我们还在这里。这些星系就像那样。它们没有同化。也没有被摧毁，它们对抗了歌利亚，而且正在幸存下来。</pre></div>
+                    <div class="card-body"><h4>暗物质缺失星系如何对抗巨人并幸存</h4><pre>一个研究团队发现了七颗被剥去暗物质的矮星系，尽管遭到窃取，它们依然存续了下来。
+
+Joanna Thompson：这里是《科学美国人》的60秒科学。我是Joanna Thompson。
+
+2018年，耶鲁大学的一组天文学家发现了一件奇怪的事：两个几乎没有暗物质的星系。这一观测在科学界引起了骚动，因为它似乎与天体物理学家关于星系形成的所有认知相矛盾。但研究人员可能刚刚发现了使这些所谓"暗物质缺失星系"成为可能的机制。
+
+在天文学中，物质分为两类：暗物质和重子。
+
+Betsey Adams：重子是普通物质的华丽说法。
+
+Thompson：那是荷兰射电天文研究所的天文学家Betsey Adams，她没有参与这项研究。与重子物质不同，暗物质是不可见的。
+
+Adams：暗物质的要点是我们看不见它，没有来自它的辐射，我们不用望远镜观测它。我们观测的是重子，普通的东西。因此，为了推断暗物质的存在，我们寻找它的引力效应。
+
+Thompson：暗物质就像无形的胶水，将星系维系在一起。一个普通星系约85%由暗物质组成，天文学家认为没有它，大多数星系将没有足够的引力来成形。
+
+偶然发现一个没有暗物质的星系，有点像发现一个没有风的飓风。那么，耶鲁大学天文学家的无暗物质星系是从哪里来的呢？这个问题引起了Jorge Moreno的注意，他是加利福尼亚州克莱蒙特波莫纳学院的天文学家。
+
+Moreno：我们很多人都吓坏了。这对我们的范式是一个重大挑战。
+
+Thompson：Moreno是一个团队的成员，该团队正在开发一个宏大、高度精细的计算机程序，用于模拟合并星系。
+
+Moreno：这就是我们所说的宇宙学模拟。你模拟宇宙的一大块，在计算机中创造一个迷你宇宙。
+
+Thompson：他使用的模拟遵循富含暗物质的标准物理模型。但并非每个物理学家都相信标准模型是正确的。
+
+Moreno：还有另一派人说，你知道吗，是时候抛弃这个模型了，这个暗物质。这是个好主意，但它与观测并不真正一致，是时候把它扔进垃圾桶，想想别的了。也许我们需要修改物理定律之类的东西。
+
+Thompson：加州大学河滨分校的理论粒子物理学家Hai-Bo Yu属于那一派。
+
+Yu：我的团队也对此感兴趣，所以我们写了一篇论文，说也许需要标准暗物质理论之外的新物理。用它来解释这两个星系更好。
+
+Thompson：但Moreno的模拟提供了一个无需抛弃传统物理的解决方案。最初，他的团队专注于大质量星系。但当他们更仔细地观察模拟中的微小矮星系时，一个惊喜出现了：其中七个缺乏暗物质。
+
+这七颗低暗物质矮星各自绕着一颗超大质量星系运行，就像月亮绕行星一样。Moreno发现，这七个星系并非在没有暗物质的情况下形成；相反，当它们与超大质量对应体交叉路径时，它们的暗物质被逐渐剥离了。
+
+Moreno：我们没有设计模拟来寻找这些东西。但它们就这样出现了。
+
+这维护了一个范式。我们基本上说，你不需要抛弃暗物质的想法，因为我们使用了带有暗物质的模拟，我们能够创造出没有暗物质的星系。
+
+Thompson：对Yu来说，这是一个令人兴奋的发现。
+
+Yu：我想说，祝贺作者。这是一项非凡的工作。而且，他们的结果实际上并不排除新物理的可能性。
+
+Thompson：据Astron的Adams说，下一步是用观测来验证Moreno的结果。
+
+Adams：论文作者，这是我很喜欢的一点，他们做了一个预测，他们说：我们认为在这个质量范围内，多达30%的中心星系应该有暗物质缺失的卫星星系。这在观测上将是大量的工作，但你可以去测试它。
+
+Thompson：对Moreno来说，这项研究具有个人维度。
+
+Moreno：我有土著血统，特别是在美国和墨西哥边境。我有一个朋友，他是德克萨斯州的物理学教授。他是切罗基人。他告诉我切罗基部落有七个氏族。所以我问，嘿，你能问问长老们是否允许我使用他们的名字吗？他们说，可以。
+
+Thompson：他以这些氏族的名字命名了七颗暗物质缺失的星系：鸟、鹿、长发、颜料、野薯、狼和蓝。
+
+Moreno：这引起我的共鸣，我认为也会引起任何有土著祖先的人的共鸣，因为在殖民过程中，我们失去了我们的语言，我们失去了我们的传统。我不知道我的音乐是什么，我有一个欧洲名字，我说欧洲语言。
+
+但我还在这里。我们还在这里。这些星系就像那样。它们没有同化。也没有被摧毁，它们对抗了歌利亚，而且正在幸存下来。</pre></div>
                     <div class="card-footer">1,880 字符</div>
+                </div>
+            
+                <div class="text-card lang-english">
+                    <div class="card-header"><span class="lang-name">English</span><span class="role-badge original">原文</span></div>
+                    <div class="card-body"><h4>Cosmic Simulation Shows How Dark-Matter-Deficient Galaxies Confront Goliath and Survive</h4><pre>A research team finds seven tiny dwarf galaxies stripped of their dark matter that nonetheless persisted despite the theft.
+
+Joanna Thompson: This is Scientific American's 60 second science. I'm Joanna Thompson.
+
+In 2018, a group of astronomers from Yale discovered something odd: two galaxies that had almost no dark matter. The observation caused a commotion in scientific circles, because it seemed to fly in the face of everything that astrophysicists thought they knew about galaxy formation. But researchers may have just discovered the mechanism that makes these so-called "dark matter deficient galaxies" possible.
+
+In astronomy, matter comes in two flavors: dark matter and baryons.
+
+Adams: Baryons is a fancy way of saying regular matter.
+
+Thompson: That's Betsey Adams, an astronomer at Astron, the Netherlands's Institute for Radio Astronomy who was not involved in the research. Unlike baryonic matter, dark matter is invisible.
+
+Adams: The point of dark matter is that we can't see it, you know, there's no radiation from it, we don't observe it with our telescopes. What we observe is the baryons, the regular stuff. And so to infer the presence of Dark Matter, we look for its effects gravitationally.
+
+Thompson: Dark matter acts like the invisible glue that holds galaxies together. Around 85% of an average galaxy consists of dark matter, and without it, astronomers think that most galaxies wouldn't have enough gravity to take shape.
+
+Stumbling across a galaxy without dark matter is a little like finding a hurricane with no wind. So, where the heck did the Yale astronomers' dark matter-less galaxies come from? That question caught the attention of Jorge Moreno, an astronomer at Pomona College in Claremont, California.
+
+Moreno: Many of us were freaking out. It was like a major challenge to our paradigm.
+
+Thompson: Moreno is part of a team working on an expansive, highly detailed computer program designed to simulate merging galaxies.
+
+Moreno: This is what we call a cosmological simulation. You simulate a big chunk of the universe, you create a mini-universe in your computer.
+
+Thompson: The simulation he works with follows the standard model of physics, which is rich in dark matter. But not every physicist is convinced that the standard model is correct.
+
+Moreno: There was another camp of people who said, you know what, it's time to just get rid of this model, this dark matter. It's a nice idea, but it's not really consistent with observations, that it's time to put it in the bin and think about something else. Maybe we need to modify the laws of physics or something like that.
+
+Thompson: Hai-Bo Yu, a theoretical particle physicist at the University of California, Riverside, fell into that camp.
+
+Yu: My group also got interested in this, so we wrote a paper saying that maybe the new physics, which is beyond the standard kind of dark matter theory, is needed. It's better to explain these two galaxies.
+
+Thompson: But Moreno's simulation offers a solution without throwing away conventional physics. Initially, his team was focused on massive galaxies. But when they looked more closely at the simulation's tiny dwarf galaxies, a surprise popped out: seven of them lacked dark matter.
+
+Each of these low-dark matter dwarves orbited a supermassive galaxy, the way a moon might orbit a planet. Moreno found that the seven galaxies hadn't formed without dark matter; instead, their dark matter had been gradually stripped away as they crossed paths with their supermassive counterpart.
+
+Moreno: We didn't design the simulation to find for these things. With it, they just appeared.
+
+It preserves a paradigm. We, we basically say, you don't need to throw away the idea of dark matter, because we use a simulation with dark matter. And we were able to create galaxies without it.
+
+Thompson: For Yu, it was an exciting find.
+
+Yu: I would say, congratulations, to the authors. It's a remarkable [piece of] work. And also, their results actually do not exclude the possibility to have new physics.
+
+Thompson: The next step, according to Adams of Astron, is to verify Moreno's results with observations.
+
+Adams: The authors of the paper, that's something that I very much liked, which is they made a prediction, they said: we think that up to 30% of central galaxies in this mass range should have dark matter deficient satellite galaxies. So it would be a lot of work observationally, but you could then go test that.
+
+Thompson: And for Moreno, the research takes on a personal dimension.
+
+Moreno: I have indigenous roots, especially on the border of the U.S. and Mexico. And I have a friend, he's a professor of physics in Texas. And he's Cherokee. And he told me that the Cherokee tribe has seven clans. So I asked, Hey, can you ask the elders if they give me permission to use their names? And they said, Yes.
+
+Thompson: He named the seven dark matter deficient galaxies after these clans: Bird, Deer, Long Hair, Paint, Wild Potato, Wolf, and Blue.
+
+Moreno: The reason this resonates with me and I think would resonate with any person of Indigenous ancestry is because that's basically what happened to us. Like, are we in the process of colonization, we lost our language, we lost our traditions. I don't know what my music is, I have a European name, I speak European languages.
+
+But I'm still here. And we're still here. These galaxies felt like that. They didn't assimilate. And they weren't destroyed, they confronted the Goliath, and they're surviving.
+
+Thompson: For 60-second Science, I'm Joanna Thompson.</pre></div>
+                    <div class="card-footer">5,611 字符</div>
                 </div>
             
                 <div class="text-card lang-spanish">
                     <div class="card-header"><span class="lang-name">Español</span><span class="role-badge translation">译文</span></div>
-                    <div class="card-body"><h4>Simulación Cósmica Muestra Cómo Galaxias Deficientes en Materia Oscura Enfrentan a Goliat y Sobreviven</h4><pre>Un equipo de investigación encuentra siete galaxias enanas despojadas de su materia oscura que, no obstante, persistieron a pesar del robo.\n\nJoanna Thompson: Esto es la ciencia de 60 segundos de Scientific American. Soy Joanna Thompson.\n\nEn 2018, un grupo de astrónomos de Yale descubrió algo extraño: dos galaxias que casi no tenían materia oscura. La observación causó conmoción en los círculos científicos, porque parecía ir en contra de todo lo que los astrofísicos creían saber sobre la formación de galaxias. Pero los investigadores pueden haber descubierto justamente el mecanismo que hace posibles estas llamadas "galaxias deficientes en materia oscura".\n\nEn astronomía, la materia viene en dos sabores: materia oscura y bariones.\n\nBetsey Adams: Bariones es una forma elegante de decir materia regular.\n\nThompson: Esa es Betsey Adams, astrónoma en Astron, el Instituto de Radio Astronomía de los Países Bajos, que no participó en la investigación. A diferencia de la materia bariónica, la materia oscura es invisible.\n\nAdams: El punto de la materia oscura es que no podemos verla, no hay radiación de ella, no la observamos con nuestros telescopios. Lo que observamos son los bariones, la materia regular. Y así, para inferir la presencia de materia oscura, buscamos sus efectos gravitacionales.\n\nThompson: La materia oscura actúa como el pegamento invisible que mantiene unidas a las galaxias. Alrededor del 85% de una galaxia promedio consiste en materia oscura, y sin ella, los astrónomos piensan que la mayoría de las galaxias no tendrían suficiente gravedad para tomar forma.\n\nTropezar con una galaxia sin materia oscura es un poco como encontrar un huracán sin viento. Entonces, ¿de dónde demonios vinieron las galaxias sin materia oscura de los astrónomos de Yale? Esa pregunta llamó la atención de Jorge Moreno, astrónomo en el Pomona College en Claremont, California.\n\nMoreno: Muchos de nosotros nos estábamos volviendo locos. Era como un desafío mayor a nuestro paradigma.\n\nThompson: Moreno es parte de un equipo que trabaja en un programa de computadora expansivo y altamente detallado diseñado para simular galaxias en colisión.\n\nMoreno: Esto es lo que llamamos una simulación cosmológica. Simulas un gran pedazo del universo, creas un mini-universo en tu computadora.\n\nThompson: La simulación con la que trabaja sigue el modelo estándar de la física, que es rico en materia oscura. Pero no todos los físicos están convencidos de que el modelo estándar sea correcto.\n\nMoreno: Había otro campo de personas que decían, sabes qué, es hora de deshacernos de este modelo, esta materia oscura. Es una buena idea, pero no es realmente consistente con las observaciones, es hora de ponerlo en la basura y pensar en algo más. Tal vez necesitemos modificar las leyes de la física o algo así.\n\nThompson: Hai-Bo Yu, físico teórico de partículas en la Universidad de California, Riverside, cayó en ese campo.\n\nYu: Mi grupo también se interesó en esto, así que escribimos un artículo diciendo que tal vez se necesita nueva física, más allá del tipo estándar de teoría de materia oscura. Es mejor para explicar estas dos galaxias.\n\nThompson: Pero la simulación de Moreno ofrece una solución sin desechar la física convencional. Inicialmente, su equipo se enfocó en galaxias masivas. Pero cuando miraron más de cerca las pequeñas galaxias enanas de la simulación, surgió una sorpresa: siete de ellas carecían de materia oscura.\n\nCada una de estas enanas de baja materia oscura orbitaba una galaxia supermasiva, de la manera en que una luna podría orbitar un planeta. Moreno descubrió que las siete galaxias no se habían formado sin materia oscura; en cambio, su materia oscura había sido despojada gradualmente a medida que cruzaban caminos con su contraparte supermasiva.\n\nMoreno: No diseñamos la simulación para encontrar estas cosas. Con ella, simplemente aparecieron.\n\nPreserva un paradigma. Básicamente decimos, no necesitas desechar la idea de materia oscura, porque usamos una simulación con materia oscura. Y pudimos crear galaxias sin ella.\n\nThompson: Para Yu, fue un hallazgo emocionante.\n\nYu: Yo diría, felicitaciones, a los autores. Es un trabajo notable. Y también, sus resultados en realidad no excluyen la posibilidad de tener nueva física.\n\nThompson: El siguiente paso, según Adams de Astron, es verificar los resultados de Moreno con observaciones.\n\nAdams: Los autores del artículo, eso es algo que me gustó mucho, que es que hicieron una predicción, dijeron: creemos que hasta el 30% de las galaxias centrales en este rango de masa deberían tener galaxias satélites deficientes en materia oscura. Así que sería mucho trabajo observacionalmente, pero podrías ir a probar eso.\n\nThompson: Y para Moreno, la investigación toma una dimensión personal.\n\nMoreno: Tengo raíces indígenas, especialmente en la frontera de EE.UU. y México. Y tengo un amigo, es profesor de física en Texas. Y es Cherokee. Y me dijo que la tribu Cherokee tiene siete clanes. Así que pregunté, oye, ¿puedes preguntarles a los ancianos si me dan permiso para usar sus nombres? Y dijeron, sí.\n\nThompson: Nombró a las siete galaxias deficientes en materia oscura después de estos clanes: Pájaro, Ciervo, Pelo Largo, Pintura, Papa Silvestre, Lobo y Azul.\n\nMoreno: La razón por la que esto resuena conmigo y creo que resonaría con cualquier persona de ascendencia indígena es porque básicamente eso es lo que nos pasó a nosotros. En el proceso de colonización, perdimos nuestro idioma, perdimos nuestras tradiciones. No sé cuál es mi música, tengo un nombre europeo, hablo idiomas europeos.\n\nPero todavía estoy aquí. Y todavía estamos aquí. Estas galaxias se sintieron así. No se asimilaron. Y no fueron destruidas, confrontaron a Goliat, y están sobreviviendo.\n\nThompson: Para Ciencia de 60 segundos, soy Joanna Thompson.</pre></div>
+                    <div class="card-body"><h4>Simulación Cósmica Muestra Cómo Galaxias Deficientes en Materia Oscura Enfrentan a Goliat y Sobreviven</h4><pre>Un equipo de investigación encuentra siete galaxias enanas despojadas de su materia oscura que, no obstante, persistieron a pesar del robo.
+
+Joanna Thompson: Esto es la ciencia de 60 segundos de Scientific American. Soy Joanna Thompson.
+
+En 2018, un grupo de astrónomos de Yale descubrió algo extraño: dos galaxias que casi no tenían materia oscura. La observación causó conmoción en los círculos científicos, porque parecía ir en contra de todo lo que los astrofísicos creían saber sobre la formación de galaxias. Pero los investigadores pueden haber descubierto justamente el mecanismo que hace posibles estas llamadas "galaxias deficientes en materia oscura".
+
+En astronomía, la materia viene en dos sabores: materia oscura y bariones.
+
+Betsey Adams: Bariones es una forma elegante de decir materia regular.
+
+Thompson: Esa es Betsey Adams, astrónoma en Astron, el Instituto de Radio Astronomía de los Países Bajos, que no participó en la investigación. A diferencia de la materia bariónica, la materia oscura es invisible.
+
+Adams: El punto de la materia oscura es que no podemos verla, no hay radiación de ella, no la observamos con nuestros telescopios. Lo que observamos son los bariones, la materia regular. Y así, para inferir la presencia de materia oscura, buscamos sus efectos gravitacionales.
+
+Thompson: La materia oscura actúa como el pegamento invisible que mantiene unidas a las galaxias. Alrededor del 85% de una galaxia promedio consiste en materia oscura, y sin ella, los astrónomos piensan que la mayoría de las galaxias no tendrían suficiente gravedad para tomar forma.
+
+Tropezar con una galaxia sin materia oscura es un poco como encontrar un huracán sin viento. Entonces, ¿de dónde demonios vinieron las galaxias sin materia oscura de los astrónomos de Yale? Esa pregunta llamó la atención de Jorge Moreno, astrónomo en el Pomona College en Claremont, California.
+
+Moreno: Muchos de nosotros nos estábamos volviendo locos. Era como un desafío mayor a nuestro paradigma.
+
+Thompson: Moreno es parte de un equipo que trabaja en un programa de computadora expansivo y altamente detallado diseñado para simular galaxias en colisión.
+
+Moreno: Esto es lo que llamamos una simulación cosmológica. Simulas un gran pedazo del universo, creas un mini-universo en tu computadora.
+
+Thompson: La simulación con la que trabaja sigue el modelo estándar de la física, que es rico en materia oscura. Pero no todos los físicos están convencidos de que el modelo estándar sea correcto.
+
+Moreno: Había otro campo de personas que decían, sabes qué, es hora de deshacernos de este modelo, esta materia oscura. Es una buena idea, pero no es realmente consistente con las observaciones, es hora de ponerlo en la basura y pensar en algo más. Tal vez necesitemos modificar las leyes de la física o algo así.
+
+Thompson: Hai-Bo Yu, físico teórico de partículas en la Universidad de California, Riverside, cayó en ese campo.
+
+Yu: Mi grupo también se interesó en esto, así que escribimos un artículo diciendo que tal vez se necesita nueva física, más allá del tipo estándar de teoría de materia oscura. Es mejor para explicar estas dos galaxias.
+
+Thompson: Pero la simulación de Moreno ofrece una solución sin desechar la física convencional. Inicialmente, su equipo se enfocó en galaxias masivas. Pero cuando miraron más de cerca las pequeñas galaxias enanas de la simulación, surgió una sorpresa: siete de ellas carecían de materia oscura.
+
+Cada una de estas enanas de baja materia oscura orbitaba una galaxia supermasiva, de la manera en que una luna podría orbitar un planeta. Moreno descubrió que las siete galaxias no se habían formado sin materia oscura; en cambio, su materia oscura había sido despojada gradualmente a medida que cruzaban caminos con su contraparte supermasiva.
+
+Moreno: No diseñamos la simulación para encontrar estas cosas. Con ella, simplemente aparecieron.
+
+Preserva un paradigma. Básicamente decimos, no necesitas desechar la idea de materia oscura, porque usamos una simulación con materia oscura. Y pudimos crear galaxias sin ella.
+
+Thompson: Para Yu, fue un hallazgo emocionante.
+
+Yu: Yo diría, felicitaciones, a los autores. Es un trabajo notable. Y también, sus resultados en realidad no excluyen la posibilidad de tener nueva física.
+
+Thompson: El siguiente paso, según Adams de Astron, es verificar los resultados de Moreno con observaciones.
+
+Adams: Los autores del artículo, eso es algo que me gustó mucho, que es que hicieron una predicción, dijeron: creemos que hasta el 30% de las galaxias centrales en este rango de masa deberían tener galaxias satélites deficientes en materia oscura. Así que sería mucho trabajo observacionalmente, pero podrías ir a probar eso.
+
+Thompson: Y para Moreno, la investigación toma una dimensión personal.
+
+Moreno: Tengo raíces indígenas, especialmente en la frontera de EE.UU. y México. Y tengo un amigo, es profesor de física en Texas. Y es Cherokee. Y me dijo que la tribu Cherokee tiene siete clanes. Así que pregunté, oye, ¿puedes preguntarles a los ancianos si me dan permiso para usar sus nombres? Y dijeron, sí.
+
+Thompson: Nombró a las siete galaxias deficientes en materia oscura después de estos clanes: Pájaro, Ciervo, Pelo Largo, Pintura, Papa Silvestre, Lobo y Azul.
+
+Moreno: La razón por la que esto resuena conmigo y creo que resonaría con cualquier persona de ascendencia indígena es porque básicamente eso es lo que nos pasó a nosotros. En el proceso de colonización, perdimos nuestro idioma, perdimos nuestras tradiciones. No sé cuál es mi música, tengo un nombre europeo, hablo idiomas europeos.
+
+Pero todavía estoy aquí. Y todavía estamos aquí. Estas galaxias se sintieron así. No se asimilaron. Y no fueron destruidas, confrontaron a Goliat, y están sobreviviendo.
+
+Thompson: Para Ciencia de 60 segundos, soy Joanna Thompson.</pre></div>
                     <div class="card-footer">5,867 字符</div>
                 </div>
             </div>
@@ -699,21 +1015,21 @@ Desde entonces, los científicos han estado trabajando día y noche para decodif
                     <div><span class="meta-label">来源 / Source</span><span class="meta-value">《左传·僖公九年》</span></div>
                     <div><span class="meta-label">时代 / Period</span><span class="meta-value">春秋时期</span></div>
                     <div><span class="meta-label">体裁 / Genre</span><span class="meta-value">历史叙事</span></div>
-                    <div><span class="meta-label">原文语言</span><span class="meta-value">classical_chinese</span></div>
+                     <div><span class="meta-label">原文语言 / ORIGINAL LANGUAGE</span><span class="meta-value">classical_chinese</span></div>
                 </div>
             </div>
             
             <div class="comparison">
                 <table>
-                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>字符数</th></tr></thead>
+                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>Unicode 字符数</th><th class="token-col-header">词元数 <span class="tokenizer-name"></span></th></tr></thead>
                     <tbody>
-                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>原文</td><td>齐桓公葵丘会盟受胙不逾礼</td><td>135</td></tr>
+                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>原文</td><td>齐桓公葵丘会盟受胙不逾礼</td><td>135</td><td class="token-count" data-article="duke_huan_qi" data-lang="classical_chinese">—</td></tr>
             
-                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>译文</td><td>齐桓公在葵丘会盟接受祭肉而不违背礼制</td><td>238</td></tr>
+                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>译文</td><td>齐桓公在葵丘会盟接受祭肉而不违背礼制</td><td>238</td><td class="token-count" data-article="duke_huan_qi" data-lang="modern_chinese">—</td></tr>
             
-                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>译文</td><td>Duke Huan of Qi Accepts the Sacrificial Meat at Kuiqiu Without Breaching Ritual Propriety</td><td>1,066</td></tr>
+                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>译文</td><td>Duke Huan of Qi Accepts the Sacrificial Meat at Kuiqiu Without Breaching Ritual Propriety</td><td>1,066</td><td class="token-count" data-article="duke_huan_qi" data-lang="english">—</td></tr>
             
-                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>El Duque Huan de Qi Acepta la Carne Sacrificial en Kuiqiu sin Violar la Propriedad Ritual</td><td>1,195</td></tr>
+                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>El Duque Huan de Qi Acepta la Carne Sacrificial en Kuiqiu sin Violar la Propriedad Ritual</td><td>1,195</td><td class="token-count" data-article="duke_huan_qi" data-lang="spanish">—</td></tr>
             </tbody>
                 </table>
             </div>
@@ -751,25 +1067,25 @@ Desde entonces, los científicos han estado trabajando día y noche para decodif
                 <div class="meta-grid">
                     <div><span class="meta-label">English Title</span><span class="meta-value">The Twenty-Eighth Year of Duke Xi of Lu in the Spring and Autumn Annals</span></div>
                     <div><span class="meta-label">Título en Español</span><span class="meta-value">El Año Vigésimo Octavo del Duque Xi de Lu en los Anales de Primavera y Otoño</span></div>
-                    <div><span class="meta-label">作者 / Author</span><span class="meta-value">孔子/左丘明</span></div>
+                    <div><span class="meta-label">作者 / Author</span><span class="meta-value">孔子</span></div>
                     <div><span class="meta-label">来源 / Source</span><span class="meta-value">《春秋·僖公二十八年》</span></div>
                     <div><span class="meta-label">时代 / Period</span><span class="meta-value">春秋时期 (公元前632年)</span></div>
                     <div><span class="meta-label">体裁 / Genre</span><span class="meta-value">编年史</span></div>
-                    <div><span class="meta-label">原文语言</span><span class="meta-value">classical_chinese</span></div>
+                     <div><span class="meta-label">原文语言 / ORIGINAL LANGUAGE</span><span class="meta-value">classical_chinese</span></div>
                 </div>
             </div>
             
             <div class="comparison">
                 <table>
-                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>字符数</th></tr></thead>
+                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>Unicode 字符数</th><th class="token-col-header">词元数 <span class="tokenizer-name"></span></th></tr></thead>
                     <tbody>
-                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>原文</td><td>春秋·僖公二十八年</td><td>286</td></tr>
+                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>原文</td><td>春秋·僖公二十八年</td><td>286</td><td class="token-count" data-article="duke_xi_28th_year" data-lang="classical_chinese">—</td></tr>
             
-                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>译文</td><td>春秋·僖公二十八年</td><td>410</td></tr>
+                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>译文</td><td>春秋·僖公二十八年</td><td>410</td><td class="token-count" data-article="duke_xi_28th_year" data-lang="modern_chinese">—</td></tr>
             
-                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>译文</td><td>The Twenty-Eighth Year of Duke Xi of Lu in the Spring and Autumn Annals</td><td>1,793</td></tr>
+                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>译文</td><td>The Twenty-Eighth Year of Duke Xi of Lu in the Spring and Autumn Annals</td><td>1,793</td><td class="token-count" data-article="duke_xi_28th_year" data-lang="english">—</td></tr>
             
-                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>El Año Vigésimo Octavo del Duque Xi de Lu en los Anales de Primavera y Otoño</td><td>1,760</td></tr>
+                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>El Año Vigésimo Octavo del Duque Xi de Lu en los Anales de Primavera y Otoño</td><td>1,760</td><td class="token-count" data-article="duke_xi_28th_year" data-lang="spanish">—</td></tr>
             </tbody>
                 </table>
             </div>
@@ -859,21 +1175,21 @@ En invierno, el Duque se reunió con el Marqués de Jin, el Marqués de Qi, el D
                     <div><span class="meta-label">来源 / Source</span><span class="meta-value">《史记·项羽本纪》</span></div>
                     <div><span class="meta-label">时代 / Period</span><span class="meta-value">秦末 (公元前207年)</span></div>
                     <div><span class="meta-label">体裁 / Genre</span><span class="meta-value">历史叙事</span></div>
-                    <div><span class="meta-label">原文语言</span><span class="meta-value">classical_chinese</span></div>
+                     <div><span class="meta-label">原文语言 / ORIGINAL LANGUAGE</span><span class="meta-value">classical_chinese</span></div>
                 </div>
             </div>
             
             <div class="comparison">
                 <table>
-                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>字符数</th></tr></thead>
+                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>Unicode 字符数</th><th class="token-col-header">词元数 <span class="tokenizer-name"></span></th></tr></thead>
                     <tbody>
-                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>原文</td><td>钜鹿之战</td><td>246</td></tr>
+                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>原文</td><td>钜鹿之战</td><td>246</td><td class="token-count" data-article="ju_lu_battle" data-lang="classical_chinese">—</td></tr>
             
-                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>译文</td><td>钜鹿之战</td><td>401</td></tr>
+                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>译文</td><td>钜鹿之战</td><td>401</td><td class="token-count" data-article="ju_lu_battle" data-lang="modern_chinese">—</td></tr>
             
-                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>译文</td><td>The Battle of Julu</td><td>1,725</td></tr>
+                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>译文</td><td>The Battle of Julu</td><td>1,725</td><td class="token-count" data-article="ju_lu_battle" data-lang="english">—</td></tr>
             
-                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>La Batalla de Julu</td><td>1,939</td></tr>
+                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>La Batalla de Julu</td><td>1,939</td><td class="token-count" data-article="ju_lu_battle" data-lang="spanish">—</td></tr>
             </tbody>
                 </table>
             </div>
@@ -925,7 +1241,7 @@ Después de derrotar completamente al ejército de Qin, Xiang Yu convocó a los 
          
         <section id="paulgraham" class="article-section ">
             <div class="metadata">
-                <h2>会写的人与不会写的人</h2>
+                <h2>能书者与不能书者</h2>
                 <div class="meta-grid">
                     <div><span class="meta-label">English Title</span><span class="meta-value">Writes and Write-Nots</span></div>
                     <div><span class="meta-label">Título en Español</span><span class="meta-value">Los que escriben y los que no</span></div>
@@ -933,60 +1249,26 @@ Después de derrotar completamente al ejército de Qin, Xiang Yu convocó a los 
                     <div><span class="meta-label">来源 / Source</span><span class="meta-value">paulgraham.com, October 2024</span></div>
                     <div><span class="meta-label">时代 / Period</span><span class="meta-value">当代 (2024年)</span></div>
                     <div><span class="meta-label">体裁 / Genre</span><span class="meta-value">科技评论/散文</span></div>
-                    <div><span class="meta-label">原文语言</span><span class="meta-value">english</span></div>
+                     <div><span class="meta-label">原文语言 / ORIGINAL LANGUAGE</span><span class="meta-value">english</span></div>
                 </div>
             </div>
             
             <div class="comparison">
                 <table>
-                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>字符数</th></tr></thead>
+                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>Unicode 字符数</th><th class="token-col-header">词元数 <span class="tokenizer-name"></span></th></tr></thead>
                     <tbody>
-                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>原文</td><td>Writes and Write-Nots</td><td>3,112</td></tr>
+                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>译文</td><td>能书者与不能书者</td><td>682</td><td class="token-count" data-article="paulgraham" data-lang="classical_chinese">—</td></tr>
             
-                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>译文</td><td>能书者与不能书者</td><td>682</td></tr>
+                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>译文</td><td>会写的人与不会写的人</td><td>960</td><td class="token-count" data-article="paulgraham" data-lang="modern_chinese">—</td></tr>
             
-                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>译文</td><td>会写的人与不会写的人</td><td>960</td></tr>
+                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>原文</td><td>Writes and Write-Nots</td><td>3,112</td><td class="token-count" data-article="paulgraham" data-lang="english">—</td></tr>
             
-                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>Los que escriben y los que no</td><td>3,343</td></tr>
+                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>Los que escriben y los que no</td><td>3,343</td><td class="token-count" data-article="paulgraham" data-lang="spanish">—</td></tr>
             </tbody>
                 </table>
             </div>
             
             <div class="text-grid">
-                <div class="text-card lang-english">
-                    <div class="card-header"><span class="lang-name">English</span><span class="role-badge original">原文</span></div>
-                    <div class="card-body"><h4>Writes and Write-Nots</h4><pre>I'm usually reluctant to make predictions about technology, but I feel fairly confident about this one: in a couple decades there won't be many people who can write.
-
-One of the strangest things you learn if you're a writer is how many people have trouble writing. Doctors know how many people have a mole they're worried about; people who are good at setting up computers know how many people aren't; writers know how many people need help writing.
-
-The reason so many people have trouble writing is that it's fundamentally difficult. To write well you have to think clearly, and thinking clearly is hard.
-
-And yet writing pervades many jobs, and the more prestigious the job, the more writing it tends to require.
-
-These two powerful opposing forces, the pervasive expectation of writing and the irreducible difficulty of doing it, create enormous pressure. This is why eminent professors often turn out to have resorted to plagiarism. The most striking thing to me about these cases is the pettiness of the thefts. The stuff they steal is usually the most mundane boilerplate — the sort of thing that anyone who was even halfway decent at writing could turn out with no effort at all. Which means they're not even halfway decent at writing.
-
-Till recently there was no convenient escape valve for the pressure created by these opposing forces. You could pay someone to write for you, like JFK, or plagiarize, like MLK, but if you couldn't buy or steal words, you had to write them yourself. And as a result nearly everyone who was expected to write had to learn how.
-
-Not anymore. AI has blown this world open. Almost all pressure to write has dissipated. You can have AI do it for you, both in school and at work.
-
-The result will be a world divided into writes and write-nots. There will still be some people who can write. Some of us like it. But the middle ground between those who are good at writing and those who can't write at all will disappear. Instead of good writers, ok writers, and people who can't write, there will just be good writers and people who can't write.
-
-Is that so bad? Isn't it common for skills to disappear when technology makes them obsolete? There aren't many blacksmiths left, and it doesn't seem to be a problem.
-
-Yes, it's bad. The reason is something I mentioned earlier: writing is thinking. In fact there's a kind of thinking that can only be done by writing. You can't make this point better than Leslie Lamport did:
-
-"If you're thinking without writing, you only think you're thinking."
-
-So a world divided into writes and write-nots is more dangerous than it sounds. It will be a world of thinks and think-nots. I know which half I want to be in, and I bet you do too.
-
-This situation is not unprecedented. In preindustrial times most people's jobs made them strong. Now if you want to be strong, you work out. So there are still strong people, but only those who choose to be.
-
-It will be the same with writing. There will still be smart people, but only those who choose to be.
-
-Thanks to Jessica Livingston, Ben Miller, and Robert Morris for reading drafts of this.</pre></div>
-                    <div class="card-footer">3,112 字符</div>
-                </div>
-            
                 <div class="text-card lang-classical">
                     <div class="card-header"><span class="lang-name">文言</span><span class="role-badge translation">译文</span></div>
                     <div class="card-body"><h4>能书者与不能书者</h4><pre>吾素不欲妄测科技之趋向，然于此事颇有把握：数十载后，世间能文者必稀。
@@ -1055,6 +1337,40 @@ Thanks to Jessica Livingston, Ben Miller, and Robert Morris for reading drafts o
                     <div class="card-footer">960 字符</div>
                 </div>
             
+                <div class="text-card lang-english">
+                    <div class="card-header"><span class="lang-name">English</span><span class="role-badge original">原文</span></div>
+                    <div class="card-body"><h4>Writes and Write-Nots</h4><pre>I'm usually reluctant to make predictions about technology, but I feel fairly confident about this one: in a couple decades there won't be many people who can write.
+
+One of the strangest things you learn if you're a writer is how many people have trouble writing. Doctors know how many people have a mole they're worried about; people who are good at setting up computers know how many people aren't; writers know how many people need help writing.
+
+The reason so many people have trouble writing is that it's fundamentally difficult. To write well you have to think clearly, and thinking clearly is hard.
+
+And yet writing pervades many jobs, and the more prestigious the job, the more writing it tends to require.
+
+These two powerful opposing forces, the pervasive expectation of writing and the irreducible difficulty of doing it, create enormous pressure. This is why eminent professors often turn out to have resorted to plagiarism. The most striking thing to me about these cases is the pettiness of the thefts. The stuff they steal is usually the most mundane boilerplate — the sort of thing that anyone who was even halfway decent at writing could turn out with no effort at all. Which means they're not even halfway decent at writing.
+
+Till recently there was no convenient escape valve for the pressure created by these opposing forces. You could pay someone to write for you, like JFK, or plagiarize, like MLK, but if you couldn't buy or steal words, you had to write them yourself. And as a result nearly everyone who was expected to write had to learn how.
+
+Not anymore. AI has blown this world open. Almost all pressure to write has dissipated. You can have AI do it for you, both in school and at work.
+
+The result will be a world divided into writes and write-nots. There will still be some people who can write. Some of us like it. But the middle ground between those who are good at writing and those who can't write at all will disappear. Instead of good writers, ok writers, and people who can't write, there will just be good writers and people who can't write.
+
+Is that so bad? Isn't it common for skills to disappear when technology makes them obsolete? There aren't many blacksmiths left, and it doesn't seem to be a problem.
+
+Yes, it's bad. The reason is something I mentioned earlier: writing is thinking. In fact there's a kind of thinking that can only be done by writing. You can't make this point better than Leslie Lamport did:
+
+"If you're thinking without writing, you only think you're thinking."
+
+So a world divided into writes and write-nots is more dangerous than it sounds. It will be a world of thinks and think-nots. I know which half I want to be in, and I bet you do too.
+
+This situation is not unprecedented. In preindustrial times most people's jobs made them strong. Now if you want to be strong, you work out. So there are still strong people, but only those who choose to be.
+
+It will be the same with writing. There will still be smart people, but only those who choose to be.
+
+Thanks to Jessica Livingston, Ben Miller, and Robert Morris for reading drafts of this.</pre></div>
+                    <div class="card-footer">3,112 字符</div>
+                </div>
+            
                 <div class="text-card lang-spanish">
                     <div class="card-header"><span class="lang-name">Español</span><span class="role-badge translation">译文</span></div>
                     <div class="card-body"><h4>Los que escriben y los que no</h4><pre>Por lo general no me gusta hacer predicciones sobre tecnología, pero esta me inspira bastante confianza: dentro de un par de décadas no quedarán muchas personas que sepan escribir.
@@ -1093,7 +1409,7 @@ Gracias a Jessica Livingston, Ben Miller y Robert Morris por leer borradores de 
          
         <section id="science_revolution_dl" class="article-section ">
             <div class="metadata">
-                <h2>深度学习与科学革命</h2>
+                <h2>深度学习与科学革命论</h2>
                 <div class="meta-grid">
                     <div><span class="meta-label">English Title</span><span class="meta-value">Deep Learning and the Scientific Revolution</span></div>
                     <div><span class="meta-label">Título en Español</span><span class="meta-value">El Aprendizaje Profundo y la Revolución Científica</span></div>
@@ -1101,47 +1417,217 @@ Gracias a Jessica Livingston, Ben Miller y Robert Morris por leer borradores de 
                     <div><span class="meta-label">来源 / Source</span><span class="meta-value">网络评论文章</span></div>
                     <div><span class="meta-label">时代 / Period</span><span class="meta-value">当代</span></div>
                     <div><span class="meta-label">体裁 / Genre</span><span class="meta-value">科学评论/议论文</span></div>
-                    <div><span class="meta-label">原文语言</span><span class="meta-value">modern_chinese</span></div>
+                     <div><span class="meta-label">原文语言 / ORIGINAL LANGUAGE</span><span class="meta-value">modern_chinese</span></div>
                 </div>
             </div>
             
             <div class="comparison">
                 <table>
-                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>字符数</th></tr></thead>
+                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>Unicode 字符数</th><th class="token-col-header">词元数 <span class="tokenizer-name"></span></th></tr></thead>
                     <tbody>
-                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>原文</td><td>深度学习与科学革命</td><td>1,613</td></tr>
+                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>译文</td><td>深度学习与科学革命论</td><td>1,436</td><td class="token-count" data-article="science_revolution_dl" data-lang="classical_chinese">—</td></tr>
             
-                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>译文</td><td>深度学习与科学革命论</td><td>1,436</td></tr>
+                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>原文</td><td>深度学习与科学革命</td><td>1,613</td><td class="token-count" data-article="science_revolution_dl" data-lang="modern_chinese">—</td></tr>
             
-                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>译文</td><td>Deep Learning and the Scientific Revolution</td><td>5,022</td></tr>
+                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>译文</td><td>Deep Learning and the Scientific Revolution</td><td>5,022</td><td class="token-count" data-article="science_revolution_dl" data-lang="english">—</td></tr>
             
-                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>El Aprendizaje Profundo y la Revolución Científica</td><td>5,646</td></tr>
+                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>El Aprendizaje Profundo y la Revolución Científica</td><td>5,646</td><td class="token-count" data-article="science_revolution_dl" data-lang="spanish">—</td></tr>
             </tbody>
                 </table>
             </div>
             
             <div class="text-grid">
-                <div class="text-card lang-modern">
-                    <div class="card-header"><span class="lang-name">现代汉语</span><span class="role-badge original">原文</span></div>
-                    <div class="card-body"><h4>深度学习与科学革命</h4><pre>如果终将失事，你是否还会扬帆远航？\n\n有一位学者叫 Jim Gray（1944-2007）。1998年因"对数据库和事务处理研究的开创性贡献以及系统实现中的技术领导地位"获得图灵奖。他很喜欢一个人出去航海。2007年，他打算前往一个小岛，把母亲的骨灰撒在岛上。但是，他再也没有回来。他的朋友、学生中有不少都是计算机视觉的高手，他们在几千张影像中希望找到 Jim Gray 的身影，但是一无所获。\n\nJim Gray 极富洞察。2007年，他提出——我们正在经历第四次科学革命。\n\n他认为：\n\n1. 第一范式：人类进行海量的实验，从而学会用火、建造埃及金字塔、发明造纸术。\n\n2. 第二范式：始于伽利略。先提出一个理论，再做实验看实验能否验证理论给出的预测。\n\n3. 第三范式：始于电子计算机。用计算机模拟现实中难做的实验。\n\n4. 第四范式：始于大数据。Jim Gray 认为，辅以大数据，计算机能理解复杂系统。（那时候是深度学习第二次寒冬，他指的不是深度学习，仅仅是大数据）\n\n2014年，一家名为第四范式的AI公司在中国成立。和大家猜的一样，创始人说——名字是为了致敬 Jim Gray。\n\n我的想法和 Jim Gray 不太一样。我不认可他所说的第一范式和第三范式：\n\n1. 伽利略之前的海量实验：当然对人类进步很重要，当然是巨大的工程进步，但是似乎不能称之为自然科学。\n\n2. 计算机模拟：我认为和实验没有本质区别，只是把现实中难做的实验拿到计算机上了。依旧是"先提出一个理论，再做实验看实验和理论是否符合"。至于用计算指导实验，我认为，类似于预实验。\n\n我同意他所说的第二范式和第四范式。除此之外，我认为他遗漏了古希腊数学。\n\n我认为，人类历史上有三次科学革命：\n\n1. 欧几里得等人撰写《几何原本》。这标志着数学的真正开端。我们把一些规则当成公理，再用它们构建我们的体系，而不仅仅是算术和画图。这就是数学。\n\n2. 伽利略撰写《两种新科学》。这标志着自然科学的真正开端。我们要判断实验结果和理论预测是否一致，而不是单纯思辨或无脑进行海量实验。这就是自然科学。后来，拉瓦锡、孟德尔也用类似的思考方式。\n\n3. 2012年至今深度学习的进展。这意味着一种人类和自然界之间"翻译软件"。上帝的语言真的是数学吗？自然界的规律真的都可以用简单的数学语言描述吗？——也许答案是否定的。到目前为止，人类能理解的规律要么能用几句数学语言描述、要么能用几句自然语言描述。但复杂系统也许不能。当系统足够复杂时，我们也许永远无法用人类可理解的语言来概括其规律，但我们**已经**可以训练一个神经网络来充当"翻译软件"。深度学习已开始充当人类和自然界（特别是复杂系统）的"翻译软件"，并且这个翻译软件的能力越来越强。例如：\n   甲） 人类能理解两个原子之间的相互作用（用牛顿方程或薛定谔方程模拟）。但基于物理定律的方法在预测蛋白质结构上完败于深度学习（2020, AlphaFold 2）。\n   乙） 人类能理解单神经元并预测动作电位波形（Hodgkin-Huxley），也能预测初级视觉皮层神经元对于视觉刺激的响应（Hubel-Wiesel）。但基于传统规律的方法在预测高级视觉皮层神经元响应上完败于深度学习（2019, DiCarlo Lab）。\n\n三次革命后，学者们不会抛弃过往的传统，而是继承：\n\n1. 伽利略之后的学者们在创立自己的学说时均借鉴了古希腊数学家的公理化思想。\n\n2. 从今往后，学者们也依然要判断实验结果和理论给出的预测是否一致。只不过，预测不再由简单的几句数学或自然语言给出，而是由人工神经网络给出。\n\nJim Gray 扬帆远去，没有归来。我们这一代人也正在驶向一片未知的海域，船上载着一个连我们自己也无法理解的翻译机器。</pre></div>
-                    <div class="card-footer">1,613 字符</div>
-                </div>
-            
                 <div class="text-card lang-classical">
                     <div class="card-header"><span class="lang-name">文言</span><span class="role-badge translation">译文</span></div>
-                    <div class="card-body"><h4>深度学习与科学革命论</h4><pre>若终将覆舟，君尚扬帆否？\n\n有学者曰 Jim Gray（一九四四至二零零七）。一九九八年以"于数据库及事务处理研究之开创性贡献，及系统实现中之技术领导"获图灵奖。彼好独航。二零零七年，彼欲往一小岛，撒其母之骨灰于其上。然彼竟不复归。其友、弟子多精于计算机视觉，于数千影像中求 Jim Gray 之踪，然一无所获。\n\nJim Gray 极富洞见。二零零七年，彼提出——吾辈正历第四次科学革命。\n\n彼以为：\n\n一、第一范式：人类行海量之实验，遂学会用火、建埃及金字塔、发明造纸术。\n\n二、第二范式：始于伽利略。先立一理论，再作实验，观实验能否验证理论所预测。\n\n三、第三范式：始于电子计算机。以计算机模拟现实中难作之实验。\n\n四、第四范式：始于大数据。Jim Gray 以为，辅以大数据，计算机能理解复杂系统。（彼时乃深度学习第二次寒冬，彼所指非深度学习，仅大数据耳。）\n\n二零一四年，有AI公司曰"第四范式"者立于中国。如众人所猜，创始人曰——名乃为致敬 Jim Gray。\n\n吾之所想与 Jim Gray 有异。吾不认可彼所谓第一范式与第三范式：\n\n一、伽利略之前之海量实验：于人类进步固然重要，于工程进步亦巨，然似不能称之为自然科学。\n\n二、计算机模拟：吾以为与实验无本质之异，仅将现实中难作之实验移于计算机耳。犹"先立理论，再作实验，观实验与理论是否符合"。至于以计算指导实验，吾以为类于预实验。\n\n吾同意彼所谓第二范式与第四范式。除此，吾以为彼遗漏古希腊数学。\n\n吾以为，人类历史上有三次科学革命：\n\n一、欧几里得等人撰《几何原本》。此标志着数学之真正开端。吾辈以若干规则为公理，再以之构建体系，而非仅算术与画图。此即数学。\n\n二、伽利略撰《两种新科学》。此标志着自然科学之真正开端。吾辈须判断实验结果与理论预测是否一致，而非单纯思辨或无脑行海量实验。此即自然科学。后拉瓦锡、孟德尔亦以类似之思。\n\n三、二零一二年至今深度学习之进展。此意味着人类与自然界之间一"翻译软件"。上帝之语言果为数学乎？自然界之规律果皆可以简数学语言述之乎？——或答案为否。至今，人类所能理解之规律，或能以数句数学语言述之，或能以数句自然语言述之。然复杂系统或不能。当系统足 complex 时，吾辈或永不能以人类可理解之语言概括其规律，然吾辈已可训练一神经网络以充"翻译软件"。深度学习已开始充人类与自然界（尤复杂系统）之"翻译软件"，且其能日强。例如：\n\n甲）人类能理解二原子间之相互作用（以牛顿方程或薛定谔方程模拟）。然基于物理定律之法于预测蛋白质结构上完败于深度学习（二零二零，AlphaFold 2）。\n\n乙）人类能理解单神经元并预测动作电位波形（Hodgkin-Huxley），亦能预测初级视觉皮层神经元对于视觉刺激之响应（Hubel-Wiesel）。然基于传统规律之法于预测高级视觉皮层神经元响应上完败于深度学习（二零一九，DiCarlo Lab）。\n\n三次革命后，学者不抛弃过往之传统，乃继承之：\n\n一、伽利略之后之学者于立己说时皆借鉴古希腊数学家之公理化思想。\n\n二、自今往后，学者亦须判断实验结果与理论所预测是否一致。然预测不再由简数句数学或自然语言给出，乃由人工神经网络给出。\n\nJim Gray 扬帆远去，不复归。吾辈亦正驶向一未知之海域，舟上载一连吾辈自身亦不能解之翻译机器。</pre></div>
+                    <div class="card-body"><h4>深度学习与科学革命论</h4><pre>若终将覆舟，君尚扬帆否？
+
+有学者曰 Jim Gray（一九四四至二零零七）。一九九八年以"于数据库及事务处理研究之开创性贡献，及系统实现中之技术领导"获图灵奖。彼好独航。二零零七年，彼欲往一小岛，撒其母之骨灰于其上。然彼竟不复归。其友、弟子多精于计算机视觉，于数千影像中求 Jim Gray 之踪，然一无所获。
+
+Jim Gray 极富洞见。二零零七年，彼提出——吾辈正历第四次科学革命。
+
+彼以为：
+
+一、第一范式：人类行海量之实验，遂学会用火、建埃及金字塔、发明造纸术。
+
+二、第二范式：始于伽利略。先立一理论，再作实验，观实验能否验证理论所预测。
+
+三、第三范式：始于电子计算机。以计算机模拟现实中难作之实验。
+
+四、第四范式：始于大数据。Jim Gray 以为，辅以大数据，计算机能理解复杂系统。（彼时乃深度学习第二次寒冬，彼所指非深度学习，仅大数据耳。）
+
+二零一四年，有AI公司曰"第四范式"者立于中国。如众人所猜，创始人曰——名乃为致敬 Jim Gray。
+
+吾之所想与 Jim Gray 有异。吾不认可彼所谓第一范式与第三范式：
+
+一、伽利略之前之海量实验：于人类进步固然重要，于工程进步亦巨，然似不能称之为自然科学。
+
+二、计算机模拟：吾以为与实验无本质之异，仅将现实中难作之实验移于计算机耳。犹"先立理论，再作实验，观实验与理论是否符合"。至于以计算指导实验，吾以为类于预实验。
+
+吾同意彼所谓第二范式与第四范式。除此，吾以为彼遗漏古希腊数学。
+
+吾以为，人类历史上有三次科学革命：
+
+一、欧几里得等人撰《几何原本》。此标志着数学之真正开端。吾辈以若干规则为公理，再以之构建体系，而非仅算术与画图。此即数学。
+
+二、伽利略撰《两种新科学》。此标志着自然科学之真正开端。吾辈须判断实验结果与理论预测是否一致，而非单纯思辨或无脑行海量实验。此即自然科学。后拉瓦锡、孟德尔亦以类似之思。
+
+三、二零一二年至今深度学习之进展。此意味着人类与自然界之间一"翻译软件"。上帝之语言果为数学乎？自然界之规律果皆可以简数学语言述之乎？——或答案为否。至今，人类所能理解之规律，或能以数句数学语言述之，或能以数句自然语言述之。然复杂系统或不能。当系统足 complex 时，吾辈或永不能以人类可理解之语言概括其规律，然吾辈已可训练一神经网络以充"翻译软件"。深度学习已开始充人类与自然界（尤复杂系统）之"翻译软件"，且其能日强。例如：
+
+甲）人类能理解二原子间之相互作用（以牛顿方程或薛定谔方程模拟）。然基于物理定律之法于预测蛋白质结构上完败于深度学习（二零二零，AlphaFold 2）。
+
+乙）人类能理解单神经元并预测动作电位波形（Hodgkin-Huxley），亦能预测初级视觉皮层神经元对于视觉刺激之响应（Hubel-Wiesel）。然基于传统规律之法于预测高级视觉皮层神经元响应上完败于深度学习（二零一九，DiCarlo Lab）。
+
+三次革命后，学者不抛弃过往之传统，乃继承之：
+
+一、伽利略之后之学者于立己说时皆借鉴古希腊数学家之公理化思想。
+
+二、自今往后，学者亦须判断实验结果与理论所预测是否一致。然预测不再由简数句数学或自然语言给出，乃由人工神经网络给出。
+
+Jim Gray 扬帆远去，不复归。吾辈亦正驶向一未知之海域，舟上载一连吾辈自身亦不能解之翻译机器。</pre></div>
                     <div class="card-footer">1,436 字符</div>
+                </div>
+            
+                <div class="text-card lang-modern">
+                    <div class="card-header"><span class="lang-name">现代汉语</span><span class="role-badge original">原文</span></div>
+                    <div class="card-body"><h4>深度学习与科学革命</h4><pre>如果终将失事，你是否还会扬帆远航？
+
+有一位学者叫 Jim Gray（1944-2007）。1998年因"对数据库和事务处理研究的开创性贡献以及系统实现中的技术领导地位"获得图灵奖。他很喜欢一个人出去航海。2007年，他打算前往一个小岛，把母亲的骨灰撒在岛上。但是，他再也没有回来。他的朋友、学生中有不少都是计算机视觉的高手，他们在几千张影像中希望找到 Jim Gray 的身影，但是一无所获。
+
+Jim Gray 极富洞察。2007年，他提出——我们正在经历第四次科学革命。
+
+他认为：
+
+1. 第一范式：人类进行海量的实验，从而学会用火、建造埃及金字塔、发明造纸术。
+
+2. 第二范式：始于伽利略。先提出一个理论，再做实验看实验能否验证理论给出的预测。
+
+3. 第三范式：始于电子计算机。用计算机模拟现实中难做的实验。
+
+4. 第四范式：始于大数据。Jim Gray 认为，辅以大数据，计算机能理解复杂系统。（那时候是深度学习第二次寒冬，他指的不是深度学习，仅仅是大数据）
+
+2014年，一家名为第四范式的AI公司在中国成立。和大家猜的一样，创始人说——名字是为了致敬 Jim Gray。
+
+我的想法和 Jim Gray 不太一样。我不认可他所说的第一范式和第三范式：
+
+1. 伽利略之前的海量实验：当然对人类进步很重要，当然是巨大的工程进步，但是似乎不能称之为自然科学。
+
+2. 计算机模拟：我认为和实验没有本质区别，只是把现实中难做的实验拿到计算机上了。依旧是"先提出一个理论，再做实验看实验和理论是否符合"。至于用计算指导实验，我认为，类似于预实验。
+
+我同意他所说的第二范式和第四范式。除此之外，我认为他遗漏了古希腊数学。
+
+我认为，人类历史上有三次科学革命：
+
+1. 欧几里得等人撰写《几何原本》。这标志着数学的真正开端。我们把一些规则当成公理，再用它们构建我们的体系，而不仅仅是算术和画图。这就是数学。
+
+2. 伽利略撰写《两种新科学》。这标志着自然科学的真正开端。我们要判断实验结果和理论预测是否一致，而不是单纯思辨或无脑进行海量实验。这就是自然科学。后来，拉瓦锡、孟德尔也用类似的思考方式。
+
+3. 2012年至今深度学习的进展。这意味着一种人类和自然界之间"翻译软件"。上帝的语言真的是数学吗？自然界的规律真的都可以用简单的数学语言描述吗？——也许答案是否定的。到目前为止，人类能理解的规律要么能用几句数学语言描述、要么能用几句自然语言描述。但复杂系统也许不能。当系统足够复杂时，我们也许永远无法用人类可理解的语言来概括其规律，但我们**已经**可以训练一个神经网络来充当"翻译软件"。深度学习已开始充当人类和自然界（特别是复杂系统）的"翻译软件"，并且这个翻译软件的能力越来越强。例如：
+   甲） 人类能理解两个原子之间的相互作用（用牛顿方程或薛定谔方程模拟）。但基于物理定律的方法在预测蛋白质结构上完败于深度学习（2020, AlphaFold 2）。
+   乙） 人类能理解单神经元并预测动作电位波形（Hodgkin-Huxley），也能预测初级视觉皮层神经元对于视觉刺激的响应（Hubel-Wiesel）。但基于传统规律的方法在预测高级视觉皮层神经元响应上完败于深度学习（2019, DiCarlo Lab）。
+
+三次革命后，学者们不会抛弃过往的传统，而是继承：
+
+1. 伽利略之后的学者们在创立自己的学说时均借鉴了古希腊数学家的公理化思想。
+
+2. 从今往后，学者们也依然要判断实验结果和理论给出的预测是否一致。只不过，预测不再由简单的几句数学或自然语言给出，而是由人工神经网络给出。
+
+Jim Gray 扬帆远去，没有归来。我们这一代人也正在驶向一片未知的海域，船上载着一个连我们自己也无法理解的翻译机器。</pre></div>
+                    <div class="card-footer">1,613 字符</div>
                 </div>
             
                 <div class="text-card lang-english">
                     <div class="card-header"><span class="lang-name">English</span><span class="role-badge translation">译文</span></div>
-                    <div class="card-body"><h4>Deep Learning and the Scientific Revolution</h4><pre>If the ship is destined to sink, would you still set sail?\n\nThere was a scholar named Jim Gray (1944-2007). In 1998, he received the Turing Award for "seminal contributions to database and transaction processing research and technical leadership in system implementation." He loved sailing alone. In 2007, he planned to travel to a small island to scatter his mother's ashes there. But he never returned. Among his friends and students were many experts in computer vision; they searched through thousands of images hoping to find Jim Gray, but to no avail.\n\nJim Gray was profoundly insightful. In 2007, he proposed that we were experiencing a fourth scientific revolution.\n\nHe believed:\n\n1. First Paradigm: Humans conducted massive experiments, thereby learning to use fire, building the Egyptian pyramids, and inventing paper.\n\n2. Second Paradigm: Began with Galileo. First propose a theory, then conduct experiments to see whether they verify the theory's predictions.\n\n3. Third Paradigm: Began with electronic computers. Using computers to simulate experiments that are difficult to perform in reality.\n\n4. Fourth Paradigm: Began with big data. Jim Gray believed that with the aid of big data, computers could understand complex systems. (At that time it was the second winter of deep learning; he was not referring to deep learning, but merely to big data.)\n\nIn 2014, an AI company named "Fourth Paradigm" was founded in China. As everyone guessed, the founder said—the name was to pay tribute to Jim Gray.\n\nMy view differs somewhat from Jim Gray's. I do not endorse his First and Third Paradigms:\n\n1. The massive experiments before Galileo: Certainly important to human progress and tremendous engineering achievements, but they cannot properly be called natural science.\n\n2. Computer simulation: I believe there is no essential difference from experiments; it merely moves experiments that are difficult to perform in reality onto computers. It remains "first propose a theory, then conduct experiments to see whether they match the theory." As for using computation to guide experiments, I consider it similar to a pilot experiment.\n\nI agree with his Second and Fourth Paradigms. Beyond that, I believe he omitted ancient Greek mathematics.\n\nI believe there have been three scientific revolutions in human history:\n\n1. Euclid and others wrote the Elements. This marks the true beginning of mathematics. We take certain rules as axioms and use them to construct our system, rather than merely arithmetic and drawing. This is mathematics.\n\n2. Galileo wrote Two New Sciences. This marks the true beginning of natural science. We must judge whether experimental results match theoretical predictions, rather than engaging in pure speculation or mindlessly conducting massive experiments. This is natural science. Later, Lavoisier and Mendel also used similar modes of thinking.\n\n3. The progress of deep learning from 2012 to the present. This represents a "translation software" between humanity and nature. Is God's language truly mathematics? Can all laws of nature be described in simple mathematical language?—Perhaps the answer is no. To date, laws that humans can understand can be described either in a few lines of mathematical language or in a few lines of natural language. But complex systems may not be so. When a system is sufficiently complex, we may never be able to summarize its laws in human-comprehensible language, but we can already train a neural network to serve as "translation software." Deep learning has already begun to serve as a "translation software" between humanity and nature (particularly complex systems), and its capabilities are growing ever stronger. For example:\n   (A) Humans can understand the interaction between two atoms (simulated using Newton's equations or the Schrödinger equation). Yet methods based on physical laws were completely defeated by deep learning in predicting protein structures (2020, AlphaFold 2).\n   (B) Humans can understand a single neuron and predict action potential waveforms (Hodgkin-Huxley), and can also predict the responses of primary visual cortex neurons to visual stimuli (Hubel-Wiesel). Yet methods based on traditional laws were completely defeated by deep learning in predicting the responses of higher visual cortex neurons (2019, DiCarlo Lab).\n\nAfter these three revolutions, scholars will not abandon past traditions but will inherit them:\n\n1. Scholars after Galileo borrowed the axiomatic thinking of ancient Greek mathematicians when establishing their own doctrines.\n\n2. From now on, scholars must still judge whether experimental results match theoretical predictions. Only the predictions will no longer be given in a few simple lines of mathematics or natural language, but by artificial neural networks.\n\nJim Gray sailed far away and never returned. Our generation too is sailing toward an unknown sea, carrying on board a translation machine that even we ourselves cannot understand.</pre></div>
+                    <div class="card-body"><h4>Deep Learning and the Scientific Revolution</h4><pre>If the ship is destined to sink, would you still set sail?
+
+There was a scholar named Jim Gray (1944-2007). In 1998, he received the Turing Award for "seminal contributions to database and transaction processing research and technical leadership in system implementation." He loved sailing alone. In 2007, he planned to travel to a small island to scatter his mother's ashes there. But he never returned. Among his friends and students were many experts in computer vision; they searched through thousands of images hoping to find Jim Gray, but to no avail.
+
+Jim Gray was profoundly insightful. In 2007, he proposed that we were experiencing a fourth scientific revolution.
+
+He believed:
+
+1. First Paradigm: Humans conducted massive experiments, thereby learning to use fire, building the Egyptian pyramids, and inventing paper.
+
+2. Second Paradigm: Began with Galileo. First propose a theory, then conduct experiments to see whether they verify the theory's predictions.
+
+3. Third Paradigm: Began with electronic computers. Using computers to simulate experiments that are difficult to perform in reality.
+
+4. Fourth Paradigm: Began with big data. Jim Gray believed that with the aid of big data, computers could understand complex systems. (At that time it was the second winter of deep learning; he was not referring to deep learning, but merely to big data.)
+
+In 2014, an AI company named "Fourth Paradigm" was founded in China. As everyone guessed, the founder said—the name was to pay tribute to Jim Gray.
+
+My view differs somewhat from Jim Gray's. I do not endorse his First and Third Paradigms:
+
+1. The massive experiments before Galileo: Certainly important to human progress and tremendous engineering achievements, but they cannot properly be called natural science.
+
+2. Computer simulation: I believe there is no essential difference from experiments; it merely moves experiments that are difficult to perform in reality onto computers. It remains "first propose a theory, then conduct experiments to see whether they match the theory." As for using computation to guide experiments, I consider it similar to a pilot experiment.
+
+I agree with his Second and Fourth Paradigms. Beyond that, I believe he omitted ancient Greek mathematics.
+
+I believe there have been three scientific revolutions in human history:
+
+1. Euclid and others wrote the Elements. This marks the true beginning of mathematics. We take certain rules as axioms and use them to construct our system, rather than merely arithmetic and drawing. This is mathematics.
+
+2. Galileo wrote Two New Sciences. This marks the true beginning of natural science. We must judge whether experimental results match theoretical predictions, rather than engaging in pure speculation or mindlessly conducting massive experiments. This is natural science. Later, Lavoisier and Mendel also used similar modes of thinking.
+
+3. The progress of deep learning from 2012 to the present. This represents a "translation software" between humanity and nature. Is God's language truly mathematics? Can all laws of nature be described in simple mathematical language?—Perhaps the answer is no. To date, laws that humans can understand can be described either in a few lines of mathematical language or in a few lines of natural language. But complex systems may not be so. When a system is sufficiently complex, we may never be able to summarize its laws in human-comprehensible language, but we can already train a neural network to serve as "translation software." Deep learning has already begun to serve as a "translation software" between humanity and nature (particularly complex systems), and its capabilities are growing ever stronger. For example:
+   (A) Humans can understand the interaction between two atoms (simulated using Newton's equations or the Schrödinger equation). Yet methods based on physical laws were completely defeated by deep learning in predicting protein structures (2020, AlphaFold 2).
+   (B) Humans can understand a single neuron and predict action potential waveforms (Hodgkin-Huxley), and can also predict the responses of primary visual cortex neurons to visual stimuli (Hubel-Wiesel). Yet methods based on traditional laws were completely defeated by deep learning in predicting the responses of higher visual cortex neurons (2019, DiCarlo Lab).
+
+After these three revolutions, scholars will not abandon past traditions but will inherit them:
+
+1. Scholars after Galileo borrowed the axiomatic thinking of ancient Greek mathematicians when establishing their own doctrines.
+
+2. From now on, scholars must still judge whether experimental results match theoretical predictions. Only the predictions will no longer be given in a few simple lines of mathematics or natural language, but by artificial neural networks.
+
+Jim Gray sailed far away and never returned. Our generation too is sailing toward an unknown sea, carrying on board a translation machine that even we ourselves cannot understand.</pre></div>
                     <div class="card-footer">5,022 字符</div>
                 </div>
             
                 <div class="text-card lang-spanish">
                     <div class="card-header"><span class="lang-name">Español</span><span class="role-badge translation">译文</span></div>
-                    <div class="card-body"><h4>El Aprendizaje Profundo y la Revolución Científica</h4><pre>Si el barco está destinado a naufragar, ¿aún zarparías?\n\nHabía un erudito llamado Jim Gray (1944-2007). En 1998, recibió el Premio Turing por "contribuciones seminales a la investigación de bases de datos y procesamiento de transacciones y liderazgo técnico en implementación de sistemas." Le encantaba navegar solo. En 2007, planeó viajar a una pequeña isla para esparcir las cenizas de su madre allí. Pero nunca regresó. Entre sus amigos y estudiantes había muchos expertos en visión por computadora; buscaron entre miles de imágenes esperando encontrar a Jim Gray, pero sin éxito.\n\nJim Gray era profundamente perspicaz. En 2007, propuso que estábamos experimentando una cuarta revolución científica.\n\nÉl creía:\n\n1. Primer Paradigma: Los humanos realizaron experimentos masivos, aprendiendo así a usar el fuego, construir las pirámides egipcias e inventar el papel.\n\n2. Segundo Paradigma: Comenzó con Galileo. Primero proponer una teoría, luego realizar experimentos para ver si verifican las predicciones de la teoría.\n\n3. Tercer Paradigma: Comenzó con las computadoras electrónicas. Usar computadoras para simular experimentos que son difíciles de realizar en la realidad.\n\n4. Cuarto Paradigma: Comenzó con los grandes datos. Jim Gray creía que con la ayuda de grandes datos, las computadoras podrían entender sistemas complejos. (En ese momento era el segundo invierno del aprendizaje profundo; no se refería al aprendizaje profundo, sino meramente a los grandes datos.)\n\nEn 2014, una empresa de IA llamada "Cuarto Paradigma" fue fundada en China. Como todos supusieron, el fundador dijo—el nombre era para rendir homenaje a Jim Gray.\n\nMi punto de vista difiere algo del de Jim Gray. No respaldo sus Primer y Tercer Paradigmas:\n\n1. Los experimentos masivos antes de Galileo: Ciertamente importantes para el progreso humano y logros tremendos de ingeniería, pero no pueden llamarse propiamente ciencia natural.\n\n2. Simulación por computadora: Creo que no hay diferencia esencial con los experimentos; simplemente traslada experimentos difíciles de realizar en la realidad a las computadoras. Sigue siendo "primero proponer una teoría, luego realizar experimentos para ver si coinciden con la teoría." En cuanto a usar la computación para guiar experimentos, lo considero similar a un experimento piloto.\n\nEstoy de acuerdo con su Segundo y Cuarto Paradigmas. Más allá de eso, creo que omitió las matemáticas de la antigua Grecia.\n\nCreo que ha habido tres revoluciones científicas en la historia humana:\n\n1. Euclides y otros escribieron los Elementos. Esto marca el verdadero comienzo de las matemáticas. Tomamos ciertas reglas como axiomas y las usamos para construir nuestro sistema, en lugar de meramente aritmética y dibujo. Esto es matemáticas.\n\n2. Galileo escribió Dos Nuevas Ciencias. Esto marca el verdadero comienzo de la ciencia natural. Debemos juzgar si los resultados experimentales coinciden con las predicciones teóricas, en lugar de dedicarnos a la especulación pura o realizar ciegamente experimentos masivos. Esto es ciencia natural. Más tarde, Lavoisier y Mendel también usaron modos de pensamiento similares.\n\n3. El progreso del aprendizaje profundo desde 2012 hasta el presente. Esto representa un "software de traducción" entre la humanidad y la naturaleza. ¿Es realmente matemáticas el lenguaje de Dios? ¿Todas las leyes de la naturaleza pueden describirse en lenguaje matemático simple?—Quizás la respuesta es no. Hasta la fecha, las leyes que los humanos pueden entender pueden describirse ya sea en unas pocas líneas de lenguaje matemático o en unas pocas líneas de lenguaje natural. Pero los sistemas complejos pueden no ser así. Cuando un sistema es suficientemente complejo, quizás nunca podamos resumir sus leyes en lenguaje comprensible para humanos, pero ya podemos entrenar una red neuronal para servir como "software de traducción." El aprendizaje profundo ya ha comenzado a servir como "software de traducción" entre la humanidad y la naturaleza (particularmente sistemas complejos), y sus capacidades se vuelven cada vez más fuertes. Por ejemplo:\n   (A) Los humanos pueden entender la interacción entre dos átomos (simulada usando las ecuaciones de Newton o la ecuación de Schrödinger). Sin embargo, los métodos basados en leyes físicas fueron completamente derrotados por el aprendizaje profundo en la predicción de estructuras de proteínas (2020, AlphaFold 2).\n   (B) Los humanos pueden entender una sola neurona y predecir las formas de onda de potencial de acción (Hodgkin-Huxley), y también pueden predecir las respuestas de neuronas de la corteza visual primaria a estímulos visuales (Hubel-Wiesel). Sin embargo, los métodos basados en leyes tradicionales fueron completamente derrotados por el aprendizaje profundo en la predicción de las respuestas de neuronas de la corteza visual superior (2019, DiCarlo Lab).\n\nDespués de estas tres revoluciones, los eruditos no abandonarán las tradiciones pasadas sino que las heredarán:\n\n1. Los eruditos después de Galileo tomaron prestado el pensamiento axiomático de los matemáticos de la antigua Grecia al establecer sus propias doctrinas.\n\n2. De ahora en adelante, los eruditos aún deben juzgar si los resultados experimentales coinciden con las predicciones teóricas. Solo que las predicciones ya no serán dadas en unas pocas líneas simples de matemáticas o lenguaje natural, sino por redes neuronales artificiales.\n\nJim Gray navejó lejos y nunca regresó. Nuestra generación también está navegando hacia un mar desconocido, llevando a bordo una máquina de traducción que incluso nosotros mismos no podemos entender.</pre></div>
+                    <div class="card-body"><h4>El Aprendizaje Profundo y la Revolución Científica</h4><pre>Si el barco está destinado a naufragar, ¿aún zarparías?
+
+Había un erudito llamado Jim Gray (1944-2007). En 1998, recibió el Premio Turing por "contribuciones seminales a la investigación de bases de datos y procesamiento de transacciones y liderazgo técnico en implementación de sistemas." Le encantaba navegar solo. En 2007, planeó viajar a una pequeña isla para esparcir las cenizas de su madre allí. Pero nunca regresó. Entre sus amigos y estudiantes había muchos expertos en visión por computadora; buscaron entre miles de imágenes esperando encontrar a Jim Gray, pero sin éxito.
+
+Jim Gray era profundamente perspicaz. En 2007, propuso que estábamos experimentando una cuarta revolución científica.
+
+Él creía:
+
+1. Primer Paradigma: Los humanos realizaron experimentos masivos, aprendiendo así a usar el fuego, construir las pirámides egipcias e inventar el papel.
+
+2. Segundo Paradigma: Comenzó con Galileo. Primero proponer una teoría, luego realizar experimentos para ver si verifican las predicciones de la teoría.
+
+3. Tercer Paradigma: Comenzó con las computadoras electrónicas. Usar computadoras para simular experimentos que son difíciles de realizar en la realidad.
+
+4. Cuarto Paradigma: Comenzó con los grandes datos. Jim Gray creía que con la ayuda de grandes datos, las computadoras podrían entender sistemas complejos. (En ese momento era el segundo invierno del aprendizaje profundo; no se refería al aprendizaje profundo, sino meramente a los grandes datos.)
+
+En 2014, una empresa de IA llamada "Cuarto Paradigma" fue fundada en China. Como todos supusieron, el fundador dijo—el nombre era para rendir homenaje a Jim Gray.
+
+Mi punto de vista difiere algo del de Jim Gray. No respaldo sus Primer y Tercer Paradigmas:
+
+1. Los experimentos masivos antes de Galileo: Ciertamente importantes para el progreso humano y logros tremendos de ingeniería, pero no pueden llamarse propiamente ciencia natural.
+
+2. Simulación por computadora: Creo que no hay diferencia esencial con los experimentos; simplemente traslada experimentos difíciles de realizar en la realidad a las computadoras. Sigue siendo "primero proponer una teoría, luego realizar experimentos para ver si coinciden con la teoría." En cuanto a usar la computación para guiar experimentos, lo considero similar a un experimento piloto.
+
+Estoy de acuerdo con su Segundo y Cuarto Paradigmas. Más allá de eso, creo que omitió las matemáticas de la antigua Grecia.
+
+Creo que ha habido tres revoluciones científicas en la historia humana:
+
+1. Euclides y otros escribieron los Elementos. Esto marca el verdadero comienzo de las matemáticas. Tomamos ciertas reglas como axiomas y las usamos para construir nuestro sistema, en lugar de meramente aritmética y dibujo. Esto es matemáticas.
+
+2. Galileo escribió Dos Nuevas Ciencias. Esto marca el verdadero comienzo de la ciencia natural. Debemos juzgar si los resultados experimentales coinciden con las predicciones teóricas, en lugar de dedicarnos a la especulación pura o realizar ciegamente experimentos masivos. Esto es ciencia natural. Más tarde, Lavoisier y Mendel también usaron modos de pensamiento similares.
+
+3. El progreso del aprendizaje profundo desde 2012 hasta el presente. Esto representa un "software de traducción" entre la humanidad y la naturaleza. ¿Es realmente matemáticas el lenguaje de Dios? ¿Todas las leyes de la naturaleza pueden describirse en lenguaje matemático simple?—Quizás la respuesta es no. Hasta la fecha, las leyes que los humanos pueden entender pueden describirse ya sea en unas pocas líneas de lenguaje matemático o en unas pocas líneas de lenguaje natural. Pero los sistemas complejos pueden no ser así. Cuando un sistema es suficientemente complejo, quizás nunca podamos resumir sus leyes en lenguaje comprensible para humanos, pero ya podemos entrenar una red neuronal para servir como "software de traducción." El aprendizaje profundo ya ha comenzado a servir como "software de traducción" entre la humanidad y la naturaleza (particularmente sistemas complejos), y sus capacidades se vuelven cada vez más fuertes. Por ejemplo:
+   (A) Los humanos pueden entender la interacción entre dos átomos (simulada usando las ecuaciones de Newton o la ecuación de Schrödinger). Sin embargo, los métodos basados en leyes físicas fueron completamente derrotados por el aprendizaje profundo en la predicción de estructuras de proteínas (2020, AlphaFold 2).
+   (B) Los humanos pueden entender una sola neurona y predecir las formas de onda de potencial de acción (Hodgkin-Huxley), y también pueden predecir las respuestas de neuronas de la corteza visual primaria a estímulos visuales (Hubel-Wiesel). Sin embargo, los métodos basados en leyes tradicionales fueron completamente derrotados por el aprendizaje profundo en la predicción de las respuestas de neuronas de la corteza visual superior (2019, DiCarlo Lab).
+
+Después de estas tres revoluciones, los eruditos no abandonarán las tradiciones pasadas sino que las heredarán:
+
+1. Los eruditos después de Galileo tomaron prestado el pensamiento axiomático de los matemáticos de la antigua Grecia al establecer sus propias doctrinas.
+
+2. De ahora en adelante, los eruditos aún deben juzgar si los resultados experimentales coinciden con las predicciones teóricas. Solo que las predicciones ya no serán dadas en unas pocas líneas simples de matemáticas o lenguaje natural, sino por redes neuronales artificiales.
+
+Jim Gray navejó lejos y nunca regresó. Nuestra generación también está navegando hacia un mar desconocido, llevando a bordo una máquina de traducción que incluso nosotros mismos no podemos entender.</pre></div>
                     <div class="card-footer">5,646 字符</div>
                 </div>
             </div>
@@ -1149,7 +1635,7 @@ Gracias a Jessica Livingston, Ben Miller y Robert Morris por leer borradores de 
          
         <section id="yangzhenning" class="article-section ">
             <div class="metadata">
-                <h2>中国今天不宜建造超大对撞机</h2>
+                <h2>谏罢建造超大对撞机疏</h2>
                 <div class="meta-grid">
                     <div><span class="meta-label">English Title</span><span class="meta-value">Why China Should Not Build a Super Collider Today</span></div>
                     <div><span class="meta-label">Título en Español</span><span class="meta-value">Por qué China no debería construir un supercolisionador hoy</span></div>
@@ -1157,62 +1643,26 @@ Gracias a Jessica Livingston, Ben Miller y Robert Morris por leer borradores de 
                     <div><span class="meta-label">来源 / Source</span><span class="meta-value">《知识分子》微信公众号, 2016年9月4日</span></div>
                     <div><span class="meta-label">时代 / Period</span><span class="meta-value">当代 (2016年)</span></div>
                     <div><span class="meta-label">体裁 / Genre</span><span class="meta-value">科学评论/议论文</span></div>
-                    <div><span class="meta-label">原文语言</span><span class="meta-value">modern_chinese</span></div>
+                     <div><span class="meta-label">原文语言 / ORIGINAL LANGUAGE</span><span class="meta-value">modern_chinese</span></div>
                 </div>
             </div>
             
             <div class="comparison">
                 <table>
-                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>字符数</th></tr></thead>
+                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>Unicode 字符数</th><th class="token-col-header">词元数 <span class="tokenizer-name"></span></th></tr></thead>
                     <tbody>
-                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>原文</td><td>中国今天不宜建造超大对撞机</td><td>1,431</td></tr>
+                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>译文</td><td>谏罢建造超大对撞机疏</td><td>1,237</td><td class="token-count" data-article="yangzhenning" data-lang="classical_chinese">—</td></tr>
             
-                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>译文</td><td>谏罢建造超大对撞机疏</td><td>1,237</td></tr>
+                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>原文</td><td>中国今天不宜建造超大对撞机</td><td>1,431</td><td class="token-count" data-article="yangzhenning" data-lang="modern_chinese">—</td></tr>
             
-                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>译文</td><td>Why China Should Not Build a Super Collider Today</td><td>5,171</td></tr>
+                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>译文</td><td>Why China Should Not Build a Super Collider Today</td><td>5,171</td><td class="token-count" data-article="yangzhenning" data-lang="english">—</td></tr>
             
-                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>Por qué China no debería construir un supercolisionador hoy</td><td>5,701</td></tr>
+                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>Por qué China no debería construir un supercolisionador hoy</td><td>5,701</td><td class="token-count" data-article="yangzhenning" data-lang="spanish">—</td></tr>
             </tbody>
                 </table>
             </div>
             
             <div class="text-grid">
-                <div class="text-card lang-modern">
-                    <div class="card-header"><span class="lang-name">现代汉语</span><span class="role-badge original">原文</span></div>
-                    <div class="card-body"><h4>中国今天不宜建造超大对撞机</h4><pre>8月29日微信公众号老顾谈几何中有一篇文章，题目是《丘成桐：关于中国建设高能对撞机的几点意见并回答媒体的问题》，讲到他（丘）赞成中国建造超大对撞机，而我（杨）反对，他难相信。其中一段如下：
-
-"这些实验背后的基础理论都用到杨先生的学说，每一次突破后，我们对杨先生的学问更加佩服！所以说杨先生反对高能物理需要有更进一步的发展，使人费解！"
-
-丘教授的理解有误！我绝不反对高能物理继续发展，我反对的是中国今天开始建造超大对撞机，原因如下：
-
-（一）建造大对撞机美国有痛苦的经验：1989年美国开始建造当时世界最大对撞机，预算开始预估为30亿美元，后来数次增加，达到80亿美元，引起众多反对声音，以致1992年国会痛苦地终止了此计划，白费了约30亿美元。这项经验使大家普遍认为造大对撞机是进无底洞。
-
-目前世界最大对撞机是CERN的LHC。2012年6000位物理学家用此对撞机发现了Higgs粒子，是粒子物理学的大贡献，验证了"标准模型"。LHC的建造前后用了许多年，建造费加上探测器费等等加起来一共不少于100亿美元。高能所建议的超大对撞机预算不可能少于200亿美元。
-
-（二）高能所倡议在中国建造超大对撞机，费用由许多国家分摊。可是其中中国的份额必极可观。今天全世界都惊叹中国GDP已跃居世界第二。可是中国仍然只是一个发展中国家，人均GDP还少于巴西、墨西哥或马来西亚，还有数亿农民与农民工，还有急待解决的环保问题、教育问题、医药健康问题等等。建造超大对撞机，费用奇大，对解决这些燃眉问题不利，我认为目前不宜考虑。
-
-（三）建造超大对撞机必将大大挤压其他基础科学的经费，包括生命科学、凝聚态物理、天文物理等等。
-
-（四）为什么有不少高能物理学家积极赞成建造超大对撞机呢？原因如下：
-
-A. 高能物理学是二战后的一个新兴领域，此领域七十年来有了辉煌的成就，验证了标准模型，使人类对物质世界中三种基本力量有了深入了解。可是还有两项大问题没有解决：
-
-甲）对剩下的第四种基本力量——引力——的深入了解还有基本困难。
-
-乙）还没有能了解如何统一力量与质量。希望解决此二问题当然是所有物理学家的愿望。
-
-B. 有些高能物理学家希望用超大对撞机发现"超对称粒子"，从而为人类指出解决此二问题的方向。
-
-但是找超对称粒子已经有很多年了，完全落空。今天希望用超大对撞机来找到超对称粒子，只是一部分高能物理学家的一个"猜想"。多数物理学家，包括我在内，认为超对称粒子的存在只是一个猜想，没有任何实验根据，希望用极大对撞机发现此猜想中的粒子更只是"猜想加猜想"。
-
-（五）七十年来高能物理的大成就对人类生活有没有实在好处呢？没有。假如高能所建议的超大对撞机能实现，而且真能成功地将高能物理学更推进一大步，对人类生活有没有实在好处呢？我认为短中期内不会有，三十年、五十年内不会有。而且我知道绝大多数物理学家都同意我的这个说法。
-
-（六）中国建立高能所到今天已有三十多年。如何评价这三十多年的成就？今天世界重要高能物理学家中，中国占有率不到百分之一、二。建造超大对撞机，其设计以及建成后的运转与分析，必将由90%的非中国人来主导。如果能得到诺贝尔奖，获奖者会是中国人吗？
-
-（七）不建超大对撞机，高能物理就完全没有前途了吗？不然。我认为至少有两个方向值得探索：A. 寻找新加速器原理；B. 寻找美妙的几何结构，如弦理论所研究的。这两方面的研究都不那么费钱，符合当今世界经济发展的总趋势。</pre></div>
-                    <div class="card-footer">1,431 字符</div>
-                </div>
-            
                 <div class="text-card lang-classical">
                     <div class="card-header"><span class="lang-name">文言</span><span class="role-badge translation">译文</span></div>
                     <div class="card-body"><h4>谏罢建造超大对撞机疏</h4><pre>八月廿九日，微信公号《老顾谈几何》载丘成桐文，题曰《关于中国建设高能对撞机之数端意见并答记者问》，言丘氏赞成中国建超大对撞机，而杨氏反对，丘氏难信。其文有云：
@@ -1247,6 +1697,42 @@ B. 有些高能物理学家希望用超大对撞机发现"超对称粒子"，从
 
 其七，不建超大对撞机，高能物理遂全无前途乎？不然。杨以为至少有二方向值得探索：甲，寻新加速器之理；乙，寻美妙之几何结构，如弦理论之所究。此二方面之研究皆不甚费钱，合于当今世界经济发轫之大势。</pre></div>
                     <div class="card-footer">1,237 字符</div>
+                </div>
+            
+                <div class="text-card lang-modern">
+                    <div class="card-header"><span class="lang-name">现代汉语</span><span class="role-badge original">原文</span></div>
+                    <div class="card-body"><h4>中国今天不宜建造超大对撞机</h4><pre>8月29日微信公众号老顾谈几何中有一篇文章，题目是《丘成桐：关于中国建设高能对撞机的几点意见并回答媒体的问题》，讲到他（丘）赞成中国建造超大对撞机，而我（杨）反对，他难相信。其中一段如下：
+
+"这些实验背后的基础理论都用到杨先生的学说，每一次突破后，我们对杨先生的学问更加佩服！所以说杨先生反对高能物理需要有更进一步的发展，使人费解！"
+
+丘教授的理解有误！我绝不反对高能物理继续发展，我反对的是中国今天开始建造超大对撞机，原因如下：
+
+（一）建造大对撞机美国有痛苦的经验：1989年美国开始建造当时世界最大对撞机，预算开始预估为30亿美元，后来数次增加，达到80亿美元，引起众多反对声音，以致1992年国会痛苦地终止了此计划，白费了约30亿美元。这项经验使大家普遍认为造大对撞机是进无底洞。
+
+目前世界最大对撞机是CERN的LHC。2012年6000位物理学家用此对撞机发现了Higgs粒子，是粒子物理学的大贡献，验证了"标准模型"。LHC的建造前后用了许多年，建造费加上探测器费等等加起来一共不少于100亿美元。高能所建议的超大对撞机预算不可能少于200亿美元。
+
+（二）高能所倡议在中国建造超大对撞机，费用由许多国家分摊。可是其中中国的份额必极可观。今天全世界都惊叹中国GDP已跃居世界第二。可是中国仍然只是一个发展中国家，人均GDP还少于巴西、墨西哥或马来西亚，还有数亿农民与农民工，还有急待解决的环保问题、教育问题、医药健康问题等等。建造超大对撞机，费用奇大，对解决这些燃眉问题不利，我认为目前不宜考虑。
+
+（三）建造超大对撞机必将大大挤压其他基础科学的经费，包括生命科学、凝聚态物理、天文物理等等。
+
+（四）为什么有不少高能物理学家积极赞成建造超大对撞机呢？原因如下：
+
+A. 高能物理学是二战后的一个新兴领域，此领域七十年来有了辉煌的成就，验证了标准模型，使人类对物质世界中三种基本力量有了深入了解。可是还有两项大问题没有解决：
+
+甲）对剩下的第四种基本力量——引力——的深入了解还有基本困难。
+
+乙）还没有能了解如何统一力量与质量。希望解决此二问题当然是所有物理学家的愿望。
+
+B. 有些高能物理学家希望用超大对撞机发现"超对称粒子"，从而为人类指出解决此二问题的方向。
+
+但是找超对称粒子已经有很多年了，完全落空。今天希望用超大对撞机来找到超对称粒子，只是一部分高能物理学家的一个"猜想"。多数物理学家，包括我在内，认为超对称粒子的存在只是一个猜想，没有任何实验根据，希望用极大对撞机发现此猜想中的粒子更只是"猜想加猜想"。
+
+（五）七十年来高能物理的大成就对人类生活有没有实在好处呢？没有。假如高能所建议的超大对撞机能实现，而且真能成功地将高能物理学更推进一大步，对人类生活有没有实在好处呢？我认为短中期内不会有，三十年、五十年内不会有。而且我知道绝大多数物理学家都同意我的这个说法。
+
+（六）中国建立高能所到今天已有三十多年。如何评价这三十多年的成就？今天世界重要高能物理学家中，中国占有率不到百分之一、二。建造超大对撞机，其设计以及建成后的运转与分析，必将由90%的非中国人来主导。如果能得到诺贝尔奖，获奖者会是中国人吗？
+
+（七）不建超大对撞机，高能物理就完全没有前途了吗？不然。我认为至少有两个方向值得探索：A. 寻找新加速器原理；B. 寻找美妙的几何结构，如弦理论所研究的。这两方面的研究都不那么费钱，符合当今世界经济发展的总趋势。</pre></div>
+                    <div class="card-footer">1,431 字符</div>
                 </div>
             
                 <div class="text-card lang-english">
@@ -1325,62 +1811,34 @@ Sin embargo, la búsqueda de partículas supersimétricas ha continuado durante 
          
         <section id="yau_collider_opinions" class="article-section ">
             <div class="metadata">
-                <h2>丘成桐：对中国建设高能对撞机的意见</h2>
+                <h2>丘成桐议中国建高能对撞机</h2>
                 <div class="meta-grid">
                     <div><span class="meta-label">English Title</span><span class="meta-value">Yau Shing-Tung: Opinions on Building a High-Energy Collider in China</span></div>
                     <div><span class="meta-label">Título en Español</span><span class="meta-value">Yau Shing-Tung: Opiniones sobre la Construcción de un Colisionador de Alta Energía en China</span></div>
                     <div><span class="meta-label">作者 / Author</span><span class="meta-value">丘成桐</span></div>
-                    <div><span class="meta-label">来源 / Source</span><span class="meta-value">网络评论文章</span></div>
+                    <div><span class="meta-label">来源 / Source</span><span class="meta-value">《老顾谈几何》微信公众号</span></div>
                     <div><span class="meta-label">时代 / Period</span><span class="meta-value">当代 (2016年左右)</span></div>
                     <div><span class="meta-label">体裁 / Genre</span><span class="meta-value">科学评论/议论文</span></div>
-                    <div><span class="meta-label">原文语言</span><span class="meta-value">modern_chinese</span></div>
+                     <div><span class="meta-label">原文语言 / ORIGINAL LANGUAGE</span><span class="meta-value">modern_chinese</span></div>
                 </div>
             </div>
             
             <div class="comparison">
                 <table>
-                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>字符数</th></tr></thead>
+                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>Unicode 字符数</th><th class="token-col-header">词元数 <span class="tokenizer-name"></span></th></tr></thead>
                     <tbody>
-                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>原文</td><td>丘成桐：对中国建设高能对撞机的意见</td><td>1,588</td></tr>
+                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>译文</td><td>丘成桐议中国建高能对撞机</td><td>1,469</td><td class="token-count" data-article="yau_collider_opinions" data-lang="classical_chinese">—</td></tr>
             
-                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>译文</td><td>丘成桐议中国建高能对撞机</td><td>1,469</td></tr>
+                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>原文</td><td>丘成桐：对中国建设高能对撞机的意见</td><td>1,588</td><td class="token-count" data-article="yau_collider_opinions" data-lang="modern_chinese">—</td></tr>
             
-                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>译文</td><td>Yau Shing-Tung: Opinions on Building a High-Energy Collider in China</td><td>5,827</td></tr>
+                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>译文</td><td>Yau Shing-Tung: Opinions on Building a High-Energy Collider in China</td><td>5,827</td><td class="token-count" data-article="yau_collider_opinions" data-lang="english">—</td></tr>
             
-                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>Yau Shing-Tung: Opiniones sobre la Construcción de un Colisionador de Alta Energía en China</td><td>6,424</td></tr>
+                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>Yau Shing-Tung: Opiniones sobre la Construcción de un Colisionador de Alta Energía en China</td><td>6,424</td><td class="token-count" data-article="yau_collider_opinions" data-lang="spanish">—</td></tr>
             </tbody>
                 </table>
             </div>
             
             <div class="text-grid">
-                <div class="text-card lang-modern">
-                    <div class="card-header"><span class="lang-name">现代汉语</span><span class="role-badge original">原文</span></div>
-                    <div class="card-body"><h4>丘成桐：对中国建设高能对撞机的意见</h4><pre>最近有很多媒体关注在中国有没有可能建造对撞机，这是好事，毕竟这个事情也是全球科学家都有兴趣的事情。不幸的是，有些媒体，急于发表自己的意见，炒作新闻，不是无中生有，就是对被访问者的说话，断章取义。
-
-对我个人而言，就发生过几次这样的媒体报导。举例来说，财新周刊在我拒绝他们的访问后，就制造了一个类似访问我的稿子，凭想像和网上看到的谣言制造了一些新闻，并基于此而对我做人身攻击。
-
-最近又有记者不断来问我一些可笑的问题，他们要我跟某个我从来没有听过的叫做王孟源的先生对话，要我评论他最近写的一篇关于对撞机的文章。同时记者坚持王先生是高能物理的专家：原因是王先生毕业于哈佛大学物理系，得过博士。对我来说，这事实在有点意外。因为我兼任哈佛大学物理系和数学系的教授，却从来没有听过王先生的名字（在哈佛大学这么多年来，我是唯一由校长正式聘任并在两个系内都可以投票的教授）。接到记者来信后，我求问哈佛大学物理系做高能物理的教授朋友们，谁认识王先生？结果没有人听过他的名字。经过多次访寻后，终于有人找到他的导师名字，是一个没有在系中升职的助理教授，难怪系中资深的高能物理学家们不认识王先生，据说王先生在他的博士论文后没有再做任何有意思的文章，做生意已经廿多年了。听到这个消息后，我不觉惊讶于中国媒体访问科技专业的能力，实在有限得很！
-
-据说王先生对我有很多指责，本来我不在乎，毕竟我每个星期都收到一些业余学者解决大问题的来信，见怪不怪了。但是记者坚持要我扯上杨振宁教授，一下子从地下升到天上了，我想应该说几句话吧。
-
-我认识杨先生已经四十五年了。除了我的老师陈省身教授外，他一向是我最尊敬的科学家，他在上世纪五十年代和六十年代在统计物理和高能物理的工作都使人敬佩，影响最大的莫过于他推广Weyl的规范场的工作到非交换规范场的理论，在七十年代由欧美诸人完成的高能物理的标准模型，可以说是人类有史以来对自然界认识最深刻的理论，这个模型的建立须要用到非交换的规范场理论。
-
-五十年来在欧美不同地方的高能对撞机每一次得出来的重要结果，都能震撼人心，因为它显示了大自然最基本结构的一部分。每一次实验的突破，都代表着人类进一步地了解了人类历史以来最想知道的事情：天地是如何建立起来的？
-
-这些实验背后的基础理论都用到杨先生的学说，因此每一次突破后，我们对杨先生的学问有更进一步的景仰！所以说杨先生反对高能物理须要有更进一步的发展，使人费解！这更不是华尔街一般的商人能够理解的事情。
-
-记者说杨教授反对在这个科学界最基本的学问领域上継续做硏究，我不敢肯定这句话的真实性。毕竟我和杨教授多有过从，却还没有亲耳听到过他反对建立对撞机的事实。所以此话只能作为存疑。
-
-但是重要科学的创作，都包含众多科学家的贡献在内，不属于某人所有，真理只在反复的推理和实验下，才能得到大家的认同，所以古希腊哲学家说：吾爱吾师，吾更爱真理。要发掘宇宙间最基本的真理，更要有这种勇气，这种毅力，才能完成。西方国家，无论是科学家，或是政府，为了暸解大自然的奥祕，都愿意无条件的付出大量的精力！一百多年来，多少智慧，多少金钱，投入在一些看来没有用的基础科学上。但是这些投资却成就了今天西方国家文化的基础。
-
-今日的中国，已非吴下阿蒙，难道不需要为这个人类最崇高的理想做点贡献？难道我们只是在游戏机，在房地产，在互联网上赚点好处，就心满意足？在我记忆所及，中外古今都还没有过这样的大国！
-
-我们扪心自问，中国当今的国力，没有能力做这个对撞机吗？中国领导说的和平崛起，可以没有重要的文化意涵，没有探索宇宙奥秘的勇气吗？现在在中国反对建做对撞机的科学家们，有谁是高能物理的实验专家？为什么有深厚经验的外国专家意见变得不重要了？
-
-我和 Steve Nadis 的书上已经解释很清楚做对撞机对科学，对中国的重要性，希望大家用理性的态度来看这事！</pre></div>
-                    <div class="card-footer">1,588 字符</div>
-                </div>
-            
                 <div class="text-card lang-classical">
                     <div class="card-header"><span class="lang-name">文言</span><span class="role-badge translation">译文</span></div>
                     <div class="card-body"><h4>丘成桐议中国建高能对撞机</h4><pre>近来多有媒体关注中国能否建造对撞机，此诚善事，毕竟此事亦全球科学家所共兴趣者。不幸者，有些媒体急于发表己意，炒作新闻，非无中生有，即对被访问者之语断章取义。
@@ -1407,6 +1865,34 @@ Sin embargo, la búsqueda de partículas supersimétricas ha continuado durante 
 
 吾与Steve Nadis之书已解释很清楚做对撞机于科学，于中国之重要性，希望大家以理性之态度看此事！</pre></div>
                     <div class="card-footer">1,469 字符</div>
+                </div>
+            
+                <div class="text-card lang-modern">
+                    <div class="card-header"><span class="lang-name">现代汉语</span><span class="role-badge original">原文</span></div>
+                    <div class="card-body"><h4>丘成桐：对中国建设高能对撞机的意见</h4><pre>最近有很多媒体关注在中国有没有可能建造对撞机，这是好事，毕竟这个事情也是全球科学家都有兴趣的事情。不幸的是，有些媒体，急于发表自己的意见，炒作新闻，不是无中生有，就是对被访问者的说话，断章取义。
+
+对我个人而言，就发生过几次这样的媒体报导。举例来说，财新周刊在我拒绝他们的访问后，就制造了一个类似访问我的稿子，凭想像和网上看到的谣言制造了一些新闻，并基于此而对我做人身攻击。
+
+最近又有记者不断来问我一些可笑的问题，他们要我跟某个我从来没有听过的叫做王孟源的先生对话，要我评论他最近写的一篇关于对撞机的文章。同时记者坚持王先生是高能物理的专家：原因是王先生毕业于哈佛大学物理系，得过博士。对我来说，这事实在有点意外。因为我兼任哈佛大学物理系和数学系的教授，却从来没有听过王先生的名字（在哈佛大学这么多年来，我是唯一由校长正式聘任并在两个系内都可以投票的教授）。接到记者来信后，我求问哈佛大学物理系做高能物理的教授朋友们，谁认识王先生？结果没有人听过他的名字。经过多次访寻后，终于有人找到他的导师名字，是一个没有在系中升职的助理教授，难怪系中资深的高能物理学家们不认识王先生，据说王先生在他的博士论文后没有再做任何有意思的文章，做生意已经廿多年了。听到这个消息后，我不觉惊讶于中国媒体访问科技专业的能力，实在有限得很！
+
+据说王先生对我有很多指责，本来我不在乎，毕竟我每个星期都收到一些业余学者解决大问题的来信，见怪不怪了。但是记者坚持要我扯上杨振宁教授，一下子从地下升到天上了，我想应该说几句话吧。
+
+我认识杨先生已经四十五年了。除了我的老师陈省身教授外，他一向是我最尊敬的科学家，他在上世纪五十年代和六十年代在统计物理和高能物理的工作都使人敬佩，影响最大的莫过于他推广Weyl的规范场的工作到非交换规范场的理论，在七十年代由欧美诸人完成的高能物理的标准模型，可以说是人类有史以来对自然界认识最深刻的理论，这个模型的建立须要用到非交换的规范场理论。
+
+五十年来在欧美不同地方的高能对撞机每一次得出来的重要结果，都能震撼人心，因为它显示了大自然最基本结构的一部分。每一次实验的突破，都代表着人类进一步地了解了人类历史以来最想知道的事情：天地是如何建立起来的？
+
+这些实验背后的基础理论都用到杨先生的学说，因此每一次突破后，我们对杨先生的学问有更进一步的景仰！所以说杨先生反对高能物理须要有更进一步的发展，使人费解！这更不是华尔街一般的商人能够理解的事情。
+
+记者说杨教授反对在这个科学界最基本的学问领域上継续做硏究，我不敢肯定这句话的真实性。毕竟我和杨教授多有过从，却还没有亲耳听到过他反对建立对撞机的事实。所以此话只能作为存疑。
+
+但是重要科学的创作，都包含众多科学家的贡献在内，不属于某人所有，真理只在反复的推理和实验下，才能得到大家的认同，所以古希腊哲学家说：吾爱吾师，吾更爱真理。要发掘宇宙间最基本的真理，更要有这种勇气，这种毅力，才能完成。西方国家，无论是科学家，或是政府，为了暸解大自然的奥祕，都愿意无条件的付出大量的精力！一百多年来，多少智慧，多少金钱，投入在一些看来没有用的基础科学上。但是这些投资却成就了今天西方国家文化的基础。
+
+今日的中国，已非吴下阿蒙，难道不需要为这个人类最崇高的理想做点贡献？难道我们只是在游戏机，在房地产，在互联网上赚点好处，就心满意足？在我记忆所及，中外古今都还没有过这样的大国！
+
+我们扪心自问，中国当今的国力，没有能力做这个对撞机吗？中国领导说的和平崛起，可以没有重要的文化意涵，没有探索宇宙奥秘的勇气吗？现在在中国反对建做对撞机的科学家们，有谁是高能物理的实验专家？为什么有深厚经验的外国专家意见变得不重要了？
+
+我和 Steve Nadis 的书上已经解释很清楚做对撞机对科学，对中国的重要性，希望大家用理性的态度来看这事！</pre></div>
+                    <div class="card-footer">1,588 字符</div>
                 </div>
             
                 <div class="text-card lang-english">
@@ -1471,7 +1957,7 @@ Mi libro con Steve Nadis ya ha explicado claramente la importancia de construir 
             </div>
         </section>
          
-        <section id="zuozhuan" class="article-section ">
+        <section id="exile_of_duke_wen_of_jin" class="article-section ">
             <div class="metadata">
                 <h2>左传·晋文公流亡</h2>
                 <div class="meta-grid">
@@ -1481,21 +1967,21 @@ Mi libro con Steve Nadis ya ha explicado claramente la importancia de construir 
                     <div><span class="meta-label">来源 / Source</span><span class="meta-value">《左传·僖公二十三年、二十四年》</span></div>
                     <div><span class="meta-label">时代 / Period</span><span class="meta-value">春秋时期 (公元前7世纪)</span></div>
                     <div><span class="meta-label">体裁 / Genre</span><span class="meta-value">历史叙事</span></div>
-                    <div><span class="meta-label">原文语言</span><span class="meta-value">classical_chinese</span></div>
+                     <div><span class="meta-label">原文语言 / ORIGINAL LANGUAGE</span><span class="meta-value">classical_chinese</span></div>
                 </div>
             </div>
             
             <div class="comparison">
                 <table>
-                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>字符数</th></tr></thead>
+                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>Unicode 字符数</th><th class="token-col-header">词元数 <span class="tokenizer-name"></span></th></tr></thead>
                     <tbody>
-                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>原文</td><td>左传·晋文公流亡</td><td>1,165</td></tr>
+                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>原文</td><td>左传·晋文公流亡</td><td>1,165</td><td class="token-count" data-article="exile_of_duke_wen_of_jin" data-lang="classical_chinese">—</td></tr>
             
-                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>译文</td><td>晋文公流亡记（白话译文）</td><td>1,650</td></tr>
+                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>译文</td><td>晋文公流亡记</td><td>1,650</td><td class="token-count" data-article="exile_of_duke_wen_of_jin" data-lang="modern_chinese">—</td></tr>
             
-                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>译文</td><td>The Exile of Duke Wen of Jin</td><td>6,422</td></tr>
+                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>译文</td><td>The Exile of Duke Wen of Jin</td><td>6,422</td><td class="token-count" data-article="exile_of_duke_wen_of_jin" data-lang="english">—</td></tr>
             
-                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>El Exilio del Duque Wen de Jin</td><td>6,565</td></tr>
+                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>El Exilio del Duque Wen de Jin</td><td>6,565</td><td class="token-count" data-article="exile_of_duke_wen_of_jin" data-lang="spanish">—</td></tr>
             </tbody>
                 </table>
             </div>
@@ -1525,7 +2011,7 @@ Mi libro con Steve Nadis ya ha explicado claramente la importancia de construir 
             
                 <div class="text-card lang-modern">
                     <div class="card-header"><span class="lang-name">现代汉语</span><span class="role-badge translation">译文</span></div>
-                    <div class="card-body"><h4>晋文公流亡记（白话译文）</h4><pre>晋国公子重耳遭遇祸难时，晋国军队攻打蒲城。重耳于是逃奔狄国。跟随他的有狐偃、赵衰、颠颉、魏武子、司空季子。狄人攻打廧咎如，俘获其二女叔隗、季隗，献给公子。公子娶季隗，生下伯儵、叔刘；又将叔隗嫁给赵衰，生下赵盾。重耳准备前往齐国，对季隗说："等我二十五年，若不来再改嫁。"季隗答道："我已二十五岁了，再等二十五年改嫁，就该进棺材了。请让我等您。"重耳在狄国住了十二年后才离开。
+                    <div class="card-body"><h4>晋文公流亡记</h4><pre>晋国公子重耳遭遇祸难时，晋国军队攻打蒲城。重耳于是逃奔狄国。跟随他的有狐偃、赵衰、颠颉、魏武子、司空季子。狄人攻打廧咎如，俘获其二女叔隗、季隗，献给公子。公子娶季隗，生下伯儵、叔刘；又将叔隗嫁给赵衰，生下赵盾。重耳准备前往齐国，对季隗说："等我二十五年，若不来再改嫁。"季隗答道："我已二十五岁了，再等二十五年改嫁，就该进棺材了。请让我等您。"重耳在狄国住了十二年后才离开。
 
 经过卫国，卫文公不以礼相待。走出五鹿，向乡野之人乞食，野人给他一块土块，公子大怒，想要鞭打他。子犯说："这是上天赐予的土地。"公子叩首致谢，接过土块装在车上。
 
@@ -1595,6 +2081,13 @@ En la primavera del vigésimo cuarto año, en el primer mes, el duque Mu de Qin 
     
     <footer>
         <p>12×4 Multilingual Corpus | Generated for Token Consumption Analysis</p>
+        <div class="footer-links">
+            <span>友情链接 / Friendly Links:</span>
+            <a href="https://gpt-tokenizer.dev/" target="_blank" rel="noopener">GPT Tokenizer</a>
+            <a href="https://www.danieldemmel.me/tokenizer" target="_blank" rel="noopener">LLM Tokenizer</a>
+            <a href="https://tiktokenizer.vercel.app/" target="_blank" rel="noopener">tiktokenizer</a>
+            <a href="https://platform.openai.com/tokenizer" target="_blank" rel="noopener">OpenAI Tokenizer</a>
+        </div>
     </footer>
     
     <script>
@@ -1651,6 +2144,131 @@ En la primavera del vigésimo cuarto año, en el primer mes, el duque Mu de Qin 
         });
 
         applyTheme('system');
+    </script>
+    <script>
+        // Precomputed token counts for open-source models (generated at build time)
+        window.PRECOMPUTED_TOKENS = {"open_source": {}};
+    </script>
+    
+    <!-- gpt-tokenizer encoding-specific UMD bundles -->
+    <script src="https://cdn.jsdelivr.net/npm/gpt-tokenizer@2.9.0/dist/o200k_base.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gpt-tokenizer@2.9.0/dist/cl100k_base.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gpt-tokenizer@2.9.0/dist/p50k_base.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gpt-tokenizer@2.9.0/dist/r50k_base.js"></script>
+    
+    <script>
+        // ── Encoder map: tokenizer name → UMD global ──
+        const ENCODERS = {
+            'gpt-4o':             GPTTokenizer_o200k_base,
+            'gpt-4.1':            GPTTokenizer_o200k_base,
+            'gpt-4':              GPTTokenizer_cl100k_base,
+            'gpt-3.5-turbo':      GPTTokenizer_cl100k_base,
+            'text-davinci-003':   GPTTokenizer_p50k_base,
+            'davinci':            GPTTokenizer_r50k_base,
+            'o200k_base':         GPTTokenizer_o200k_base,
+            'cl100k_base':        GPTTokenizer_cl100k_base,
+            'p50k_base':          GPTTokenizer_p50k_base,
+            'r50k_base':          GPTTokenizer_r50k_base,
+        };
+
+        const OPEN_SOURCE_MODELS = [
+            'Qwen2.5-72B', 'Phi-2', 'Gemma-7B',
+            'DeepSeek-R1', 'Llama-3-8B', 'Llama-3-70B'
+        ];
+
+        function isOpenSource(name) {
+            return OPEN_SOURCE_MODELS.includes(name);
+        }
+
+        // ── Text cache: extract all <pre> texts once ──
+        const textCache = new Map();
+        function getTextKey(articleId, lang) {
+            return `${articleId}::${lang}`;
+        }
+        function getText(articleId, lang) {
+            const key = getTextKey(articleId, lang);
+            if (textCache.has(key)) return textCache.get(key);
+            const section = document.getElementById(articleId);
+            if (!section) return '';
+            const cards = section.querySelectorAll('.text-card');
+            for (const card of cards) {
+                const langClass = Array.from(card.classList).find(c =>
+                    c.startsWith('lang-') && !c.endsWith('-name'));
+                if (!langClass) continue;
+                const pre = card.querySelector('pre');
+                if (!pre) continue;
+                let cardLang = null;
+                if (langClass === 'lang-classical') cardLang = 'classical_chinese';
+                else if (langClass === 'lang-modern') cardLang = 'modern_chinese';
+                else if (langClass === 'lang-english') cardLang = 'english';
+                else if (langClass === 'lang-spanish') cardLang = 'spanish';
+                if (cardLang && cardLang === lang) {
+                    textCache.set(key, pre.textContent);
+                    return pre.textContent;
+                }
+            }
+            return '';
+        }
+
+        // ── Count tokens ──
+        function countTokens(text, tokenizerName) {
+            const encoder = ENCODERS[tokenizerName];
+            if (!encoder || typeof encoder.encode !== 'function') return -1;
+            try {
+                return encoder.encode(text).length;
+            } catch(e) {
+                return -1;
+            }
+        }
+
+        // ── Update all token cells ──
+        let currentTokenizer = 'gpt-4o';
+
+        function updateAllTokenCounts() {
+            const name = currentTokenizer;
+            document.querySelectorAll('.tokenizer-name').forEach(el => {
+                el.textContent = `(${name})`;
+            });
+
+            const cells = document.querySelectorAll('.token-count');
+            cells.forEach(cell => { cell.classList.add('loading'); cell.textContent = '...'; });
+
+            setTimeout(() => {
+                cells.forEach(cell => {
+                    const articleId = cell.dataset.article;
+                    const lang = cell.dataset.lang;
+                    cell.classList.remove('loading');
+
+                    if (isOpenSource(name)) {
+                        const pre = window.PRECOMPUTED_TOKENS;
+                        if (pre && pre.open_source && pre.open_source[name] &&
+                            pre.open_source[name][articleId] &&
+                            pre.open_source[name][articleId][lang] !== undefined) {
+                            cell.textContent = pre.open_source[name][articleId][lang].toLocaleString();
+                        } else {
+                            cell.textContent = '需预计算';
+                            cell.title = '运行 code/precompute_tokens.js 生成数据';
+                        }
+                        return;
+                    }
+
+                    const text = getText(articleId, lang);
+                    if (!text) { cell.textContent = '—'; return; }
+
+                    const count = countTokens(text, name);
+                    cell.textContent = count > 0 ? count.toLocaleString() : '—';
+                });
+            }, 10);
+        }
+
+        // ── Init ──
+        document.getElementById('tokenizer-select').addEventListener('change', function() {
+            currentTokenizer = this.value;
+            updateAllTokenCounts();
+        });
+
+        document.addEventListener('DOMContentLoaded', updateAllTokenCounts);
+        if (document.readyState !== 'loading') updateAllTokenCounts();
     </script>
 </body>
 </html>

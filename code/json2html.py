@@ -8,12 +8,23 @@ def json_to_html():
     articles = []
     
     for filepath in json_files:
+        if filepath.name == 'token_counts.json':
+            continue
         with open(filepath, 'r', encoding='utf-8') as f:
             articles.append(json.load(f))
     
     if not articles:
         print("No JSON files found in ../data/!")
         return
+    
+    # Load precomputed token counts (if available) for embedding as JS variable
+    token_counts_json = "{}"
+    try:
+        with open('./data/token_counts.json', 'r', encoding='utf-8') as f:
+            token_counts_json = json.dumps(json.load(f), ensure_ascii=False)
+        print("Loaded precomputed token counts from token_counts.json")
+    except FileNotFoundError:
+        print("No token_counts.json found — open-source tokenizers will show placeholder")
     
     # Language configuration
     LANG_CONFIG = {
@@ -23,11 +34,12 @@ def json_to_html():
         'spanish': {'label': 'Español', 'css': 'lang-spanish', 'dot': '#ff7b72', 'dot_light': '#dc2626'},
     }
     
-    # Build navigation
+    # Build navigation - use classical Chinese title for nav buttons
     nav_items = []
     for i, article in enumerate(articles):
         active = 'active' if i == 0 else ''
-        nav_items.append(f'<button class="nav-btn {active}" data-id="{article["id"]}">{article["metadata"]["title_zh"]}</button>')
+        classical_title = next((t['title'] for t in article['texts'] if t['language'] == 'classical_chinese'), article['metadata']['title_zh'])
+        nav_items.append(f'<button class="nav-btn {active}" data-id="{article["id"]}">{classical_title}</button>')
     
     # Build article sections
     sections = []
@@ -36,9 +48,12 @@ def json_to_html():
         meta = article['metadata']
         texts = article['texts']
         
-        # Sort: original first, then by language order
+        # Use classical Chinese title as the main page title
+        classical_title = next((t['title'] for t in texts if t['language'] == 'classical_chinese'), meta['title_zh'])
+        
+        # Sort by fixed language order: 文言, 现代汉语, English, Español
         lang_order = {'classical_chinese': 0, 'modern_chinese': 1, 'english': 2, 'spanish': 3}
-        texts_sorted = sorted(texts, key=lambda x: (0 if x['role'] == 'original' else 1, lang_order.get(x['language'], 99)))
+        texts_sorted = sorted(texts, key=lambda x: lang_order.get(x['language'], 99))
         
         # Build text cards
         cards = []
@@ -47,10 +62,16 @@ def json_to_html():
             role_text = '原文' if text['role'] == 'original' else '译文'
             char_count = len(text['content'])
             
+            # Fix: some JSON files contain literal \n sequences instead of actual newlines
+            content_fixed = text['content'].replace('\\n', '\n')
+            
             cards.append(f'''
                 <div class="text-card {cfg['css']}">
                     <div class="card-header"><span class="lang-name">{cfg['label']}</span><span class="role-badge {'original' if text['role'] == 'original' else 'translation'}">{role_text}</span></div>
-                    <div class="card-body"><h4>{text['title']}</h4><pre>{text['content']}</pre></div>
+                    <div class="card-body">
+                        <button class="copy-btn" data-content="{content_fixed.replace(chr(34), '&quot;').replace(chr(39), '&#39;')}" title="复制全文">📋</button>
+                        <h4>{text['title']}</h4><pre>{content_fixed}</pre>
+                    </div>
                     <div class="card-footer">{char_count:,} 字符</div>
                 </div>
             ''')
@@ -61,13 +82,13 @@ def json_to_html():
             cfg = LANG_CONFIG.get(text['language'], {'label': text['language'], 'dot': '#fff'})
             role_text = '原文' if text['role'] == 'original' else '译文'
             rows.append(f'''
-                <tr><td><span class="dot" style="background:{cfg['dot']}"></span>{cfg['label']}</td><td>{role_text}</td><td>{text['title']}</td><td>{len(text['content']):,}</td></tr>
+                <tr><td><span class="dot" style="background:{cfg['dot']}"></span>{cfg['label']}</td><td>{role_text}</td><td>{text['title']}</td><td>{len(text['content']):,}</td><td class="token-count" data-article="{article['id']}" data-lang="{text['language']}">—</td></tr>
             ''')
         
         sections.append(f'''
         <section id="{article['id']}" class="article-section {active}">
             <div class="metadata">
-                <h2>{meta['title_zh']}</h2>
+                <h2>{classical_title}</h2>
                 <div class="meta-grid">
                     <div><span class="meta-label">English Title</span><span class="meta-value">{meta.get('title_en', '')}</span></div>
                     <div><span class="meta-label">Título en Español</span><span class="meta-value">{meta.get('title_es', '')}</span></div>
@@ -75,13 +96,13 @@ def json_to_html():
                     <div><span class="meta-label">来源 / Source</span><span class="meta-value">{meta.get('source', '')}</span></div>
                     <div><span class="meta-label">时代 / Period</span><span class="meta-value">{meta.get('period', '')}</span></div>
                     <div><span class="meta-label">体裁 / Genre</span><span class="meta-value">{meta.get('genre', '')}</span></div>
-                    <div><span class="meta-label">原文语言</span><span class="meta-value">{meta.get('original_language', '')}</span></div>
+                     <div><span class="meta-label">原文语言 / ORIGINAL LANGUAGE</span><span class="meta-value">{meta.get('original_language', '')}</span></div>
                 </div>
             </div>
             
             <div class="comparison">
                 <table>
-                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>字符数</th></tr></thead>
+                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>Unicode 字符数</th><th class="token-col-header">词元数 <span class="tokenizer-name"></span></th></tr></thead>
                     <tbody>{''.join(rows)}</tbody>
                 </table>
             </div>
@@ -95,7 +116,7 @@ def json_to_html():
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{len(articles)}×4 多语言语料库阅读器</title>
+    <title>用文言，可省词元乎？</title>
     <style>
         :root {{
             --bg-body: #f8f9fa;
@@ -306,6 +327,20 @@ def json_to_html():
             background: var(--bg-card);
             transition: background 0.3s;
         }}
+        .footer-links {{
+            margin-top: 1rem;
+            font-size: 0.85rem;
+        }}
+        .footer-links a {{
+            color: var(--accent);
+            text-decoration: none;
+            margin: 0 0.6rem;
+            transition: opacity 0.2s;
+        }}
+        .footer-links a:hover {{
+            text-decoration: underline;
+            opacity: 0.8;
+        }}
         
         /* Language colors */
         .lang-classical {{ border-top-color: #ffd700 !important; }}
@@ -320,17 +355,83 @@ def json_to_html():
         .lang-spanish {{ border-top-color: #ff7b72 !important; }}
         .lang-spanish .lang-name {{ color: #ff7b72; }}
         [data-theme="light"] .lang-spanish .lang-name {{ color: #dc2626; }}
+        
+        /* Tokenizer selector */
+        .tokenizer-bar {{
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-left: auto;
+            padding-left: 1.5rem;
+            border-left: 1px solid var(--border);
+        }}
+        .tokenizer-bar label {{
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }}
+        .tokenizer-select {{
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.3s;
+        }}
+        .tokenizer-select:hover, .tokenizer-select:focus {{
+            border-color: var(--accent);
+        }}
+        .token-col-header .tokenizer-name {{
+            font-weight: 400;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }}
+        .token-count {{
+            font-variant-numeric: tabular-nums;
+            transition: color 0.2s;
+        }}
+        .token-count.loading {{
+            color: var(--text-secondary);
+            font-style: italic;
+        }}
     </style>
 </head>
 <body>
     <header>
         <button class="theme-toggle" onclick="toggleTheme()" title="切换主题"></button>
-        <h1>{len(articles)}×4 多语言语料库阅读器</h1>
-        <p>Token Consumption Analysis Corpus | 四种语言 · {len(articles)}篇文章 · 平行对照</p>
+        <h1>用文言，可省词元乎？</h1>
+        <p>Token Consumption Analysis Corpus | 四种语言 · {len(articles)}篇文章</p>
     </header>
     
     <nav>
         {' '.join(nav_items)}
+        <div class="tokenizer-bar">
+            <label for="tokenizer-select">分词器：</label>
+            <select id="tokenizer-select" class="tokenizer-select">
+                <optgroup label="OpenAI（实时）">
+                    <option value="gpt-4o" selected>gpt-4o (o200k_base)</option>
+                    <option value="gpt-4.1">gpt-4.1</option>
+                    <option value="gpt-4">gpt-4 / gpt-3.5-turbo (cl100k_base)</option>
+                    <option value="text-davinci-003">text-davinci-003 (p50k_base)</option>
+                    <option value="davinci">davinci (r50k_base)</option>
+                    <option value="o200k_base">o200k_base (编码)</option>
+                    <option value="cl100k_base">cl100k_base (编码)</option>
+                    <option value="p50k_base">p50k_base (编码)</option>
+                    <option value="r50k_base">r50k_base (编码)</option>
+                </optgroup>
+                <optgroup label="开源模型（预计算）">
+                    <option value="Qwen2.5-72B">Qwen2.5-72B</option>
+                    <option value="Phi-2">Phi-2</option>
+                    <option value="Gemma-7B">Gemma-7B</option>
+                    <option value="DeepSeek-R1">DeepSeek-R1</option>
+                    <option value="Llama-3-8B">Llama-3-8B</option>
+                    <option value="Llama-3-70B">Llama-3-70B</option>
+                </optgroup>
+            </select>
+        </div>
     </nav>
     
     <main>
@@ -339,6 +440,13 @@ def json_to_html():
     
     <footer>
         <p>{len(articles)}×4 Multilingual Corpus | Generated for Token Consumption Analysis</p>
+        <div class="footer-links">
+            <span>友情链接 / Friendly Links:</span>
+            <a href="https://gpt-tokenizer.dev/" target="_blank" rel="noopener">GPT Tokenizer</a>
+            <a href="https://www.danieldemmel.me/tokenizer" target="_blank" rel="noopener">LLM Tokenizer</a>
+            <a href="https://tiktokenizer.vercel.app/" target="_blank" rel="noopener">tiktokenizer</a>
+            <a href="https://platform.openai.com/tokenizer" target="_blank" rel="noopener">OpenAI Tokenizer</a>
+        </div>
     </footer>
     
     <script>
@@ -395,6 +503,131 @@ def json_to_html():
         }});
 
         applyTheme('system');
+    </script>
+    <script>
+        // Precomputed token counts for open-source models (generated at build time)
+        window.PRECOMPUTED_TOKENS = {token_counts_json};
+    </script>
+    
+    <!-- gpt-tokenizer encoding-specific UMD bundles -->
+    <script src="https://cdn.jsdelivr.net/npm/gpt-tokenizer@2.9.0/dist/o200k_base.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gpt-tokenizer@2.9.0/dist/cl100k_base.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gpt-tokenizer@2.9.0/dist/p50k_base.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gpt-tokenizer@2.9.0/dist/r50k_base.js"></script>
+    
+    <script>
+        // ── Encoder map: tokenizer name → UMD global ──
+        const ENCODERS = {{
+            'gpt-4o':             GPTTokenizer_o200k_base,
+            'gpt-4.1':            GPTTokenizer_o200k_base,
+            'gpt-4':              GPTTokenizer_cl100k_base,
+            'gpt-3.5-turbo':      GPTTokenizer_cl100k_base,
+            'text-davinci-003':   GPTTokenizer_p50k_base,
+            'davinci':            GPTTokenizer_r50k_base,
+            'o200k_base':         GPTTokenizer_o200k_base,
+            'cl100k_base':        GPTTokenizer_cl100k_base,
+            'p50k_base':          GPTTokenizer_p50k_base,
+            'r50k_base':          GPTTokenizer_r50k_base,
+        }};
+
+        const OPEN_SOURCE_MODELS = [
+            'Qwen2.5-72B', 'Phi-2', 'Gemma-7B',
+            'DeepSeek-R1', 'Llama-3-8B', 'Llama-3-70B'
+        ];
+
+        function isOpenSource(name) {{
+            return OPEN_SOURCE_MODELS.includes(name);
+        }}
+
+        // ── Text cache: extract all <pre> texts once ──
+        const textCache = new Map();
+        function getTextKey(articleId, lang) {{
+            return `${{articleId}}::${{lang}}`;
+        }}
+        function getText(articleId, lang) {{
+            const key = getTextKey(articleId, lang);
+            if (textCache.has(key)) return textCache.get(key);
+            const section = document.getElementById(articleId);
+            if (!section) return '';
+            const cards = section.querySelectorAll('.text-card');
+            for (const card of cards) {{
+                const langClass = Array.from(card.classList).find(c =>
+                    c.startsWith('lang-') && !c.endsWith('-name'));
+                if (!langClass) continue;
+                const pre = card.querySelector('pre');
+                if (!pre) continue;
+                let cardLang = null;
+                if (langClass === 'lang-classical') cardLang = 'classical_chinese';
+                else if (langClass === 'lang-modern') cardLang = 'modern_chinese';
+                else if (langClass === 'lang-english') cardLang = 'english';
+                else if (langClass === 'lang-spanish') cardLang = 'spanish';
+                if (cardLang && cardLang === lang) {{
+                    textCache.set(key, pre.textContent);
+                    return pre.textContent;
+                }}
+            }}
+            return '';
+        }}
+
+        // ── Count tokens ──
+        function countTokens(text, tokenizerName) {{
+            const encoder = ENCODERS[tokenizerName];
+            if (!encoder || typeof encoder.encode !== 'function') return -1;
+            try {{
+                return encoder.encode(text).length;
+            }} catch(e) {{
+                return -1;
+            }}
+        }}
+
+        // ── Update all token cells ──
+        let currentTokenizer = 'gpt-4o';
+
+        function updateAllTokenCounts() {{
+            const name = currentTokenizer;
+            document.querySelectorAll('.tokenizer-name').forEach(el => {{
+                el.textContent = `(${{name}})`;
+            }});
+
+            const cells = document.querySelectorAll('.token-count');
+            cells.forEach(cell => {{ cell.classList.add('loading'); cell.textContent = '...'; }});
+
+            setTimeout(() => {{
+                cells.forEach(cell => {{
+                    const articleId = cell.dataset.article;
+                    const lang = cell.dataset.lang;
+                    cell.classList.remove('loading');
+
+                    if (isOpenSource(name)) {{
+                        const pre = window.PRECOMPUTED_TOKENS;
+                        if (pre && pre.open_source && pre.open_source[name] &&
+                            pre.open_source[name][articleId] &&
+                            pre.open_source[name][articleId][lang] !== undefined) {{
+                            cell.textContent = pre.open_source[name][articleId][lang].toLocaleString();
+                        }} else {{
+                            cell.textContent = '需预计算';
+                            cell.title = '运行 code/precompute_tokens.js 生成数据';
+                        }}
+                        return;
+                    }}
+
+                    const text = getText(articleId, lang);
+                    if (!text) {{ cell.textContent = '—'; return; }}
+
+                    const count = countTokens(text, name);
+                    cell.textContent = count > 0 ? count.toLocaleString() : '—';
+                }});
+            }}, 10);
+        }}
+
+        // ── Init ──
+        document.getElementById('tokenizer-select').addEventListener('change', function() {{
+            currentTokenizer = this.value;
+            updateAllTokenCounts();
+        }});
+
+        document.addEventListener('DOMContentLoaded', updateAllTokenCounts);
+        if (document.readyState !== 'loading') updateAllTokenCounts();
     </script>
 </body>
 </html>'''
