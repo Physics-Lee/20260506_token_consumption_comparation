@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4×4 多语言语料库阅读器</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", "Noto Serif SC", serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            line-height: 1.6;
+        }
+        header {
+            background: #161b22;
+            padding: 2rem;
+            text-align: center;
+            border-bottom: 3px solid #58a6ff;
+        }
+        header h1 {
+            font-size: 2rem;
+            color: #58a6ff;
+            margin-bottom: 0.5rem;
+        }
+        header p { color: #8b949e; }
+        
+        nav {
+            background: #161b22;
+            padding: 1rem;
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid #30363d;
+        }
+        .nav-btn {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid #30363d;
+            background: transparent;
+            color: #8b949e;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+        .nav-btn:hover { border-color: #58a6ff; color: #fff; }
+        .nav-btn.active { background: #58a6ff; border-color: #58a6ff; color: #fff; }
+        
+        main { max-width: 1600px; margin: 0 auto; padding: 2rem; }
+        
+        .article-section { display: none; }
+        .article-section.active { display: block; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .metadata {
+            background: #161b22;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            border: 1px solid #30363d;
+        }
+        .metadata h2 { color: #58a6ff; margin-bottom: 1rem; }
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        .meta-label { display: block; color: #8b949e; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 0.25rem; }
+        .meta-value { font-size: 1rem; font-weight: 500; color: #c9d1d9; }
+        
+        .comparison {
+            background: #161b22;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+            border: 1px solid #30363d;
+        }
+        .comparison table { width: 100%; border-collapse: collapse; }
+        .comparison th {
+            background: #21262d;
+            padding: 1rem;
+            text-align: left;
+            color: #58a6ff;
+            font-weight: 600;
+            border-bottom: 2px solid #30363d;
+        }
+        .comparison td { padding: 1rem; border-bottom: 1px solid #30363d; }
+        .comparison tr:hover td { background: rgba(88, 166, 255, 0.05); }
+        .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 8px; }
+        
+        .text-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        @media (max-width: 1200px) { .text-grid { grid-template-columns: 1fr; } }
+        
+        .text-card {
+            background: #161b22;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #30363d;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .text-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .card-header {
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #30363d;
+            border-top: 4px solid;
+        }
+        .lang-name { font-weight: 700; font-size: 0.9rem; letter-spacing: 1px; }
+        .role-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .role-badge.original { background: #58a6ff; color: #0d1117; }
+        .role-badge.translation { background: #21262d; color: #8b949e; border: 1px solid #30363d; }
+        
+        .card-body {
+            padding: 1.5rem;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        .card-body h4 { margin-bottom: 1rem; color: #f0f6fc; font-size: 1.1rem; }
+        .card-body pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: "Noto Sans SC", "Noto Serif SC", serif;
+            line-height: 1.8;
+            font-size: 0.95rem;
+            color: #c9d1d9;
+            background: transparent;
+            border: none;
+            padding: 0;
+        }
+        
+        .card-footer {
+            padding: 1rem 1.5rem;
+            background: #21262d;
+            border-top: 1px solid #30363d;
+            color: #8b949e;
+            font-size: 0.85rem;
+            text-align: right;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: #8b949e;
+            border-top: 1px solid #30363d;
+            margin-top: 3rem;
+        }
+        
+        /* Language colors */
+        .lang-classical { border-top-color: #ffd700 !important; }
+        .lang-classical .lang-name { color: #ffd700; }
+        .lang-modern { border-top-color: #4ecdc4 !important; }
+        .lang-modern .lang-name { color: #4ecdc4; }
+        .lang-english { border-top-color: #a5d6ff !important; }
+        .lang-english .lang-name { color: #a5d6ff; }
+        .lang-spanish { border-top-color: #ff7b72 !important; }
+        .lang-spanish .lang-name { color: #ff7b72; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>4×4 多语言语料库阅读器</h1>
+        <p>Token Consumption Analysis Corpus | 四种语言 · 四篇文章 · 平行对照</p>
+    </header>
+    
+    <nav>
+        <button class="nav-btn active" data-id="zuozhuan">左传·晋文公流亡</button>
+        <button class="nav-btn" data-id="paulgraham">会写的人与不会写的人</button>
+        <button class="nav-btn" data-id="allende">阿连德最后的演讲</button>
+        <button class="nav-btn" data-id="yangzhenning">中国今天不宜建造超大对撞机</button>
+    </nav>
+    
+    <main>
+        <!-- 左传 -->
+        <section id="zuozhuan" class="article-section active">
+            <div class="metadata">
+                <h2>左传·晋文公流亡</h2>
+                <div class="meta-grid">
+                    <div><span class="meta-label">English Title</span><span class="meta-value">Zuo Zhuan: The Exile of Duke Wen of Jin</span></div>
+                    <div><span class="meta-label">Título en Español</span><span class="meta-value">Zuo Zhuan: El Exilio del Duque Wen de Jin</span></div>
+                    <div><span class="meta-label">作者 / Author</span><span class="meta-value">左丘明</span></div>
+                    <div><span class="meta-label">来源 / Source</span><span class="meta-value">《左传·僖公二十三年、二十四年》</span></div>
+                    <div><span class="meta-label">时代 / Period</span><span class="meta-value">春秋时期 (公元前7世纪)</span></div>
+                    <div><span class="meta-label">体裁 / Genre</span><span class="meta-value">历史叙事</span></div>
+                    <div><span class="meta-label">原文语言</span><span class="meta-value">classical_chinese</span></div>
+                </div>
+            </div>
+            
+            <div class="comparison">
+                <table>
+                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>字符数</th></tr></thead>
+                    <tbody>
+                        <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>原文</td><td>左传·晋文公流亡</td><td>1,742</td></tr>
+                        <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>译文</td><td>晋文公流亡记（白话译文）</td><td>3,247</td></tr>
+                        <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>译文</td><td>The Exile of Duke Wen of Jin</td><td>4,089</td></tr>
+                        <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>El Exilio del Duque Wen de Jin</td><td>4,422</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="text-grid">
+                <div class="text-card lang-classical">
+                    <div class="card-header"><span class="lang-name">文言</span><span class="role-badge original">原文</span></div>
+                    <div class="card-body"><h4>左传·晋文公流亡</h4><pre>晋公子重耳之及于难也，晋人伐诸蒲城。遂奔狄。从者狐偃、赵衰、颠颉、魏武子、司空季子。狄人伐廧咎如，获其二女：叔隗、季隗，纳诸公子。公子取季隗，生伯儵、叔刘，以叔隗妻赵衰，生盾。将适齐，谓季隗曰："待我二十五年，不来而后嫁。"对曰："我二十五年矣，又如是而嫁，则就木焉。请待子。"处狄十二年而行。
+
+过卫，卫文公不礼焉。出于五鹿，乞食于野人，野人与之块，公子怒，欲鞭之。子犯曰："天赐也。"稽首，受而载之。
+
+及齐，齐桓公妻之，有马二十乘，公子安之。从者以为不可。将行，谋于桑下。蚕妾在其上，以告姜氏。姜氏杀之，而谓公子曰："子有四方之志，其闻之者吾杀之矣。"公子曰："无之。"姜曰："行也。怀与安，实败名。"公子不可。姜与子犯谋，醉而遣之。醒，以戈逐子犯。
+
+及曹，曹共公闻其骈胁，欲观其裸。浴，薄而观之。僖负羁之妻曰："吾观晋公子之从者，皆足以相国。若以相，夫子必反其国。反其国，必得志于诸侯。得志于诸侯，而诛无礼，曹其首也。子盍蚤自贰焉。"乃馈盘飨，置璧焉。公子受飨反璧。
+
+及宋，宋襄公赠之以马二十乘。
+
+及郑，郑文公亦不礼焉。叔詹谏曰："臣闻天之所启，人弗及也。晋公子有三焉，天其或者将建诸。君其礼焉。男女同姓，其生不蕃。晋公子，姬出也，而至于今，一也。离外之患，而天不靖晋国，殆将启之，二也。有三士足以上人，而从之，三也。晋郑同侪，其过子弟，固将礼焉，况天之所启乎。"弗听。
+
+及楚，楚子飨之，曰："公子若反晋国，则何以报不穀？"对曰："子女玉帛，则君有之。羽毛齿革，则君地生焉。其波及晋国者，君之余也。其何以报君？"曰："虽然，何以报我？"对曰："若以君之灵，得反晋国，晋楚治兵，遇于中原，其辟君三舍。若不获命，其左执鞭弭，右属櫜鞬，以与君周旋。"子玉请杀之。楚子曰："晋公子广而俭，文而有礼。其从者肃而宽，忠而能力。晋侯无亲，外内恶之。吾闻姬姓，唐叔之后，其后衰者也，其将由晋公子乎。天将兴之，谁能废之。违天必有大咎。"乃送诸秦。
+
+秦伯纳女五人，怀嬴与焉。奉匜沃盥，既而挥之。怒曰："秦晋匹也，何以卑我。"公子惧，降服而囚。他日，公享之。子犯曰："吾不如衰之文也，请使衰从。"公子赋《河水》，公赋《六月》。赵衰曰："重耳拜赐。"公子降，拜，稽首，公降一级而辞焉。衰曰："君称所以佐天子者命重耳，重耳敢不拜。"
+
+二十四年春，王正月，秦伯纳之。不书，不告入也。及河，子犯以璧授公子，曰："臣负羁绁从君巡于天下，臣之罪甚多矣。臣犹知之，而况君乎。请由此亡。"公子曰："所不与舅氏同心者，有如白水。"投其璧于河。济河，围令狐，入桑泉，取臼衰。二月甲午，晋师军于庐柳。秦伯使公子絷如晋师。师退，军于郇。辛丑，狐偃及秦晋之大夫盟于郇。壬寅，公子入于晋师。丙午，入于曲沃。丁未，朝于武宫。戊申，使杀怀公于高粱。不书，亦不告也。</pre></div>
+                    <div class="card-footer">1,742 字符</div>
+                </div>
+                
+                <div class="text-card lang-modern">
+                    <div class="card-header"><span class="lang-name">现代汉语</span><span class="role-badge translation">译文</span></div>
+                    <div class="card-body"><h4>晋文公流亡记（白话译文）</h4><pre>晋国公子重耳遭遇祸难时，晋国军队攻打蒲城。重耳于是逃奔狄国。跟随他的有狐偃、赵衰、颠颉、魏武子、司空季子。狄人攻打廧咎如，俘获其二女叔隗、季隗，献给公子。公子娶季隗，生下伯儵、叔刘；又将叔隗嫁给赵衰，生下赵盾。重耳准备前往齐国，对季隗说："等我二十五年，若不来再改嫁。"季隗答道："我已二十五岁了，再等二十五年改嫁，就该进棺材了。请让我等您。"重耳在狄国住了十二年后才离开。
+
+经过卫国，卫文公不以礼相待。走出五鹿，向乡野之人乞食，野人给他一块土块，公子大怒，想要鞭打他。子犯说："这是上天赐予的土地。"公子叩首致谢，接过土块装在车上。
+
+到了齐国，齐桓公把女儿嫁给他，并给他八十匹马，公子安于这样的生活。随从们认为不能这样。准备离开时，在桑树下商议。养蚕的侍女在树上听到，告诉了姜氏。姜氏杀了侍女，对公子说："您有远大的志向，听到这事的人我已经杀了。"公子说："没有这回事。"姜氏说："走吧。贪恋安逸，会败坏功名。"公子不肯。姜氏与子犯商议，把公子灌醉后送走。公子醒来，拿起戈追逐子犯。
+
+到了曹国，曹共公听说重耳的肋骨连在一起，想看他裸体。趁重耳洗澡时，隔着帘子偷看。僖负羁的妻子说："我看晋公子的随从，都足以辅佐国君。若让他们为相，公子必定能返回晋国。返回晋国后，必能在诸侯中得志。得志后必会诛伐无礼之国，曹国恐怕首当其冲。您何不早做打算。"于是僖负羁送去食物，在食物下藏了玉璧。公子收下食物，退还了玉璧。
+
+到了宋国，宋襄公送给他八十匹马。
+
+到了郑国，郑文公也不以礼相待。叔詹劝谏说："臣听说天所启佑的人，常人是比不上的。晋公子有三点异于常人，上天或许要立他为君。国君还是以礼相待吧。男女同姓结婚，子孙不昌盛。晋公子是姬姓，却能活到今天，这是其一。遭受流亡国外的祸难，上天却不使晋国安定，大概是准备启示他回国，这是其二。有三个才能出众的人追随他，这是其三。晋国与郑国同等，其子弟路过，本来就应该以礼相待，何况是上天所启佑的人呢。"郑文公不听。
+
+到了楚国，楚成王设宴款待他，说："公子如果返回晋国，用什么来报答我？"重耳回答说："子女玉帛，您都有了。羽毛齿革，都出产于贵国土地。那些流传到晋国的，不过是您的剩余之物，我还能用什么来报答您呢？"楚王说："即便如此，你到底用什么报答我？"重耳答道："如果托您的福，得以返回晋国，将来晋楚两国在中原交战，我愿退避九十里。若这样还得不到谅解，我就左手执鞭握弓，右手佩箭戴盔，来与您较量一番。"子玉请求杀掉重耳。楚王说："晋公子志向远大而生活俭朴，文雅而有礼节。他的随从严肃而宽厚，忠诚而能干。晋侯没有亲近的人，国内外都厌恶他。我听说姬姓中，唐叔的后代，最后衰落的，大概将由晋公子来振兴。天要使他兴盛，谁能废除他呢？违背上天必有大祸。"于是把重耳送到秦国。
+
+秦穆公送给重耳五个女子，怀嬴也在其中。怀嬴捧着水盘为公子浇水洗手，公子洗完后挥手让她走开。怀嬴生气地说："秦晋两国地位相当，你为什么轻视我？"公子害怕了，脱去上衣自我囚禁以示谢罪。有一天，秦公设宴款待公子。子犯说："我不如赵衰善于言辞，请让赵衰陪您去。"公子赋《河水》之诗，秦公赋《六月》之诗。赵衰说："重耳拜谢恩赐。"公子下阶，拜叩首，秦公降一级台阶辞谢。赵衰说："国君以辅佐天子之职命令重耳，重耳怎敢不拜。"
+
+鲁僖公二十四年春，周历正月，秦穆公送重耳回国。《春秋》没有记载，因为重耳没有通告鲁国就入境了。到了黄河边，子犯把玉璧交给公子，说："臣背着马缰绳跟随您巡行天下，臣的罪过太多了。臣自己都知道，何况您呢？请让我从此离开。"公子说："若不与舅舅同心，有白水为证。"把玉璧投入黄河中。渡过黄河后，包围令狐，进入桑泉，夺取臼衰。二月甲午日，晋国军队驻扎在庐柳。秦穆公派公子絷到晋军中去交涉，晋军后退，驻扎在郇地。辛丑日，狐偃与秦、晋两国大夫在郇地结盟。壬寅日，公子进入晋军。丙午日，进入曲沃。丁未日，到武宫朝拜即位。戊申日，派人在高梁杀死了晋怀公。《春秋》没有记载这些事，也没有通告。</pre></div>
+                    <div class="card-footer">3,247 字符</div>
+                </div>
+                
+                <div class="text-card lang-english">
+                    <div class="card-header"><span class="lang-name">English</span><span class="role-badge translation">译文</span></div>
+                    <div class="card-body"><h4>The Exile of Duke Wen of Jin</h4><pre>When Prince Chong'er of Jin fell into misfortune, the Jin army attacked Pucheng. He fled to the Di tribes, accompanied by Hu Yan, Zhao Cui, Dian Jie, Wei Wuzi, and Sikong Jizi. The Di attacked Qiangjiuru and captured two daughters, Shuwei and Jiwei, whom they presented to the prince. The prince took Jiwei as his wife, and she bore him Bo Chou and Shu Liu; he gave Shuwei to Zhao Cui in marriage, and she bore Dun. When preparing to depart for Qi, he said to Jiwei, "Wait twenty-five years for me; if I do not return, then remarry." She replied, "I am already twenty-five. If I wait another twenty-five years to remarry, I shall be in my coffin. Please let me wait for you." He remained among the Di for twelve years before departing.
+
+Passing through Wey, Duke Wen of Wey failed to treat him with courtesy. Exiting through Wulu, he begged food from a countryman, who gave him a clod of earth. The prince grew angry and wished to whip him. Zifan said, "This is a gift from Heaven." The prince bowed to the earth, accepted it, and placed it in his carriage.
+
+Arriving in Qi, Duke Huan of Qi gave him his daughter in marriage and presented him with eighty horses. The prince grew content with such a life, but his followers deemed it unsustainable. As they prepared to depart, they conspired beneath a mulberry tree. A silkworm maid overheard them from above and reported to Jiang Shi. Jiang Shi killed the maid and said to the prince, "You have ambitions for all four directions; she who heard of them I have killed." The prince said, "It is not so." Jiang said, "You must go. Complacency and comfort ruin one's name." The prince refused. Jiang conspired with Zifan, got the prince drunk, and sent him away. When he awoke, he seized a spear and chased Zifan.
+
+When they reached Cao, Duke Gong of Cao, having heard that Chong'er's ribs were fused together, wished to see him naked. He peered at him through a curtain as he bathed. The wife of Xi Fujie said, "I observe that the prince's followers are all capable of assisting a state. If they become ministers, the prince will surely return to Jin. Once he returns, he will surely gain his will among the feudal lords. When he gains his will, he will punish those who showed him disrespect, and Cao will be the first. Why do you not early distinguish yourself?" She then sent him a platter of food with a jade disc hidden beneath it. The prince accepted the food but returned the disc.
+
+In Song, Duke Xiang of Song gifted him eighty horses.
+
+In Zheng, Duke Wen of Zheng also showed him no courtesy. Shu Zhan remonstrated, saying, "I have heard that those whom Heaven enlightens, ordinary men cannot surpass. The prince of Jin has three such qualities; Heaven perhaps intends to establish him. You should treat him with courtesy. When men and women of the same surname marry, their offspring do not flourish. The prince of Jin is of the Ji clan, yet he has survived until now—this is the first sign. He has suffered the calamity of exile abroad, yet Heaven has not pacified Jin, perhaps preparing to enlighten him—this is the second. He has three men of superior talent following him—this is the third. Jin and Zheng are equals; when their sons and younger brothers pass through, they should properly be treated with courtesy, let alone one whom Heaven enlightens." The duke would not listen.
+
+In Chu, King Cheng hosted a banquet and asked, "If you return to Jin, how will you repay me?" Chong'er replied, "As for sons and daughters, jade and silk, you already possess them. Feathers, hair, teeth, and hides are produced in your land. Whatever reaches Jin are merely your surplus. How then could I repay you?" The king said, "Even so, how will you repay me?" Chong'er replied, "If by your grace I return to Jin, should Jin and Chu mobilize their armies and meet in the Central Plains, I shall retreat ninety li to yield to you. If this does not satisfy you, I shall take up whip and bow in my left hand and quiver and armor in my right, to engage you in battle." Ziyu requested that Chong'er be killed. The king of Chu said, "The prince of Jin is broad-minded and frugal, cultured and courteous. His followers are solemn and generous, loyal and capable. The marquis of Jin has no intimates; both within and without he is despised. I have heard that among the Ji clan, the descendants of Tang Shu, the one who shall finally decline and then rise again will be this prince of Jin. Heaven intends to raise him up; who can abolish him? To oppose Heaven brings great calamity." He then sent Chong'er to Qin.
+
+Duke Mu of Qin presented him with five women, among whom was Huai Ying. She held a basin to wash his hands, and after washing, he waved her away dismissively. Angrily she said, "Qin and Jin are equals; why do you slight me?" The prince grew fearful, removed his garments, and confined himself in penance. Another day, the duke hosted a feast. Zifan said, "I am not as eloquent as Zhao Cui; please let Zhao Cui accompany you." The prince recited the "He Shui" poem; the duke recited the "Liu Yue" poem. Zhao Cui said, "Chong'er thanks you for this gift." The prince descended the steps, bowed, and knocked his head; the duke descended one step and declined the honor. Zhao Cui said, "The lord commands Chong'er with the capacity to assist the Son of Heaven; how dare Chong'er not bow?"
+
+In the spring of the twenty-fourth year, in the first month, Duke Mu of Qin escorted him into Jin. This was not recorded, for he did not announce his entry. At the Yellow River, Zifan handed the prince a jade disc, saying, "I have followed you throughout the world bearing reins and ropes; my transgressions are many. I know them myself—how much more so do you? Please let me depart from here." The prince said, "If I am not of one heart with my uncle, may the White River bear witness." He cast the disc into the river. Crossing the river, they surrounded Linghu, entered Sangquan, and took Jiucui. On the jiawu day of the second month, the Jin army encamped at Luliu. Duke Mu sent Prince Zhi to the Jin army. The army retreated and encamped at Xun. On the xinchou day, Hu Yan and the great officers of Qin and Jin made covenant at Xun. On the renyin day, the prince entered the Jin army. On the bingwu day, he entered Quwo. On the dingwei day, he paid homage at the Martial Temple. On the wushen day, he had Duke Huai killed at Gaoliang. This was not recorded, nor was it announced.</pre></div>
+                    <div class="card-footer">4,089 字符</div>
+                </div>
+                
+                <div class="text-card lang-spanish">
+                    <div class="card-header"><span class="lang-name">Español</span><span class="role-badge translation">译文</span></div>
+                    <div class="card-body"><h4>El Exilio del Duque Wen de Jin</h4><pre>Cuando el príncipe Chong'er de Jin cayó en desgracia, el ejército de Jin atacó Pucheng. Huyó a las tribus Di, acompañado por Hu Yan, Zhao Cui, Dian Jie, Wei Wuzi y Sikong Jizi. Los Di atacaron Qiangjiuru y capturaron a dos hijas, Shuwei y Jiwei, que presentaron al príncipe. El príncipe tomó a Jiwei por esposa, y ella le dio a luz Bo Chou y Shu Liu; dio a Shuwei en matrimonio a Zhao Cui, y ella dio a luz a Dun. Al prepararse para partir hacia Qi, le dijo a Jiwei: "Espérame veinticinco años; si no regreso, entonces vuélvete a casar." Ella respondió: "Ya tengo veinticinco años. Si espero otros veinticinco para volverme a casar, estaré en mi ataúd. Permíteme esperarte." Permaneció entre los Di durante doce años antes de partir.
+
+Pasando por Wey, el duque Wen de Wey no lo recibió con cortesía. Saliendo por Wulu, pidió comida a un campesino, quien le dio un terrón de tierra. El príncipe se enfureció y quiso azotarlo. Zifan dijo: "Este es un regalo del Cielo." El príncipe inclinó la cabeza ante la tierra, la aceptó y la colocó en su carruaje.
+
+Al llegar a Qi, el duque Huan de Qi le dio su hija en matrimonio y le regaló ochenta caballos. El príncipe se acomodó a tal vida, pero sus seguidores consideraron que no podían permanecer así. Mientras se preparaban para partir, conspiraron bajo una morera. Una criada criadora de gusanos de seda los oyó desde arriba y se lo contó a Jiang Shi. Jiang Shi mató a la criada y dijo al príncipe: "Tienes ambiciones para las cuatro direcciones; a quien los oyó la he matado." El príncipe dijo: "No es así." Jiang dijo: "Debes irte. La complacencia y la comodidad arruinan el nombre de un hombre." El príncipe se negó. Jiang conspiró con Zifan, emborrachó al príncipe y lo envió lejos. Cuando despertó, tomó una lanza y persiguió a Zifan.
+
+Cuando llegaron a Cao, el duque Gong de Cao, al oír que las costillas de Chong'er estaban fusionadas, deseaba verlo desnudo. Lo espiaba a través de una cortina mientras se bañaba. La esposa de Xi Fujie dijo: "Observo que los seguidores del príncipe son todos capaces de asistir a un estado. Si se convierten en ministros, el príncipe seguramente regresará a Jin. Una vez que regrese, seguramente conseguirá su voluntad entre los señores feudales. Cuando la consiga, castigará a quienes le mostraron falta de respeto, y Cao será el primero. ¿Por qué no te distingues tempranamente?" Entonces le envió una bandeja de comida con un disco de jade escondido debajo. El príncipe aceptó la comida pero devolvió el disco.
+
+En Song, el duque Xiang de Song le obsequió ochenta caballos.
+
+En Zheng, el duque Wen de Zheng tampoco lo trató con respeto. Shu Zhan amonestó, diciendo: "He oído que aquellos a quienes el Cielo ilumina, los hombres ordinarios no pueden superar. El príncipe de Jin tiene tres cualidades de este tipo; el Cielo tal vez intenta establecerlo. Deberías tratarlo con cortesía. Cuando hombres y mujeres del mismo clan se casan, su descendencia no prospera. El príncipe de Jin es del clan Ji, y sin embargo ha sobrevivido hasta ahora: esta es la primera señal. Ha sufrido la calamidad del exilio en el extranjero, y sin embargo el Cielo no ha pacificado Jin, tal vez preparándose para iluminarlo: esta es la segunda. Tiene tres hombres de talento superior siguiéndolo: esta es la tercera. Jin y Zheng son iguales; cuando sus hijos y hermanos menores pasan por aquí, deberían ser tratados con cortesía, y mucho más uno a quien el Cielo ilumina." El duque no quiso escuchar.
+
+En Chu, el rey Cheng ofreció un banquete y preguntó: "Si regresas a Jin, ¿cómo me recompensarás?" Chong'er respondió: "En cuanto a hijos e hijas, jade y seda, ya los posees. Plumas, pelo, dientes y pieles se producen en tu tierra. Lo que llega a Jin son meramente tus sobrantes. ¿Cómo podría recompensarte?" El rey dijo: "Aun así, ¿cómo me recompensarás?" Chong'er respondió: "Si por tu gracia regreso a Jin, si Jin y Chu movilizan sus ejércitos y se encuentran en las Llanuras Centrales, retrocederé noventa li para cederte el paso. Si esto no te satisface, tomaré látigo y arco en mi mano izquierda y carcaj y armadura en mi derecha, para enzarzarme contigo en batalla." Ziyu pidió que mataran a Chong'er. El rey de Chu dijo: "El príncipe de Jin es magnánimo y frugal, culto y cortés. Sus seguidores son solemnes y generosos, leales y capaces. El marqués de Jin no tiene íntimos; tanto dentro como fuera es despreciado. He oído que entre el clan Ji, los descendientes de Tang Shu, aquel que finalmente declinará y luego resurgirá será este príncipe de Jin. El Cielo intenta levantarlo; ¿quién puede abolirlo? Oponerse al Cielo trae gran calamidad." Entonces envió a Chong'er a Qin.
+
+El duque Mu de Qin le presentó a cinco mujeres, entre quienes estaba Huai Ying. Ella sostuvo una vasija para lavarle las manos, y después de lavarlas, él la apartó con un gesto despectivo. Enojada, ella dijo: "Qin y Jin son iguales; ¿por qué me menosprecias?" El príncipe, temeroso, se despojó de sus vestiduras y se confinó en penitencia. Otro día, el duque ofreció un banquete. Zifan dijo: "No soy tan elocuente como Zhao Cui; permite que Zhao Cui te acompañe." El príncipe recitó el poema "He Shui"; el duque recitó el poema "Liu Yue". Zhao Cui dijo: "Chong'er agradece este don." El príncipe descendió los escalones, se inclinó y golpeó su cabeza en el suelo; el duque descendió un escalón y declinó el honor. Zhao Cui dijo: "El señor le ordena a Chong'er con la capacidad de asistir al Hijo del Cielo; ¿cómo se atreve Chong'er a no inclinarse?"
+
+En la primavera del vigésimo cuarto año, en el primer mes, el duque Mu de Qin lo escoltó a Jin. Esto no fue registrado, pues no anunció su entrada. En el Río Amarillo, Zifan entregó al príncipe un disco de jade, diciendo: "Te he seguido por todo el mundo llevando riendas y cuerdas; mis transgresiones son muchas. Yo las conozco —¿cuánto más tú? Permíteme partir de aquí." El príncipe dijo: "Si no soy de un corazón con mi tío, que el Río Blanco sea testigo." Arrojó el disco al río. Cruzando el río, rodearon Linghu, entraron en Sangquan y tomaron Jiucui. En el día jiawu del segundo mes, el ejército de Jin acampó en Luliu. El duque Mu envió al príncipe Zhi al ejército de Jin. El ejército se retiró y acampó en Xun. En el día xinchou, Hu Yan y los grandes oficiales de Qin y Jin hicieron pacto en Xun. En el día renyin, el príncipe entró en el ejército de Jin. En el día bingwu, entró en Quwo. En el día dingwei, rindió homenaje en el Templo Marcial. En el día wushen, mandó matar al duque Huai en Gaoliang. Esto no fue registrado, ni tampoco fue anunciado.</pre></div>
+                    <div class="card-footer">4,422 字符</div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Paul Graham -->
+        <section id="paulgraham" class="article-section">
+            <div class="metadata">
+                <h2>会写的人与不会写的人</h2>
+                <div class="meta-grid">
+                    <div><span class="meta-label">English Title</span><span class="meta-value">Writes and Write-Nots</span></div>
+                    <div><span class="meta-label">Título en Español</span><span class="meta-value">Los que escriben y los que no</span></div>
+                    <div><span class="meta-label">作者 / Author</span><span class="meta-value">Paul Graham</span></div>
+                    <div><span class="meta-label">来源 / Source</span><span class="meta-value">paulgraham.com, October 2024</span></div>
+                    <div><span class="meta-label">时代 / Period</span><span class="meta-value">当代 (2024年)</span></div>
+                    <div><span class="meta-label">体裁 / Genre</span><span class="meta-value">科技评论/散文</span></div>
+                    <div><span class="meta-label">原文语言</span><span class="meta-value">english</span></div>
+                </div>
+            </div>
+            
+            <div class="comparison">
+                <table>
+                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>字符数</th></tr></thead>
+                    <tbody>
+                        <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>译文</td><td>能书者与不能书者</td><td>1,389</td></tr>
+                        <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>译文</td><td>会写的人与不会写的人</td><td>2,119</td></tr>
+                        <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>原文</td><td>Writes and Write-Nots</td><td>3,149</td></tr>
+                        <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>Los que escriben y los que no</td><td>3,505</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="text-grid">
+                <div class="text-card lang-classical">
+                    <div class="card-header"><span class="lang-name">文言</span><span class="role-badge translation">译文</span></div>
+                    <div class="card-body"><h4>能书者与不能书者</h4><pre>吾素不欲妄测科技之趋向，然于此事颇有把握：数十载后，世间能文者必稀。
+
+为文之人所知最异者，莫若世人多拙于书。医者知世人患痣之忧者众，善装机者知世人不通机算者众，为文者知世人需助以书者众。
+
+世人之所以多拙于书，以其本难也。欲善书者，必先善思；欲善思者，其事至艰。
+
+然书之为用，遍于百业；业愈贵者，书之所需愈多。
+
+此二力相持：书之期于四方，与书之难不可解，其压至巨。故世之名教授，多有剽窃之事。吾观其事，最可异者在其窃之琐屑。所窃者皆最庸常之套语——稍能文者皆可信手为之，不假思索。是彼辈之书，未及中人远矣。
+
+向者无便捷之途以泄此压。或如甘迺迪，雇人为书；或如路德·金，窃人之文。然不能买窃者，必自为之。故凡世之所期以书者，皆不得不学。
+
+今非昔比。机算智能辟此局。书之压力几尽消弭。在校在公，皆可假机算为之。
+
+其势必使世分二涂：能书者与不能书者。能书者自仍有之，亦有人好此。然善书者与不能书者之间，不复有中人也。向有善书者、可书者、不能书者，今唯余善书者与不能书者矣。
+
+此亦何害？技艺因技术而废，世之常也。今之铁匠亦稀，未闻其为患也。
+
+不然，此诚有害。其故吾前已言：书即思也。实有一种思虑，非书不能为。雷士礼·兰波特之言，无以过之：
+
+"思而不书，汝惟自以为思耳。"
+
+故能书不能与书之分，其险甚于所闻。是将为能思者与不能思者之分。吾知吾欲处何方，君亦必知之。
+
+此事非无前例。前工业之世，百业皆使人强。今欲强者，必自锻炼。故强者仍有之，惟自择者耳。
+
+书亦将如是。智者仍有之，惟自择者耳。
+
+感謝洁西卡·李文斯顿、本·米勒、罗伯特·莫里斯阅此草稿。</pre></div>
+                    <div class="card-footer">1,389 字符</div>
+                </div>
+                
+                <div class="text-card lang-modern">
+                    <div class="card-header"><span class="lang-name">现代汉语</span><span class="role-badge translation">译文</span></div>
+                    <div class="card-body"><h4>会写的人与不会写的人</h4><pre>我通常不愿意对技术走向做预测，但这件事我很有把握：再过几十年，世上能写作的人不会很多。
+
+如果你是作家，你会发现一件最奇怪的事：居然有那么多人不会写作。医生知道有多少人对自己身上的痣忧心忡忡；会装电脑的人知道有多少人完全不会弄电脑；作家知道有多少人需要别人帮忙写作。
+
+那么多人不会写，是因为写作本质上就很难。要写好，必须先想清楚；而想清楚了，本身就是件难事。
+
+然而写作渗透在各行各业中，而且工作越体面，通常越需要写作。
+
+这两股强大的对立力量——无处不在的写作需求，与写作不可化约的困难——造成了巨大的压力。这就是为什么很多名教授最后会去抄袭。这些案子最让我震惊的是，他们偷的东西多么鸡毛蒜皮。偷的往往是最平庸的套话——任何一个写作稍微有点水平的人都能不费吹灰之力写出来。这说明他们连"有点水平"都谈不上。
+
+直到最近，这种压力还没有便捷的宣泄口。你可以像肯尼迪那样花钱请人代写，或者像马丁·路德·金那样抄袭。但如果你买不来、偷不到，就只能自己写。结果，几乎所有被期望写作的人都不得不学会了写作。
+
+现在不同了。AI把这个格局彻底打开了。写作的压力几乎消散殆尽。无论在学校还是在职场，你都可以让AI帮你写。
+
+结果将是一个分为"会写的人"和"不会写的人"的世界。仍然会有些人能写。我们当中有些人就是喜欢写。但擅长写作和完全不会写之间的中间地带将会消失。以后不再有"好作家、还行、不会写"这三档，只剩下"好作家"和"不会写的人"。
+
+这有那么糟糕吗？技术让某种技能过时，这种事不是很常见吗？现在铁匠不多了，也没见出什么问题。
+
+是的，这很糟糕。原因就是我前面说的：写作就是思考。事实上，有一种思考只能通过写作来完成。莱斯利·兰波特把这个道理说得再好不过了：
+
+"如果你不动笔就在思考，那你只是自以为在思考。"
+
+所以，一个分为"会写"和"不会写"的世界，比听起来更危险。它将是一个"会思考"和"不会思考"的世界。我知道我想站在哪一边，我打赌你也知道。
+
+这种情况并非没有先例。在前工业时代，大多数人的工作让他们身体强壮。现在如果你想强壮，你得去健身。所以仍然有强壮的人，但只有那些选择变强的人。
+
+写作也将如此。仍然有聪明的人，但只有那些选择变聪明的人。
+
+感谢杰西卡·利文斯顿、本·米勒和罗伯特·莫里斯阅读本文草稿。</pre></div>
+                    <div class="card-footer">2,119 字符</div>
+                </div>
+                
+                <div class="text-card lang-english">
+                    <div class="card-header"><span class="lang-name">English</span><span class="role-badge original">原文</span></div>
+                    <div class="card-body"><h4>Writes and Write-Nots</h4><pre>I'm usually reluctant to make predictions about technology, but I feel fairly confident about this one: in a couple decades there won't be many people who can write.
+
+One of the strangest things you learn if you're a writer is how many people have trouble writing. Doctors know how many people have a mole they're worried about; people who are good at setting up computers know how many people aren't; writers know how many people need help writing.
+
+The reason so many people have trouble writing is that it's fundamentally difficult. To write well you have to think clearly, and thinking clearly is hard.
+
+And yet writing pervades many jobs, and the more prestigious the job, the more writing it tends to require.
+
+These two powerful opposing forces, the pervasive expectation of writing and the irreducible difficulty of doing it, create enormous pressure. This is why eminent professors often turn out to have resorted to plagiarism. The most striking thing to me about these cases is the pettiness of the thefts. The stuff they steal is usually the most mundane boilerplate — the sort of thing that anyone who was even halfway decent at writing could turn out with no effort at all. Which means they're not even halfway decent at writing.
+
+Till recently there was no convenient escape valve for the pressure created by these opposing forces. You could pay someone to write for you, like JFK, or plagiarize, like MLK, but if you couldn't buy or steal words, you had to write them yourself. And as a result nearly everyone who was expected to write had to learn how.
+
+Not anymore. AI has blown this world open. Almost all pressure to write has dissipated. You can have AI do it for you, both in school and at work.
+
+The result will be a world divided into writes and write-nots. There will still be some people who can write. Some of us like it. But the middle ground between those who are good at writing and those who can't write at all will disappear. Instead of good writers, ok writers, and people who can't write, there will just be good writers and people who can't write.
+
+Is that so bad? Isn't it common for skills to disappear when technology makes them obsolete? There aren't many blacksmiths left, and it doesn't seem to be a problem.
+
+Yes, it's bad. The reason is something I mentioned earlier: writing is thinking. In fact there's a kind of thinking that can only be done by writing. You can't make this point better than Leslie Lamport did:
+
+"If you're thinking without writing, you only think you're thinking."
+
+So a world divided into writes and write-nots is more dangerous than it sounds. It will be a world of thinks and think-nots. I know which half I want to be in, and I bet you do too.
+
+This situation is not unprecedented. In preindustrial times most people's jobs made them strong. Now if you want to be strong, you work out. So there are still strong people, but only those who choose to be.
+
+It will be the same with writing. There will still be smart people, but only those who choose to be.
+
+Thanks to Jessica Livingston, Ben Miller, and Robert Morris for reading drafts of this.</pre></div>
+                    <div class="card-footer">3,149 字符</div>
+                </div>
+                
+                <div class="text-card lang-spanish">
+                    <div class="card-header"><span class="lang-name">Español</span><span class="role-badge translation">译文</span></div>
+                    <div class="card-body"><h4>Los que escriben y los que no</h4><pre>Por lo general no me gusta hacer predicciones sobre tecnología, pero esta me inspira bastante confianza: dentro de un par de décadas no quedarán muchas personas que sepan escribir.
+
+Una de las cosas más extrañas que aprendes si eres escritor es cuánta gente tiene dificultades para escribir. Los médicos saben cuántas personas tienen un lunar que les preocupa; quienes saben armar computadoras saben cuánta gente no tiene ni idea; los escritores saben cuánta gente necesita ayuda para escribir.
+
+La razón por la que tanta gente tiene problemas para escribir es que es fundamentalmente difícil. Para escribir bien hay que pensar con claridad, y pensar con claridad es difícil.
+
+Y sin embargo la escritura impregna muchos trabajos, y cuanto más prestigioso el empleo, más escritura suele exigir.
+
+Estas dos poderosas fuerzas opuestas —la omnipresente expectativa de escribir y la dificultad irreducible de hacerlo— crean una presión enorme. Por eso los profesores eméritos a menudo terminan recurriendo al plagio. Lo que más me llama la atención de estos casos es la mezquindad de los robos. Lo que roban suele ser el lugar común más mundano: algo que cualquiera con un nivel medianamente decente de escritura podría producir sin esfuerzo. Lo cual significa que ni siquiera llegan a ese nivel medianamente decente.
+
+Hasta hace poco no había una válvula de escape conveniente para la presión creada por estas fuerzas opuestas. Podías pagarle a alguien para que escribiera por ti, como hizo JFK, o plagiar, como hizo MLK, pero si no podías comprar o robar palabras, tenías que escribirlas tú mismo. Y como resultado, casi todo el mundo a quien se esperaba que escribiera tuvo que aprender a hacerlo.
+
+Ya no. La IA ha abierto este mundo de par en par. Casi toda la presión por escribir se ha disipado. Puedes hacer que la IA lo haga por ti, tanto en la escuela como en el trabajo.
+
+El resultado será un mundo dividido entre los que escriben y los que no. Todavía habrá algunas personas que sepan escribir. A algunos nos gusta. Pero el terreno intermedio entre quienes escriben bien y quienes no pueden escribir en absoluto desaparecerá. En lugar de buenos escritores, escritores más o menos, y personas que no pueden escribir, solo habrá buenos escritores y personas que no pueden escribir.
+
+¿Es tan malo? ¿No es común que las habilidades desaparezcan cuando la tecnología las vuelve obsoletas? Ya no quedan muchos herreros, y no parece ser un problema.
+
+Sí, es malo. La razón es algo que mencioné antes: escribir es pensar. De hecho, hay un tipo de pensamiento que solo se puede hacer escribiendo. No se puede expresar este punto mejor que como lo hizo Leslie Lamport:
+
+"Si estás pensando sin escribir, solo crees que estás pensando."
+
+Así que un mundo dividido entre los que escriben y los que no es más peligroso de lo que parece. Será un mundo de los que piensan y los que no. Sé en qué mitad quiero estar, y apuesto a que tú también.
+
+Esta situación no carece de precedentes. En tiempos preindustriales, el trabajo de la mayoría les daba fuerza. Ahora, si quieres ser fuerte, haces ejercicio. Así que todavía hay gente fuerte, pero solo quienes eligen serlo.
+
+Será lo mismo con la escritura. Todavía habrá gente inteligente, pero solo quienes elijan serlo.
+
+Gracias a Jessica Livingston, Ben Miller y Robert Morris por leer borradores de esto.</pre></div>
+                    <div class="card-footer">3,505 字符</div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Allende -->
+        <section id="allende" class="article-section">
+            <div class="metadata">
+                <h2>阿连德最后的演讲</h2>
+                <div class="meta-grid">
+                    <div><span class="meta-label">English Title</span><span class="meta-value">Last Speech of Salvador Allende</span></div>
+                    <div><span class="meta-label">Título en Español</span><span class="meta-value">Último discurso de Salvador Allende</span></div>
+                    <div><span class="meta-label">作者 / Author</span><span class="meta-value">Salvador Allende Gossens</span></div>
+                    <div><span class="meta-label">来源 / Source</span><span class="meta-value">Radio Magallanes, 11 de septiembre de 1973</span></div>
+                    <div><span class="meta-label">时代 / Period</span><span class="meta-value">当代 (1973年)</span></div>
+                    <div><span class="meta-label">体裁 / Genre</span><span class="meta-value">政治演讲/绝命书</span></div>
+                    <div><span class="meta-label">原文语言</span><span class="meta-value">spanish</span></div>
+                </div>
+            </div>
+            
+            <div class="comparison">
+                <table>
+                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>字符数</th></tr></thead>
+                    <tbody>
+                        <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>译文</td><td>阿连德绝命书</td><td>1,456</td></tr>
+                        <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>译文</td><td>萨尔瓦多·阿连德的最后一次演讲</td><td>2,367</td></tr>
+                        <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>译文</td><td>Last Speech of Salvador Allende</td><td>2,712</td></tr>
+                        <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>原文</td><td>Último discurso de Salvador Allende</td><td>3,829</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="text-grid">
+                <div class="text-card lang-classical">
+                    <div class="card-header"><span class="lang-name">文言</span><span class="role-badge translation">译文</span></div>
+                    <div class="card-body"><h4>阿连德绝命书</h4><pre>智利圣地亚哥，一九七三年九月十一日，九时十分。
+
+同胞诸君：
+
+此殆吾最后一次与诸君言矣。空军已轰.Portal之塔及Corporación之塔。吾言无苦，唯有所失望耳。此失望将为彼背誓者之道德惩罚：智利之兵士，有名分之统帅，自命之海军上将梅里诺，以及昨日犹表忠于政府、今日复自命为武警总监之卑劣将军门多萨。
+
+处此境地，吾唯告工人诸君：吾绝不辞职！立于历史之转折，吾将以生命偿人民之忠诚。吾知吾等播于万千智利人尊严意识中之种子，终不可尽除也。
+
+彼有武力，彼可蹂躏吾等，然社会进程不因罪恶与暴力而停。历史属于吾等，历史由人民书写。
+
+祖国之工人诸君：感君等始终之忠诚，感君等托身于仅为大义之传声者、誓守宪法法律且践行之之人。于此时刻，吾最后一次告诸君，愿君等汲取教训：外资、帝国主义，合于反动派，造成气氛，使武装力量背弃其传统——此传统为施奈德将军所教、阿拉亚司令所重申者也。彼等死于今日安坐家中、借他人之手复辟政权以保其私利之同一社会阶层。
+
+吾尤告吾土之朴质妇女，告信任吾等之农妇；告最勤劳之女工，告知吾等关怀儿童之母。吾告祖国之专业人士，告爱国之专业人士，告数日来反对专业学院所煽动之叛国者——此等阶级学院亦为维护资本主义社会少数人之利而设。吾告青年，告曾歌唱、奉献欢乐与战斗精神者。吾告智利之人，告工人、农夫、知识分子，告将被迫害者——盖吾国之法西斯主义早已于恐怖炸弹、炸桥、断铁路、毁油管气管中显现，而彼当行事者默然不应：彼等已同流合污。历史将审判彼等。
+
+Magallanes电台必被噤声，吾平静之嗓音将不再达于诸君。无妨，诸君仍将闻之。吾将永与诸君同在。至少，吾之记忆将为忠于工人忠诚之体面人。
+
+人民当自卫，然不当自殉。人民不当任人摧毁杀戮，然亦不可自辱。
+
+祖国之工人诸君：吾信智利及其命运。他人将越过此灰暗苦涩之时刻，其时背叛欲逞其志。诸君当知， sooner rather than later，自由之人将再辟大道，以建更善之社会。
+
+智利万岁！人民万岁！工人万岁！
+
+此吾最后之言。吾知吾之牺牲不会徒然。吾知至少将有一道德教训，惩罚叛国、怯懦与背叛。</pre></div>
+                    <div class="card-footer">1,456 字符</div>
+                </div>
+                
+                <div class="text-card lang-modern">
+                    <div class="card-header"><span class="lang-name">现代汉语</span><span class="role-badge translation">译文</span></div>
+                    <div class="card-body"><h4>萨尔瓦多·阿连德的最后一次演讲</h4><pre>智利圣地亚哥，1973年9月11日，当地时间上午9时10分。
+
+同胞们：
+
+这大概是我最后一次有机会向你们讲话了。空军已经轰炸了Portales电台和Corporación电台的塔楼。
+
+我的话里没有痛苦，只有失望。这些失望将成为对那些背叛誓言者的道德惩罚：智利的士兵们，有名无实的总司令们，自封的海军上将梅里诺，以及仅在昨天还宣示对政府忠诚、今天却又自封为国家警察总监的卑劣将军门多萨。
+
+面对这些事实，我只能对工人们说：我不会辞职！身处历史的转折关头，我将用生命回报人民的忠诚。我要告诉你们，我确信我们播撒到成千上万智利人尊严意识中的种子，绝不会被彻底铲除。
+
+他们有力量，他们可以蹂躏我们，但社会进程不会因犯罪和暴力而停止。历史是我们的，历史由人民创造。
+
+祖国的工人们：我要感谢你们始终如一的忠诚，感谢你们把信任寄托于一个只是伟大正义渴望的传声筒的人，一个以名誉担保将尊重宪法和法律并且确实做到了的人。在这决定性的时刻，在我最后一次向你们讲话的时刻，我希望你们吸取这个教训：外国资本、帝国主义，联合反动派，制造了让武装力量背弃其传统的气候——施奈德将军教导过这个传统，阿拉亚司令重申过这个传统。他们死于同一个社会阶层，这个阶层今天正坐在家中，借他人之手重新夺权，以继续捍卫他们的小地盘和特权。
+
+我尤其要向这片土地上朴实的妇女讲话，向信任我们的农妇讲话；向最辛勤劳动的女工讲话，向知道我们关怀儿童的母亲讲话。我要向祖国的专业人士讲话，向爱国的专业人士讲话，向几天前还在反对由专业学院煽动的叛国行为的人们讲话——这些阶级学院也是为了维护资本主义社会给予少数人的优势而存在的。我要向青年讲话，向那些歌唱过、奉献过欢乐和战斗精神的人们讲话。我要向智利人讲话，向工人、农民、知识分子讲话，向那些将被迫害的人们讲话——因为在我国，法西斯主义已经在恐怖炸弹、炸毁桥梁、切断铁路、摧毁输油管和输气管中出现了好几个小时；而那些有义务采取行动的人却保持沉默：他们已经同流合污。历史将审判他们。
+
+Magallanes电台肯定会被噤声，我平静的嗓音将不再传到你们耳中。没关系，你们会继续听到它。我将永远与你们同在。至少，我的记忆将是一个忠于工人忠诚的体面人。
+
+人民应当自卫，但不应当自我牺牲。人民不应当任人摧毁和屠杀，但也不可以自我屈辱。
+
+祖国的工人们：我相信智利和它的命运。其他人将越过这个灰暗而苦涩的时刻，在这个时刻背叛企图逞其志。你们要知道， sooner rather than later，自由的人将再次开辟宽阔的大道，以建设一个更好的社会。
+
+智利万岁！人民万岁！工人万岁！
+
+这就是我的最后的话。我确信我的牺牲不会白费。我确信至少将有一个道德教训，惩罚叛国、怯懦和背叛。</pre></div>
+                    <div class="card-footer">2,367 字符</div>
+                </div>
+                
+                <div class="text-card lang-english">
+                    <div class="card-header"><span class="lang-name">English</span><span class="role-badge translation">译文</span></div>
+                    <div class="card-body"><h4>Last Speech of Salvador Allende</h4><pre>Santiago de Chile, Tuesday, September 11, 1973, 9:10 a.m. local time.
+
+Compatriots:
+
+This will surely be the last opportunity I have to address you. The Air Force has bombed the towers of Radio Portales and Radio Corporación.
+
+My words hold no bitterness, only disappointment, and they shall be the moral punishment for those who have betrayed the oath they swore: soldiers of Chile, titular commanders-in-chief, Admiral Merino who has self-appointed himself, and Mr. Mendoza, an abject general who only yesterday professed his fidelity and loyalty to the government, and who has also proclaimed himself Director General of the Carabineros.
+
+Before these facts, I can only say to the workers: I will not resign! Placed in a historic moment, I shall pay with my life for the loyalty of the people. And I tell you that I am certain the seed we have sown in the dignified conscience of thousands and thousands of Chileans cannot be definitively reaped.
+
+They have the strength, they may crush us, but social processes are not halted by crime or by force. History is ours, and it is made by the people.
+
+Workers of my fatherland: I want to thank you for the loyalty you have always shown, the confidence you placed in a man who was only the interpreter of great longings for justice, who pledged his word to respect the Constitution and the law, and so he did. At this definitive moment, the last in which I can address you, I want you to take the lesson to heart. Foreign capital, imperialism, united with reaction, created the climate for the Armed Forces to break their tradition—the tradition taught them by General Schneider and reaffirmed by Commander Araya, victims of the same social sector that today will be in their homes waiting, with another's hand, to reconquer power in order to continue defending their petty interests and privileges.
+
+I address myself above all to the modest women of our land, to the peasant woman who believed in us; to the working woman who labored most, to the mother who knew of our concern for the children. I address the professionals of the fatherland, the patriotic professionals, those who in recent days were working against the sedition sponsored by the professional colleges—class colleges to defend also the advantages that a capitalist society gives to a few. I address the youth, those who sang and gave their joy and their spirit of struggle. I address the people of Chile, the worker, the peasant, the intellectual, those who will be persecuted—because in our country fascism has already been present for many hours in the terrorist attacks, blowing up bridges, cutting the railway lines, destroying the oil and gas pipelines, before the silence of those who had the obligation to act: they were compromised. History will judge them.
+
+Surely Radio Magallanes will be silenced and the calm metal of my voice will no longer reach you. It does not matter. You will continue to hear it. I shall always be with you. At least my memory will be that of a dignified man who was loyal to the loyalty of the workers.
+
+The people must defend themselves, but must not sacrifice themselves. The people must not allow themselves to be devastated or riddled with bullets, but neither can they humble themselves.
+
+Workers of my fatherland: I have faith in Chile and its destiny. Others will overcome this gray and bitter moment in which treason seeks to impose itself. Continue knowing that, sooner rather than later, the great avenues will open again through which the free man shall pass to build a better society.
+
+Long live Chile! Long live the people! Long live the workers!
+
+These are my last words, and I am certain that my sacrifice will not be in vain. I am certain that, at the very least, there will be a moral lesson that will punish felony, cowardice, and treason.</pre></div>
+                    <div class="card-footer">2,712 字符</div>
+                </div>
+                
+                <div class="text-card lang-spanish">
+                    <div class="card-header"><span class="lang-name">Español</span><span class="role-badge original">原文</span></div>
+                    <div class="card-body"><h4>Último discurso de Salvador Allende</h4><pre>Santiago de Chile, martes 11 de septiembre de 1973, 9:10 hora local.
+
+Compatriotas:
+
+Esta será seguramente la última oportunidad en que me pueda dirigir a ustedes. La Fuerza Aérea ha bombardeado las torres de Radio Portales y Radio Corporación.
+
+Mis palabras no tienen amargura, sino decepción, y serán ellas el castigo moral para los que han traicionado el juramento que hicieron: soldados de Chile, comandantes en jefe titulares, el almirante Merino que se ha autodesignado, más el señor Mendoza, general rastrero que sólo ayer manifestara su fidelidad y lealtad al gobierno, y que también se ha autodenominado director general de Carabineros.
+
+Ante estos hechos, sólo me cabe decirle a los trabajadores: ¡Yo no voy a renunciar! Colocado en un tránsito histórico, pagaré con mi vida la lealtad del pueblo. Y les digo que tengo la certeza de que la semilla que entregáramos a la conciencia digna de miles y miles de chilenos, no podrá ser segada definitivamente.
+
+Tienen la fuerza, podrán avasallarnos, pero no se detienen los procesos sociales ni con el crimen ni con la fuerza. La historia es nuestra y la hacen los pueblos.
+
+Trabajadores de mi patria: Quiero agradecerles la lealtad que siempre tuvieron, la confianza que depositaron en un hombre que sólo fue intérprete de grandes anhelos de justicia, que empeñó su palabra en que respetaría la Constitución y la ley y así lo hizo. En este momento definitivo, el último en que yo pueda dirigirme a ustedes, quiero que aprovechen la lección. El capital foráneo, el imperialismo, unido a la reacción, creó el clima para que las Fuerzas Armadas rompieran su tradición, la que les enseñara Schneider y que reafirmara el comandante Araya, víctimas del mismo sector social que hoy estará en sus casas, esperando con mano ajena reconquistar el poder para seguir defendiendo sus granjerías y sus privilegios.
+
+Me dirijo, sobre todo, a la modesta mujer de nuestra tierra, a la campesina que creyó en nosotros; a la obrera que trabajó más, a la madre que supo de nuestra preocupación por los niños. Me dirijo a los profesionales de la patria, a los profesionales patriotas, a los que hace días estuvieron trabajando contra la sedición auspiciada por los Colegios profesionales, colegios de clase para defender también las ventajas que una sociedad capitalista da a unos pocos. Me dirijo a la juventud, a aquellos que cantaron, entregaron su alegría y su espíritu de lucha. Me dirijo al hombre de Chile, al obrero, al campesino, al intelectual, a aquellos que serán perseguidos, porque en nuestro país el fascismo ya estuvo hace muchas horas presente en los atentados terroristas, volando los puentes, cortando la línea férrea, destruyendo los oleoductos y los gaseoductos, frente al silencio de los que tenían la obligación de proceder: estaban comprometidos. La historia los juzgará.
+
+Seguramente Radio Magallanes será callada y el metal tranquilo de mi voz no llegará a ustedes. No importa, lo seguirán oyendo. Siempre estaré junto a ustedes. Por lo menos, mi recuerdo será el de un hombre digno que fue leal a la lealtad de los trabajadores.
+
+El pueblo debe defenderse, pero no sacrificarse. El pueblo no debe dejarse arrasar ni acribillar, pero tampoco puede humillarse.
+
+Trabajadores de mi patria: tengo fe en Chile y su destino. Superarán otros hombres este momento gris y amargo, donde la traición pretende imponerse. Sigan ustedes sabiendo que, mucho más temprano que tarde, de nuevo abrirán las grandes alamedas por donde pase el hombre libre para construir una sociedad mejor.
+
+¡Viva Chile! ¡Viva el pueblo! ¡Vivan los trabajadores!
+
+Éstas son mis últimas palabras y tengo la certeza de que mi sacrificio no será en vano. Tengo la certeza de que, por lo menos, habrá una lección moral que castigará la felonía, la cobardía y la traición.</pre></div>
+                    <div class="card-footer">3,829 字符</div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 杨振宁 -->
+        <section id="yangzhenning" class="article-section">
+            <div class="metadata">
+                <h2>中国今天不宜建造超大对撞机</h2>
+                <div class="meta-grid">
+                    <div><span class="meta-label">English Title</span><span class="meta-value">Why China Should Not Build a Super Collider Today</span></div>
+                    <div><span class="meta-label">Título en Español</span><span class="meta-value">Por qué China no debería construir un supercolisionador hoy</span></div>
+                    <div><span class="meta-label">作者 / Author</span><span class="meta-value">杨振宁 (Chen-Ning Yang)</span></div>
+                    <div><span class="meta-label">来源 / Source</span><span class="meta-value">《知识分子》微信公众号, 2016年9月4日</span></div>
+                    <div><span class="meta-label">时代 / Period</span><span class="meta-value">当代 (2016年)</span></div>
+                    <div><span class="meta-label">体裁 / Genre</span><span class="meta-value">科学评论/议论文</span></div>
+                    <div><span class="meta-label">原文语言</span><span class="meta-value">modern_chinese</span></div>
+                </div>
+            </div>
+            
+            <div class="comparison">
+                <table>
+                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>字符数</th></tr></thead>
+                    <tbody>
+                        <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>译文</td><td>谏罢建造超大对撞机疏</td><td>1,580</td></tr>
+                        <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>原文</td><td>中国今天不宜建造超大对撞机</td><td>2,127</td></tr>
+                        <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>译文</td><td>Why China Should Not Build a Super Collider Today</td><td>3,412</td></tr>
+                        <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>Por qué China no debería construir un supercolisionador hoy</td><td>3,612</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="text-grid">
+                <div class="text-card lang-classical">
+                    <div class="card-header"><span class="lang-name">文言</span><span class="role-badge translation">译文</span></div>
+                    <div class="card-body"><h4>谏罢建造超大对撞机疏</h4><pre>八月廿九日，微信公号《老顾谈几何》载丘成桐文，题曰《关于中国建设高能对撞机之数端意见并答记者问》，言丘氏赞成中国建超大对撞机，而杨氏反对，丘氏难信。其文有云：
+
+"诸实验之基础理论皆用杨公之学，每有突破，吾辈于杨公之学益加叹服！故杨公反对高能物理之更进，使人费解！"
+
+丘公之解有误！杨非反对高能物理之续进，所反对者，中国于今日始建超大对撞机也。其故如下：
+
+其一，造大对撞机，美利坚有痛苦之经验。一九八九年，美国始造当时世界最大对撞机，预算初估三十亿美元，后数增之，至八十亿，众议哗然，致一九九二年国会痛苦终止此计，虚掷约三十亿。由是举世皆谓造大对撞机为进无底之洞。
+
+今世界最大对撞机为欧洲核子中心之LHC。二零一二年，六千物理学家以此机发现希格斯之粒子，诚粒子物理学之大贡献，验证"标准模型"。LHC之建造历有年所，建费加探测器之费等，总不少于百亿美元。高能所建议之超大对撞机，预算必不少于二百亿美元。
+
+其二，高能所倡议于中国建超大对撞机，费由多国分摊。然中国之份额必极可观。今举世皆叹中国GDP已跃居世界第二。然中国仍属发展中国家，人均GDP尚少于巴西、墨西哥、马来西亚，犹有数亿农民与农民工，尚有亟待解决之环保、教育、医药健康诸问题。建超大对撞机，费巨，于解决此等燃眉之急不利，杨以为目前不宜议及。
+
+其三，建超大对撞机，必将大挤其他基础科学之经费，含生命科学、凝聚态物理、天文物理等。
+
+其四，何以多有高能物理学家积极赞成建超大对撞机？其故如下：
+
+甲，高能物理学乃二战后新兴之域，七十年来成就辉煌，验证标准模型，使人类于物质世界三种基本力有深入了解。然尚有二大问题未解：
+
+一、于所余第四种基本力——引力——之深入了解，尚有根本困难。
+
+二、犹未能解如何统一力与质量。欲解此二问，固天下物理学家之所同欲也。
+
+乙，有高能物理学家欲以超大对撞机发现"超对称粒子"，从而为人类指示解决此二问题之方向。
+
+然寻超对称粒子已历多年，全然落空。今欲以超大对撞机寻超对称粒子，仅一部分高能物理学家之"猜想"。多数物理学家，含杨在内，以为超对称粒子之存在仅一猜想，毫无实验根据，欲以极大对撞机发现此猜想中之粒子，更只是"猜想之叠"。
+
+其五，七十年来高能物理之大成就，于人类生活有无实在之益？无有。倘高能所建议之超大对撞机能实现，且真能成功将高能物理学更推大步，于人类生活有无实在之益？杨以为短中期内必无，三十年、五十年内必无。且杨知绝大多数物理学家皆同意此说。
+
+其六，中国建高能所至今三十有余年。此三十余年之成就何如？今世界重要高能物理学家中，中国人所占不到百分之一二。建超大对撞机，其设计暨建成后之运转与分析，必以百分之九十非中国人主导。倘能得诺贝尔奖，获奖者为中国人乎？
+
+其七，不建超大对撞机，高能物理遂全无前途乎？不然。杨以为至少有二方向值得探索：甲，寻新加速器之理；乙，寻美妙之几何结构，如弦理论之所究。此二方面之研究皆不甚费钱，合于当今世界经济发轫之大势。</pre></div>
+                    <div class="card-footer">1,580 字符</div>
+                </div>
+                
+                <div class="text-card lang-modern">
+                    <div class="card-header"><span class="lang-name">现代汉语</span><span class="role-badge original">原文</span></div>
+                    <div class="card-body"><h4>中国今天不宜建造超大对撞机</h4><pre>8月29日微信公众号老顾谈几何中有一篇文章，题目是《丘成桐：关于中国建设高能对撞机的几点意见并回答媒体的问题》，讲到他（丘）赞成中国建造超大对撞机，而我（杨）反对，他难相信。其中一段如下：
+
+"这些实验背后的基础理论都用到杨先生的学说，每一次突破后，我们对杨先生的学问更加佩服！所以说杨先生反对高能物理需要有更进一步的发展，使人费解！"
+
+丘教授的理解有误！我绝不反对高能物理继续发展，我反对的是中国今天开始建造超大对撞机，原因如下：
+
+（一）建造大对撞机美国有痛苦的经验：1989年美国开始建造当时世界最大对撞机，预算开始预估为30亿美元，后来数次增加，达到80亿美元，引起众多反对声音，以致1992年国会痛苦地终止了此计划，白费了约30亿美元。这项经验使大家普遍认为造大对撞机是进无底洞。
+
+目前世界最大对撞机是CERN的LHC。2012年6000位物理学家用此对撞机发现了Higgs粒子，是粒子物理学的大贡献，验证了"标准模型"。LHC的建造前后用了许多年，建造费加上探测器费等等加起来一共不少于100亿美元。高能所建议的超大对撞机预算不可能少于200亿美元。
+
+（二）高能所倡议在中国建造超大对撞机，费用由许多国家分摊。可是其中中国的份额必极可观。今天全世界都惊叹中国GDP已跃居世界第二。可是中国仍然只是一个发展中国家，人均GDP还少于巴西、墨西哥或马来西亚，还有数亿农民与农民工，还有急待解决的环保问题、教育问题、医药健康问题等等。建造超大对撞机，费用奇大，对解决这些燃眉问题不利，我认为目前不宜考虑。
+
+（三）建造超大对撞机必将大大挤压其他基础科学的经费，包括生命科学、凝聚态物理、天文物理等等。
+
+（四）为什么有不少高能物理学家积极赞成建造超大对撞机呢？原因如下：
+
+A. 高能物理学是二战后的一个新兴领域，此领域七十年来有了辉煌的成就，验证了标准模型，使人类对物质世界中三种基本力量有了深入了解。可是还有两项大问题没有解决：
+
+甲）对剩下的第四种基本力量——引力——的深入了解还有基本困难。
+
+乙）还没有能了解如何统一力量与质量。希望解决此二问题当然是所有物理学家的愿望。
+
+B. 有些高能物理学家希望用超大对撞机发现"超对称粒子"，从而为人类指出解决此二问题的方向。
+
+但是找超对称粒子已经有很多年了，完全落空。今天希望用超大对撞机来找到超对称粒子，只是一部分高能物理学家的一个"猜想"。多数物理学家，包括我在内，认为超对称粒子的存在只是一个猜想，没有任何实验根据，希望用极大对撞机发现此猜想中的粒子更只是"猜想加猜想"。
+
+（五）七十年来高能物理的大成就对人类生活有没有实在好处呢？没有。假如高能所建议的超大对撞机能实现，而且真能成功地将高能物理学更推进一大步，对人类生活有没有实在好处呢？我认为短中期内不会有，三十年、五十年内不会有。而且我知道绝大多数物理学家都同意我的这个说法。
+
+（六）中国建立高能所到今天已有三十多年。如何评价这三十多年的成就？今天世界重要高能物理学家中，中国占有率不到百分之一、二。建造超大对撞机，其设计以及建成后的运转与分析，必将由90%的非中国人来主导。如果能得到诺贝尔奖，获奖者会是中国人吗？
+
+（七）不建超大对撞机，高能物理就完全没有前途了吗？不然。我认为至少有两个方向值得探索：A. 寻找新加速器原理；B. 寻找美妙的几何结构，如弦理论所研究的。这两方面的研究都不那么费钱，符合当今世界经济发展的总趋势。</pre></div>
+                    <div class="card-footer">2,127 字符</div>
+                </div>
+                
+                <div class="text-card lang-english">
+                    <div class="card-header"><span class="lang-name">English</span><span class="role-badge translation">译文</span></div>
+                    <div class="card-body"><h4>Why China Should Not Build a Super Collider Today</h4><pre>On August 29, an article appeared on the WeChat public account "Lao Gu Talks Geometry" titled "Yau Shing-Tung: Several Opinions on Building a High-Energy Collider in China and Answers to Media Questions." In it, Yau expressed his support for building a super collider in China, while I (Yang) oppose it—a position he found difficult to believe. One passage reads:
+
+"The basic theories behind these experiments all employ Mr. Yang's work; with each breakthrough, our admiration for Mr. Yang's scholarship grows! So Mr. Yang's opposition to further development in high-energy physics is perplexing!"
+
+Professor Yau misunderstands! I do not oppose the continued development of high-energy physics. What I oppose is China beginning to build a super collider today. My reasons are as follows:
+
+(1) The United States had a painful experience building a large collider. In 1989, the U.S. began constructing what was then the world's largest collider. The initial budget was estimated at $3 billion, but after several increases it reached $8 billion, provoking widespread opposition. In 1992, Congress painfully terminated the project, wasting roughly $3 billion. This experience led to the widespread view that building large colliders is a bottomless pit.
+
+Currently, the world's largest collider is CERN's LHC. In 2012, six thousand physicists used this collider to discover the Higgs boson—a major contribution to particle physics and a validation of the Standard Model. The LHC took many years to build; construction costs plus detector expenses total no less than $10 billion. The super collider proposed by the Institute of High Energy Physics (IHEP) would cost no less than $20 billion.
+
+(2) IHEP proposes building the super collider in China with costs shared among many nations. However, China's share would certainly be substantial. Today the world marvels that China's GDP has risen to second place globally. Yet China remains a developing country. Its per capita GDP is still lower than that of Brazil, Mexico, or Malaysia. There are still hundreds of millions of farmers and migrant workers, along with urgent environmental, educational, and public health problems that demand attention. Building a super collider would be extraordinarily expensive and would not help address these burning issues. I believe this is not the time to consider it.
+
+(3) Building a super collider would inevitably squeeze funding for other basic sciences, including life sciences, condensed matter physics, astrophysics, and others.
+
+(4) Why do many high-energy physicists actively support building a super collider? The reasons are as follows:
+
+A. High-energy physics is an emerging field that arose after World War II. Over the past seventy years it has achieved brilliant success, validating the Standard Model and giving humanity a deep understanding of three fundamental forces in the material world. However, two major problems remain unsolved:
+
+(i) A fundamental difficulty remains in achieving a deep understanding of the remaining fourth fundamental force—gravity.
+
+(ii) We still do not understand how to unify force and mass. Of course, all physicists wish to solve these two problems.
+
+B. Some high-energy physicists hope to use a super collider to discover "supersymmetric particles," thereby pointing the way toward solving these two problems.
+
+However, the search for supersymmetric particles has been going on for many years and has completely failed. Today, hoping to find supersymmetric particles with a super collider is merely a "conjecture" held by some high-energy physicists. Most physicists, including myself, believe the existence of supersymmetric particles is only a conjecture with no experimental basis whatsoever. Hoping to discover these conjectured particles with an enormous collider is nothing more than "conjecture upon conjecture."
+
+(5) Have the great achievements of high-energy physics over the past seventy years brought any tangible benefits to human life? No. If the super collider proposed by IHEP could be realized, and if it truly advanced high-energy physics by a major step, would there be any tangible benefit to human life? I believe there would be none in the short to medium term—none in thirty or fifty years. And I know that the overwhelming majority of physicists agree with me.
+
+(6) It has been more than thirty years since China established IHEP. How should we evaluate its achievements over these three decades? Among the world's important high-energy physicists today, Chinese nationals account for less than one or two percent. The design, operation, and analysis of a super collider, once built, would inevitably be dominated by ninety percent non-Chinese. If a Nobel Prize were to result, would the laureate be Chinese?
+
+(7) If we do not build a super collider, does high-energy physics have no future at all? Not so. I believe there are at least two directions worth exploring: (A) searching for new accelerator principles; (B) searching for beautiful geometric structures, such as those studied in string theory. Research in both directions is far less expensive and accords with the general trend of the world economy today.</pre></div>
+                    <div class="card-footer">3,412 字符</div>
+                </div>
+                
+                <div class="text-card lang-spanish">
+                    <div class="card-header"><span class="lang-name">Español</span><span class="role-badge translation">译文</span></div>
+                    <div class="card-body"><h4>Por qué China no debería construir un supercolisionador hoy</h4><pre>El 29 de agosto, apareció un artículo en la cuenta pública de WeChat "Lao Gu Talks Geometry" titulado "Yau Shing-Tung: Varias opiniones sobre la construcción de un colisionador de alta energía en China y respuestas a preguntas de los medios". En él, Yau expresó su apoyo a construir un supercolisionador en China, mientras que yo (Yang) me opongo—a una posición que le resultaba difícil de creer. Un pasaje dice:
+
+"¡Las teorías básicas detrás de estos experimentos emplean todas el trabajo del señor Yang; con cada avance, nuestra admiración por la erudición del señor Yang crece! ¡Así que la oposición del señor Yang al desarrollo futuro de la física de alta energía resulta desconcertante!"
+
+¡El profesor Yau malentiende! No me opongo al desarrollo continuado de la física de alta energía. A lo que me opongo es a que China comience hoy a construir un supercolisionador. Mis razones son las siguientes:
+
+(1) Estados Unidos tuvo una experiencia dolorosa construyendo un gran colisionador. En 1989, EE.UU. comenzó a construir lo que entonces era el colisionador más grande del mundo. El presupuesto inicial se estimó en 3 mil millones de dólares, pero tras varios aumentos llegó a 8 mil millones, provocando una oposición generalizada. En 1992, el Congreso terminó dolorosamente el proyecto, desperdiciando aproximadamente 3 mil millones. Esta experiencia llevó a la visión generalizada de que construir grandes colisionadores es un pozo sin fondo.
+
+Actualmente, el colisionador más grande del mundo es el LHC del CERN. En 2012, seis mil físicos usaron este colisionador para descubrir el bosón de Higgs—una contribución mayor a la física de partículas y una validación del Modelo Estándar. El LHC tomó muchos años en construirse; los costos de construcción más los gastos en detectores suman no menos de 10 mil millones de dólares. El supercolisionador propuesto por el Instituto de Física de Alta Energía (IHEP) costaría no menos de 20 mil millones.
+
+(2) El IHEP propone construir el supercolisionador en China con costos compartidos entre muchas naciones. Sin embargo, la parte de China ciertamente sería sustancial. Hoy el mundo se maravilla de que el PIB de China haya ascendido al segundo lugar mundial. Sin embargo, China sigue siendo un país en desarrollo. Su PIB per cápita sigue siendo inferior al de Brasil, México o Malasia. Todavía hay cientos de millones de agricultores y trabajadores migrantes, junto con urgentes problemas ambientales, educativos y de salud pública que exigen atención. Construir un supercolisionador sería extraordinariamente caro y no ayudaría a abordar estos temas apremiantes. Creo que no es el momento de considerarlo.
+
+(3) Construir un supercolisionador inevitablemente comprimiría el financiamiento de otras ciencias básicas, incluyendo ciencias de la vida, física de la materia condensada, astrofísica y otras.
+
+(4) ¿Por qué muchos físicos de alta energía apoyan activamente construir un supercolisionador? Las razones son las siguientes:
+
+A. La física de alta energía es un campo emergente que surgió después de la Segunda Guerra Mundial. En los últimos setenta años ha logrado un éxito brillante, validando el Modelo Estándar y dando a la humanidad una comprensión profunda de tres fuerzas fundamentales en el mundo material. Sin embargo, dos problemas mayores permanecen sin resolver:
+
+(i) Permanece una dificultad fundamental en lograr una comprensión profunda de la cuarta fuerza fundamental restante: la gravedad.
+
+(ii) Todavía no entendemos cómo unificar fuerza y masa. Por supuesto, todos los físicos desean resolver estos dos problemas.
+
+B. Algunos físicos de alta energía esperan usar un supercolisionador para descubrir "partículas supersimétricas", señalando así el camino hacia la solución de estos dos problemas.
+
+Sin embargo, la búsqueda de partículas supersimétricas ha continuado durante muchos años y ha fracasado por completo. Hoy, esperar encontrar partículas supersimétricas con un supercolisionador es meramente una "conjetura" sostenida por algunos físicos de alta energía. La mayoría de los físicos, incluyéndome a mí, creemos que la existencia de partículas supersimétricas es solo una conjetura sin ninguna base experimental. Esperar descubrir estas partículas conjeturadas con un colisionador enorme no es más que "conjetura sobre conjetura".
+
+(5) ¿Han traído los grandes logros de la física de alta energía durante los últimos setenta años algún beneficio tangible a la vida humana? No. Si el supercolisionador propuesto por el IHEP pudiera realizarse, y si realmente avanzara la física de alta energía un paso mayor, ¿habría algún beneficio tangible para la vida humana? Creo que no habría ninguno a corto o mediano plazo—ninguno en treinta o cincuenta años. Y sé que la aplastante mayoría de los físicos está de acuerdo conmigo.
+
+(6) Han pasado más de treinta años desde que China estableció el IHEP. ¿Cómo deberíamos evaluar sus logros durante estas tres décadas? Entre los físicos de alta energía importantes del mundo hoy, los ciudadanos chinos representan menos del uno o dos por ciento. El diseño, operación y análisis de un supercolisionador, una vez construido, inevitablemente estaría dominado por un noventa por ciento de no chinos. Si resultara un Premio Nobel, ¿sería el laureado chino?
+
+(7) Si no construimos un supercolisionador, ¿la física de alta energía no tiene futuro alguno? No es así. Creo que hay al menos dos direcciones que vale la pena explorar: (A) buscar nuevos principios de aceleradores; (B) buscar hermosas estructuras geométricas, como las estudiadas en la teoría de cuerdas. La investigación en ambas direcciones es mucho menos costosa y se ajusta a la tendencia general de la economía mundial hoy.</pre></div>
+                    <div class="card-footer">3,612 字符</div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <footer>
+        <p>4×4 Multilingual Corpus | Generated for Token Consumption Analysis</p>
+    </footer>
+    
+    <script>
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.article-section').forEach(s => s.classList.remove('active'));
+                this.classList.add('active');
+                document.getElementById(this.dataset.id).classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
