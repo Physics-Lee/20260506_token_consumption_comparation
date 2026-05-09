@@ -1,3 +1,300 @@
 {
-  "open_source": {}
+  "open_source": {
+    "DeepSeek-R1": {
+      "allende": {
+        "classical_chinese": 16,
+        "modern_chinese": 20,
+        "english": 939,
+        "spanish": 1196
+      },
+      "assassination_qin": {
+        "classical_chinese": 5,
+        "modern_chinese": 5,
+        "english": 749,
+        "spanish": 987
+      },
+      "bird_migration": {
+        "classical_chinese": 30,
+        "modern_chinese": 44,
+        "english": 1425,
+        "spanish": 1943
+      },
+      "dark_matter_galaxies": {
+        "classical_chinese": 120,
+        "modern_chinese": 125,
+        "english": 1455,
+        "spanish": 1902
+      },
+      "duke_huan_qi": {
+        "classical_chinese": 3,
+        "modern_chinese": 3,
+        "english": 286,
+        "spanish": 390
+      },
+      "duke_xi_28th_year": {
+        "classical_chinese": 0,
+        "modern_chinese": 0,
+        "english": 513,
+        "spanish": 629
+      },
+      "ju_lu_battle": {
+        "classical_chinese": 0,
+        "modern_chinese": 0,
+        "english": 466,
+        "spanish": 609
+      },
+      "paulgraham": {
+        "classical_chinese": 6,
+        "modern_chinese": 20,
+        "english": 756,
+        "spanish": 1031
+      },
+      "science_revolution_dl": {
+        "classical_chinese": 84,
+        "modern_chinese": 123,
+        "english": 1225,
+        "spanish": 1766
+      },
+      "yangzhenning": {
+        "classical_chinese": 11,
+        "modern_chinese": 32,
+        "english": 1246,
+        "spanish": 1799
+      },
+      "yau_collider_opinions": {
+        "classical_chinese": 6,
+        "modern_chinese": 6,
+        "english": 1313,
+        "spanish": 1953
+      },
+      "exile_of_duke_wen_of_jin": {
+        "classical_chinese": 19,
+        "modern_chinese": 19,
+        "english": 1805,
+        "spanish": 2263
+      }
+    },
+    "Qwen2.5-72B": {
+      "allende": {
+        "classical_chinese": 658,
+        "modern_chinese": 712,
+        "english": 795,
+        "spanish": 1042
+      },
+      "assassination_qin": {
+        "classical_chinese": 439,
+        "modern_chinese": 554,
+        "english": 636,
+        "spanish": 885
+      },
+      "bird_migration": {
+        "classical_chinese": 929,
+        "modern_chinese": 1041,
+        "english": 1210,
+        "spanish": 1690
+      },
+      "dark_matter_galaxies": {
+        "classical_chinese": 1014,
+        "modern_chinese": 1093,
+        "english": 1255,
+        "spanish": 1592
+      },
+      "duke_huan_qi": {
+        "classical_chinese": 129,
+        "modern_chinese": 196,
+        "english": 240,
+        "spanish": 339
+      },
+      "duke_xi_28th_year": {
+        "classical_chinese": 266,
+        "modern_chinese": 339,
+        "english": 477,
+        "spanish": 604
+      },
+      "ju_lu_battle": {
+        "classical_chinese": 230,
+        "modern_chinese": 298,
+        "english": 360,
+        "spanish": 543
+      },
+      "paulgraham": {
+        "classical_chinese": 585,
+        "modern_chinese": 592,
+        "english": 664,
+        "spanish": 857
+      },
+      "science_revolution_dl": {
+        "classical_chinese": 989,
+        "modern_chinese": 985,
+        "english": 1031,
+        "spanish": 1514
+      },
+      "yangzhenning": {
+        "classical_chinese": 935,
+        "modern_chinese": 918,
+        "english": 1034,
+        "spanish": 1447
+      },
+      "yau_collider_opinions": {
+        "classical_chinese": 1014,
+        "modern_chinese": 962,
+        "english": 1106,
+        "spanish": 1567
+      },
+      "exile_of_duke_wen_of_jin": {
+        "classical_chinese": 1063,
+        "modern_chinese": 1323,
+        "english": 1549,
+        "spanish": 2083
+      }
+    },
+    "Phi-2": {
+      "allende": {
+        "classical_chinese": 1702,
+        "modern_chinese": 2209,
+        "english": 820,
+        "spanish": 1348
+      },
+      "assassination_qin": {
+        "classical_chinese": 1039,
+        "modern_chinese": 1581,
+        "english": 637,
+        "spanish": 1081
+      },
+      "bird_migration": {
+        "classical_chinese": 2368,
+        "modern_chinese": 3294,
+        "english": 1243,
+        "spanish": 2199
+      },
+      "dark_matter_galaxies": {
+        "classical_chinese": 2613,
+        "modern_chinese": 3381,
+        "english": 1287,
+        "spanish": 2103
+      },
+      "duke_huan_qi": {
+        "classical_chinese": 284,
+        "modern_chinese": 521,
+        "english": 239,
+        "spanish": 419
+      },
+      "duke_xi_28th_year": {
+        "classical_chinese": 591,
+        "modern_chinese": 860,
+        "english": 483,
+        "spanish": 653
+      },
+      "ju_lu_battle": {
+        "classical_chinese": 546,
+        "modern_chinese": 886,
+        "english": 361,
+        "spanish": 681
+      },
+      "paulgraham": {
+        "classical_chinese": 1326,
+        "modern_chinese": 1852,
+        "english": 696,
+        "spanish": 1195
+      },
+      "science_revolution_dl": {
+        "classical_chinese": 2744,
+        "modern_chinese": 2993,
+        "english": 1038,
+        "spanish": 1958
+      },
+      "yangzhenning": {
+        "classical_chinese": 2557,
+        "modern_chinese": 2872,
+        "english": 1084,
+        "spanish": 1966
+      },
+      "yau_collider_opinions": {
+        "classical_chinese": 3070,
+        "modern_chinese": 3288,
+        "english": 1136,
+        "spanish": 2188
+      },
+      "exile_of_duke_wen_of_jin": {
+        "classical_chinese": 2365,
+        "modern_chinese": 3446,
+        "english": 1566,
+        "spanish": 2479
+      }
+    },
+    "GPT-2": {
+      "allende": {
+        "classical_chinese": 1702,
+        "modern_chinese": 2209,
+        "english": 820,
+        "spanish": 1348
+      },
+      "assassination_qin": {
+        "classical_chinese": 1039,
+        "modern_chinese": 1581,
+        "english": 637,
+        "spanish": 1081
+      },
+      "bird_migration": {
+        "classical_chinese": 2368,
+        "modern_chinese": 3294,
+        "english": 1243,
+        "spanish": 2199
+      },
+      "dark_matter_galaxies": {
+        "classical_chinese": 2613,
+        "modern_chinese": 3381,
+        "english": 1287,
+        "spanish": 2103
+      },
+      "duke_huan_qi": {
+        "classical_chinese": 284,
+        "modern_chinese": 521,
+        "english": 239,
+        "spanish": 419
+      },
+      "duke_xi_28th_year": {
+        "classical_chinese": 591,
+        "modern_chinese": 860,
+        "english": 483,
+        "spanish": 653
+      },
+      "ju_lu_battle": {
+        "classical_chinese": 546,
+        "modern_chinese": 886,
+        "english": 361,
+        "spanish": 681
+      },
+      "paulgraham": {
+        "classical_chinese": 1326,
+        "modern_chinese": 1852,
+        "english": 696,
+        "spanish": 1195
+      },
+      "science_revolution_dl": {
+        "classical_chinese": 2744,
+        "modern_chinese": 2997,
+        "english": 1040,
+        "spanish": 1960
+      },
+      "yangzhenning": {
+        "classical_chinese": 2557,
+        "modern_chinese": 2872,
+        "english": 1084,
+        "spanish": 1966
+      },
+      "yau_collider_opinions": {
+        "classical_chinese": 3070,
+        "modern_chinese": 3288,
+        "english": 1136,
+        "spanish": 2188
+      },
+      "exile_of_duke_wen_of_jin": {
+        "classical_chinese": 2365,
+        "modern_chinese": 3446,
+        "english": 1566,
+        "spanish": 2479
+      }
+    }
+  }
 }

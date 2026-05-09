@@ -4,7 +4,7 @@ from pathlib import Path
 def build_index():
     """Generate index.html with token consumption comparison across tokenizers."""
     
-    json_files = sorted(Path('./data').glob('*.json'))
+    json_files = list(Path('./data').glob('*.json'))
     articles = []
     
     for filepath in json_files:
@@ -12,6 +12,25 @@ def build_index():
             continue
         with open(filepath, 'r', encoding='utf-8') as f:
             articles.append(json.load(f))
+    
+    # Sort articles by pinyin of classical Chinese title
+    def get_pinyin_key(article):
+        classical_title = next((t['title'] for t in article['texts'] if t['language'] == 'classical_chinese'), article['metadata']['title_zh'])
+        first_char = classical_title[0]
+        try:
+            from pypinyin import pinyin, Style
+            py = pinyin(first_char, style=Style.NORMAL)
+            return py[0][0] if py else first_char
+        except ImportError:
+            # Fallback: hardcoded mapping for common characters
+            pinyin_map = {
+                '阿': 'a', '暗': 'an', '春': 'chun', '谏': 'jian',
+                '能': 'neng', '丘': 'qiu', '深': 'shen', '史': 'shi',
+                '夜': 'ye', '战': 'zhan', '左': 'zuo'
+            }
+            return pinyin_map.get(first_char, first_char)
+    
+    articles.sort(key=get_pinyin_key)
     
     if not articles:
         print("No JSON files found in ../data/!")
@@ -408,12 +427,13 @@ def build_index():
             <label for="tokenizer-select">分词器：</label>
             <select id="tokenizer-select" class="tokenizer-select">
                 <optgroup label="OpenAI（实时）">
-                    <option value="r50k_base">r50k_base — davinci / GPT-3（2020）</option>
-                    <option value="p50k_base">p50k_base — text-davinci-003 / Codex（2021）</option>
-                    <option value="cl100k_base">cl100k_base — gpt-4 / gpt-3.5-turbo（2022）</option>
-                    <option value="o200k_base" selected>o200k_base — gpt-4o / gpt-4.1 / o1 / o3 / gpt-5.x（2024+）</option>
+<option value="r50k_base">r50k_base — gpt-3 / text-davinci-001（2020-）</option>
+<option value="p50k_base">p50k_base — code-davinci-002 / text-davinci-003（2021-）</option>
+<option value="cl100k_base">cl100k_base — gpt-3.5-turbo / gpt-4（2022-）</option>
+<option value="o200k_base" selected>o200k_base — gpt-4o / gpt-4.1 / o1 / o3 / gpt-5.x（2024-）</option>
                 </optgroup>
                 <optgroup label="开源模型（预计算）">
+                    <option value="GPT-2">GPT-2 (2019)</option>
                     <option value="Qwen2.5-72B">Qwen2.5-72B</option>
                     <option value="Phi-2">Phi-2</option>
                     <option value="Gemma-7B">Gemma-7B</option>
@@ -471,9 +491,9 @@ def build_index():
         function updateThemeBtn() {{
             const attr = document.documentElement.getAttribute('data-theme');
             let label, icon;
-            if (attr === 'light') {{ icon = '\u2600\ufe0f'; label = '\u6d45\u8272'; }}
-            else if (attr === 'dark') {{ icon = '\ud83c\udf19'; label = '\u6df1\u8272'; }}
-            else {{ icon = '\ud83d\udcbb'; label = '\u8ddf\u968f\u7cfb\u7edf'; }}
+            if (attr === 'light') {{ icon = '\\u2600\\ufe0f'; label = '\u6d45\u8272'; }}
+            else if (attr === 'dark') {{ icon = '\\ud83c\\udf19'; label = '\u6df1\u8272'; }}
+            else {{ icon = '\\ud83d\\udcbb'; label = '\u8ddf\u968f\u7cfb\u7edf'; }}
             themeBtn.textContent = `${{icon}} ${{label}}`;
             const effective = getEffectiveTheme();
             themeBtn.title = `\u5f53\u524d\u6a21\u5f0f: ${{label}} (\u5b9e\u9645: ${{effective === 'dark' ? '\u6df1\u8272' : '\u6d45\u8272'}}) \u2014 \u70b9\u51fb\u5207\u6362`;
@@ -511,6 +531,7 @@ def build_index():
         }};
 
         const OPEN_SOURCE_MODELS = [
+            'GPT-2',
             'Qwen2.5-72B', 'Phi-2', 'Gemma-7B',
             'DeepSeek-R1', 'Llama-3-8B', 'Llama-3-70B'
         ];

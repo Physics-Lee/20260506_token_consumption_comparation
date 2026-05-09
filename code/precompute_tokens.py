@@ -91,6 +91,46 @@ def compute_token_counts(corpus):
     return result
 
 
+def compute_gpt2(corpus):
+    """Compute token counts for GPT-2 using tiktoken."""
+    import tiktoken
+
+    print(f"\n{'='*60}")
+    print(f"  Loading: GPT-2 (tiktoken-gpt2)")
+    print(f"{'='*60}")
+
+    try:
+        enc = tiktoken.get_encoding("gpt2")
+    except Exception as e:
+        print(f"  [SKIP] Failed to load GPT-2 encoding: {e}")
+        print("  Install: pip install tiktoken")
+        return {}
+
+    model_counts = {}
+    for article_id, article in corpus.items():
+        text_counts = {}
+        for text in article["texts"]:
+            lang = text["language"]
+            content = text["content"]
+            try:
+                tokens = enc.encode(content)
+                text_counts[lang] = len(tokens)
+            except Exception as e:
+                print(f"  [ERR] {article_id}/{lang}: {e}")
+                text_counts[lang] = -1
+
+        model_counts[article_id] = text_counts
+        print(
+            f"  {article_id:30s}  "
+            + "  ".join(
+                f"{lang}: {count:>5}"
+                for lang, count in text_counts.items()
+            )
+        )
+
+    return {"GPT-2": model_counts}
+
+
 def main():
     print("Loading corpus data...")
     corpus = load_corpus()
@@ -101,6 +141,12 @@ def main():
 
     print("\nComputing token counts...")
     result = compute_token_counts(corpus)
+
+    # Compute GPT-2 tokens via tiktoken
+    print("\nComputing GPT-2 token counts...")
+    gpt2_result = compute_gpt2(corpus)
+    if gpt2_result:
+        result["open_source"].update(gpt2_result)
 
     # Write output
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
