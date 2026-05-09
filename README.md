@@ -7,51 +7,41 @@ A multilingual parallel corpus for comparing token consumption across languages 
 ```
 .
 ├── code/                          # 构建脚本
-│   ├── build_index.py             # 生成 index.html（含 token 对比 + 分词器切换）
-│   ├── json2html.py               # 生成 corpus_reader.html（纯阅读 + 主题切换）
-│   ├── precompute_tokens.py       # Python 版：HuggingFace transformers 预计算开源模型 token 数
+│   ├── build_index.py             # 生成 index.html
+│   ├── precompute_tokens.py       # Python 版：HuggingFace 预计算开源模型 token 数
 │   └── precompute_tokens.js       # JS 版：纯 JS BPE 预计算，零 Python 依赖
-├── index.html                     # Token 消耗对比页（build_index.py 生成）
-├── corpus_reader.html             # 语料库阅读器（json2html.py 生成）
+├── index.html                     # 产物：Token 消耗对比页 + 阅读器
 ├── data/                          # 规范语料数据
 │   ├── *.json                     # 文章数据（每篇含 4 种语言）
-│   └── token_counts.json          # 预计算的开源模型 token 数（precompute_tokens.* 生成）
+│   └── token_counts.json          # 预计算的开源模型 token 数
 ├── note/                          # 文档
 └── resource/                      # 原文 Markdown
 ```
 
 ## 更新流程
 
-### 只加/改文章，不需要 token 分析
-
-```
-改 data/*.json          →  python code/json2html.py       →  corpus_reader.html
-（加文章/改文本）          （生成阅读器）                      （浏览器打开）
-```
-
-### 加/改文章，需要 token 分析
-
 ```
 改 data/*.json          →  python code/precompute_tokens.py  →  data/token_counts.json
 （加文章/改文本）            （重新编码所有文本）                  ↓
                                                          python code/build_index.py  →  index.html
-                                                         （生成对比页）                  （浏览器打开）
+                                                         （构建页面）                    （浏览器打开）
 ```
 
 > `precompute_tokens.py` 需要 `pip install transformers`。不想装 Python 依赖可用 `node code/precompute_tokens.js`，纯 JS BPE 实现，零依赖。
 
-### 只改样式或代码
+### 如果只改样式/代码（不改数据）
 
 ```
 改 build_index.py 模板   →  python code/build_index.py    →  index.html
 ```
 
-### 增删分词器
+### 如果增删分词器
 
 1. 改 `build_index.py` 里 `<optgroup>` 那段的 `<option>` 列表
-2. 如果增删的是开源模型，同步改 `precompute_tokens.py` 的 `OPEN_SOURCE_MODELS` 字典
-3. 重新跑 `precompute_tokens.py`
-4. 重新跑 `build_index.py`
+2. 开源模型增删需同步改 `precompute_tokens.py` 的 `OPEN_SOURCE_MODELS` 字典
+3. 重新跑 `precompute_tokens.py` → `build_index.py`
+
+> 如果 token_counts.json 还没生成过（或不需要开源模型数据），直接跑 `build_index.py` 也行——开源模型那列会显示"需预计算"。
 
 ## 如何添加新文章
 
