@@ -80,3 +80,18 @@ text-davinci-003 是 175B 参数的全量模型，ChatGPT 背后的 gpt-3.5-turb
 ```
 
 ChatGPT 的起点是 gpt-3.5-turbo + RLHF + cl100k_base 编码，它的"前身"应该是 RLHF 训练之前的 gpt-3.5 基础模型，而不是 text-davinci-003。
+
+# 价格
+
+davinci。 定价是 gpt-3.5-turbo 的 10 倍。
+davinci            $0.02  / 1K tokens   ← GPT-3 旗舰（175B 参数）
+gpt-3.5-turbo      $0.002 / 1K tokens   ← ChatGPT API（便宜 10 倍）
+更直观的对比：送同样一份 4K token 的文本进去：
+davinci:         $0.08
+gpt-3.5-turbo:   $0.008
+有意思的是，gpt-3.5-turbo 的定价故意钉在了 curie 的价格档位上：
+ada       $0.0004  最便宜
+babbage   $0.0005
+curie     $0.002   ← gpt-3.5-turbo 定在这
+davinci   $0.02    最贵（被 gpt-3.5-turbo 用 1/10 价格碾压）
+OpenAI 用中等模型的价格卖最强大模型——这是他们抢占市场的策略：用 ChatGPT 积累用户，用低价 API 锁死开发者生态。davinci 此后形同虚设，2024 年 1 月正式下线。
