@@ -2,76 +2,60 @@
 
 A multilingual parallel corpus for comparing token consumption across languages and tokenizer models.
 
-## 语料库概况
-
-- **12 篇文章** × **4 种语言** = 48 个文本
-- 四种语言：文言、现代汉语、English、Español
-- 每篇文章均含 1 个原文 + 3 个译文
-- 导航栏与页面主标题统一使用**文言标题**
-
 ## 目录结构
 
 ```
 .
-├── code/                          # 构建脚本（纯 Python）
-│   ├── extract_originals.py       # 从 JSON 提取原文到 resource/
-│   ├── json2html.py               # 从 JSON 生成主题化 HTML
-│   └── md2json.py                 # 将 Markdown 原文转为 JSON 骨架
-├── corpus_reader.html             # 主阅读器（自动生成）
-├── data/                          # 规范语料数据（JSON）
-│   ├── allende.json               # 阿连德最后的演讲
-│   ├── assassination_qin.json     # 荆轲刺秦王
-│   ├── bird_migration.json        # 夜间鸟类迁徙监测网络
-│   ├── dark_matter_galaxies.json  # 暗物质缺失星系
-│   ├── duke_huan_qi.json          # 齐桓公葵丘会盟
-│   ├── duke_xi_28th_year.json     # 春秋·僖公二十八年
-│   ├── exile_of_duke_wen_of_jin.json  # 左传·晋文公流亡
-│   ├── ju_lu_battle.json          # 钜鹿之战
-│   ├── paulgraham.json            # 会写的人与不会写的人
-│   ├── science_revolution_dl.json # 深度学习与科学革命
-│   ├── yangzhenning.json          # 谏罢建造超大对撞机疏
-│   └── yau_collider_opinions.json # 丘成桐议中国建高能对撞机
+├── code/                          # 构建脚本
+│   ├── build_index.py             # 生成 index.html（含 token 对比 + 分词器切换）
+│   ├── json2html.py               # 生成 corpus_reader.html（纯阅读 + 主题切换）
+│   ├── precompute_tokens.py       # Python 版：HuggingFace transformers 预计算开源模型 token 数
+│   └── precompute_tokens.js       # JS 版：纯 JS BPE 预计算，零 Python 依赖
+├── index.html                     # Token 消耗对比页（build_index.py 生成）
+├── corpus_reader.html             # 语料库阅读器（json2html.py 生成）
+├── data/                          # 规范语料数据
+│   ├── *.json                     # 文章数据（每篇含 4 种语言）
+│   └── token_counts.json          # 预计算的开源模型 token 数（precompute_tokens.* 生成）
 ├── note/                          # 文档
-│   ├── how-to-change-card-order.md      # 如何更改卡片顺序
-│   ├── how-character-counting-works.md  # 字符统计机制
-│   └── theme-system-preference.md       # 三态主题切换原理
 └── resource/                      # 原文 Markdown
-    ├── Last_Speech_of_Salvador_Allende.md
-    ├── The_Assassination_Attempt_on_the_King_of_Qin.md
-    ├── Bird_Migration.md
-    ├── Dark_Matter_Deficient_Galaxies.md
-    ├── Duke_Huan_of_Qi_Accepts_the_Sacrificial_Meat_at_Kuiqiu_Without_Breaching_Ritual_Propriety.md
-    ├── Ju_Lu_Battle.md
-    ├── Science_Revolution_by_DL.md
-    ├── Several_Opinions_on_Chinas_Construction_of_a_High_Energy_Collider_and_Responses_to_Media_Questions.md
-    ├── The_Exile_of_Duke_Wen_of_Jin.md
-    ├── The_Twenty_Eighth_Year_of_Duke_Xi_of_Lu_in_the_Spring_and_Autumn_Annals.md
-    ├── Why_China_Should_Not_Build_a_Super_Collider_Today.md
-    └── Writes_and_Write_Nots.md
 ```
 
-## 快速开始
+## 更新流程
 
-```bash
-# 生成阅读器
-python code/json2html.py
+### 只加/改文章，不需要 token 分析
 
-# 在浏览器中打开
-corpus_reader.html
 ```
+改 data/*.json          →  python code/json2html.py       →  corpus_reader.html
+（加文章/改文本）          （生成阅读器）                      （浏览器打开）
+```
+
+### 加/改文章，需要 token 分析
+
+```
+改 data/*.json          →  python code/precompute_tokens.py  →  data/token_counts.json
+（加文章/改文本）            （重新编码所有文本）                  ↓
+                                                         python code/build_index.py  →  index.html
+                                                         （生成对比页）                  （浏览器打开）
+```
+
+> `precompute_tokens.py` 需要 `pip install transformers`。不想装 Python 依赖可用 `node code/precompute_tokens.js`，纯 JS BPE 实现，零依赖。
+
+### 只改样式或代码
+
+```
+改 build_index.py 模板   →  python code/build_index.py    →  index.html
+```
+
+### 增删分词器
+
+1. 改 `build_index.py` 里 `<optgroup>` 那段的 `<option>` 列表
+2. 如果增删的是开源模型，同步改 `precompute_tokens.py` 的 `OPEN_SOURCE_MODELS` 字典
+3. 重新跑 `precompute_tokens.py`
+4. 重新跑 `build_index.py`
 
 ## 如何添加新文章
 
-### 方式一：使用 md2json.py 生成骨架
-
-```bash
-# 将 Markdown 原文放入 resource/
-python code/md2json.py resource/My_Article.md --lang modern_chinese
-```
-
-这会生成 `data/my_article.json`，其中包含待填写的 metadata 和 3 个占位译文。
-
-### 方式二：手动创建 JSON
+1. 创建 JSON 文件放入 `data/`，遵循此 schema：
 
 ```json
 {
@@ -115,53 +99,20 @@ python code/md2json.py resource/My_Article.md --lang modern_chinese
 }
 ```
 
-**重要**：请使用 Python `json.dump()` 生成 JSON，不要手动拼接字符串，否则引号不会自动转义。
-
-### 最后一步
-
-```bash
-python code/json2html.py
-```
+2. 按需要跑上面「更新流程」中的对应命令。
 
 ## 阅读器特性
 
-- **三态主题**：浅色 / 深色 / 跟随系统（默认）
-- **固定卡片顺序**：文言 → 现代汉语 → English → Español
-- **文言标题**：导航栏与页面主标题统一使用文言标题
-- **Unicode 字符数统计**：每篇文章附字符对比表
-- **Sticky 导航**：顶部导航栏始终可见
-- **响应式布局**：窄屏自动折叠为单列
+- **三态主题**：浅色 / 深色 / 跟随系统
+- **分词器切换**：OpenAI 4 种编码 + 6 种开源模型，实时对比 token 消耗
+- **预计算 + 实时**：开源模型 token 数预计算，OpenAI 编码浏览器端实时跑
+- **响应式布局**：窄屏自动折叠
 
-## 技术细节
+## 语言标识
 
-### 字符统计
-
-采用 Python `len(str)`，统计 Unicode code points：
-- 每个汉字 = 1 字符
-- 每个英文字母 = 1 字符
-- 换行符、空格均计入
-
-### 语言标识
-
-| 标识 | 语言 | CSS 类 |
-|---|---|---|
-| `classical_chinese` | 文言 | `lang-classical` |
-| `modern_chinese` | 现代汉语 | `lang-modern` |
-| `english` | English | `lang-english` |
-| `spanish` | Español | `lang-spanish` |
-
-## 文档
-
-- [`note/theme-system-preference.md`](note/theme-system-preference.md) — 三态主题切换实现
-- [`note/how-to-change-card-order.md`](note/how-to-change-card-order.md) — 如何修改卡片显示顺序
-- [`note/how-character-counting-works.md`](note/how-character-counting-works.md) — 字符统计机制
-
-## Token 分析管线（计划中）
-
-- OpenAI `tiktoken` for GPT token counts
-- DeepSeek / HuggingFace tokenizers for comparison
-- Statistical summary tables
-
-## License
-
-Created for token consumption research. Texts are translations of public-domain or widely published works.
+| 标识 | 语言 |
+|------|------|
+| `classical_chinese` | 文言 |
+| `modern_chinese` | 现代汉语 |
+| `english` | English |
+| `spanish` | Español |
