@@ -280,48 +280,6 @@
         .lang-spanish { border-top-color: #ff7b72 !important; }
         .lang-spanish .lang-name { color: #ff7b72; }
         [data-theme="light"] .lang-spanish .lang-name { color: #dc2626; }
-        
-        /* Tokenizer selector */
-        .tokenizer-bar {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-left: auto;
-            padding-left: 1.5rem;
-            border-left: 1px solid var(--border);
-        }
-        .tokenizer-bar label {
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-            white-space: nowrap;
-        }
-        .tokenizer-select {
-            padding: 0.5rem 1rem;
-            border: 2px solid var(--border);
-            background: var(--bg-card);
-            color: var(--text-primary);
-            border-radius: 8px;
-            font-size: 0.9rem;
-            cursor: pointer;
-            outline: none;
-            transition: border-color 0.3s;
-        }
-        .tokenizer-select:hover, .tokenizer-select:focus {
-            border-color: var(--accent);
-        }
-        .token-col-header .tokenizer-name {
-            font-weight: 400;
-            color: var(--text-secondary);
-            font-size: 0.8rem;
-        }
-        .token-count {
-            font-variant-numeric: tabular-nums;
-            transition: color 0.2s;
-        }
-        .token-count.loading {
-            color: var(--text-secondary);
-            font-style: italic;
-        }
     </style>
 </head>
 <body>
@@ -333,30 +291,6 @@
     
     <nav>
         <button class="nav-btn active" data-id="allende">阿连德绝命书</button> <button class="nav-btn " data-id="assassination_qin">荆轲刺秦王</button> <button class="nav-btn " data-id="bird_migration">夜鸟迁徙之监</button> <button class="nav-btn " data-id="dark_matter_galaxies">暗质缺失之星系何以抗巨灵而存</button> <button class="nav-btn " data-id="duke_huan_qi">齐桓公葵丘会盟受胙不逾礼</button> <button class="nav-btn " data-id="duke_xi_28th_year">春秋·僖公二十八年</button> <button class="nav-btn " data-id="ju_lu_battle">钜鹿之战</button> <button class="nav-btn " data-id="paulgraham">能书者与不能书者</button> <button class="nav-btn " data-id="science_revolution_dl">深度学习与科学革命论</button> <button class="nav-btn " data-id="yangzhenning">谏罢建造超大对撞机疏</button> <button class="nav-btn " data-id="yau_collider_opinions">丘成桐议中国建高能对撞机</button> <button class="nav-btn " data-id="exile_of_duke_wen_of_jin">左传·晋文公流亡</button>
-        <div class="tokenizer-bar">
-            <label for="tokenizer-select">分词器：</label>
-            <select id="tokenizer-select" class="tokenizer-select">
-                <optgroup label="OpenAI（实时）">
-                    <option value="gpt-4o" selected>gpt-4o (o200k_base)</option>
-                    <option value="gpt-4.1">gpt-4.1</option>
-                    <option value="gpt-4">gpt-4 / gpt-3.5-turbo (cl100k_base)</option>
-                    <option value="text-davinci-003">text-davinci-003 (p50k_base)</option>
-                    <option value="davinci">davinci (r50k_base)</option>
-                    <option value="o200k_base">o200k_base (编码)</option>
-                    <option value="cl100k_base">cl100k_base (编码)</option>
-                    <option value="p50k_base">p50k_base (编码)</option>
-                    <option value="r50k_base">r50k_base (编码)</option>
-                </optgroup>
-                <optgroup label="开源模型（预计算）">
-                    <option value="Qwen2.5-72B">Qwen2.5-72B</option>
-                    <option value="Phi-2">Phi-2</option>
-                    <option value="Gemma-7B">Gemma-7B</option>
-                    <option value="DeepSeek-R1">DeepSeek-R1</option>
-                    <option value="Llama-3-8B">Llama-3-8B</option>
-                    <option value="Llama-3-70B">Llama-3-70B</option>
-                </optgroup>
-            </select>
-        </div>
     </nav>
     
     <main>
@@ -377,15 +311,15 @@
             
             <div class="comparison">
                 <table>
-                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>Unicode 字符数</th><th class="token-col-header">词元数 <span class="tokenizer-name"></span></th></tr></thead>
+                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>Unicode 字符数</th></tr></thead>
                     <tbody>
-                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>译文</td><td>阿连德绝命书</td><td>888</td><td class="token-count" data-article="allende" data-lang="classical_chinese">—</td></tr>
+                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>译文</td><td>阿连德绝命书</td><td>888</td></tr>
             
-                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>译文</td><td>萨尔瓦多·阿连德的最后一次演讲</td><td>1,138</td><td class="token-count" data-article="allende" data-lang="modern_chinese">—</td></tr>
+                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>译文</td><td>萨尔瓦多·阿连德的最后一次演讲</td><td>1,138</td></tr>
             
-                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>译文</td><td>Last Speech of Salvador Allende</td><td>3,809</td><td class="token-count" data-article="allende" data-lang="english">—</td></tr>
+                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>译文</td><td>Last Speech of Salvador Allende</td><td>3,809</td></tr>
             
-                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>原文</td><td>Último discurso de Salvador Allende</td><td>3,792</td><td class="token-count" data-article="allende" data-lang="spanish">—</td></tr>
+                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>原文</td><td>Último discurso de Salvador Allende</td><td>3,792</td></tr>
             </tbody>
                 </table>
             </div>
@@ -633,15 +567,15 @@ Trabajadores de mi patria: tengo fe en Chile y su destino. Superarán otros homb
             
             <div class="comparison">
                 <table>
-                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>Unicode 字符数</th><th class="token-col-header">词元数 <span class="tokenizer-name"></span></th></tr></thead>
+                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>Unicode 字符数</th></tr></thead>
                     <tbody>
-                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>原文</td><td>荆轲刺秦王</td><td>463</td><td class="token-count" data-article="assassination_qin" data-lang="classical_chinese">—</td></tr>
+                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>原文</td><td>荆轲刺秦王</td><td>463</td></tr>
             
-                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>译文</td><td>荆轲刺秦王</td><td>714</td><td class="token-count" data-article="assassination_qin" data-lang="modern_chinese">—</td></tr>
+                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>译文</td><td>荆轲刺秦王</td><td>714</td></tr>
             
-                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>译文</td><td>The Assassination Attempt on the King of Qin</td><td>2,876</td><td class="token-count" data-article="assassination_qin" data-lang="english">—</td></tr>
+                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>译文</td><td>The Assassination Attempt on the King of Qin</td><td>2,876</td></tr>
             
-                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>El Intento de Asesinato contra el Rey de Qin</td><td>2,959</td><td class="token-count" data-article="assassination_qin" data-lang="spanish">—</td></tr>
+                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>El Intento de Asesinato contra el Rey de Qin</td><td>2,959</td></tr>
             </tbody>
                 </table>
             </div>
@@ -717,15 +651,15 @@ Jing Ke supo que su misión había fracasado. Apoyado contra el pilar, se rió, 
             
             <div class="comparison">
                 <table>
-                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>Unicode 字符数</th><th class="token-col-header">词元数 <span class="tokenizer-name"></span></th></tr></thead>
+                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>Unicode 字符数</th></tr></thead>
                     <tbody>
-                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>译文</td><td>夜鸟迁徙之监</td><td>741</td><td class="token-count" data-article="bird_migration" data-lang="classical_chinese">—</td></tr>
+                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>译文</td><td>夜鸟迁徙之监</td><td>741</td></tr>
             
-                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>译文</td><td>夜间鸟类迁徙监测网络</td><td>1,120</td><td class="token-count" data-article="bird_migration" data-lang="modern_chinese">—</td></tr>
+                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>译文</td><td>夜间鸟类迁徙监测网络</td><td>1,120</td></tr>
             
-                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>原文</td><td>They Tap Into the Magical, Hidden Pulse of the Planet, but What is the Nighttime Bird Surveillance Network?</td><td>5,694</td><td class="token-count" data-article="bird_migration" data-lang="english">—</td></tr>
+                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>原文</td><td>They Tap Into the Magical, Hidden Pulse of the Planet, but What is the Nighttime Bird Surveillance Network?</td><td>5,694</td></tr>
             
-                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>La Red de Vigilancia de Aves Nocturnas</td><td>4,450</td><td class="token-count" data-article="bird_migration" data-lang="spanish">—</td></tr>
+                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>La Red de Vigilancia de Aves Nocturnas</td><td>4,450</td></tr>
             </tbody>
                 </table>
             </div>
@@ -1041,15 +975,15 @@ Desde entonces, los científicos han estado trabajando día y noche para decodif
             
             <div class="comparison">
                 <table>
-                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>Unicode 字符数</th><th class="token-col-header">词元数 <span class="tokenizer-name"></span></th></tr></thead>
+                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>Unicode 字符数</th></tr></thead>
                     <tbody>
-                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>译文</td><td>暗质缺失之星系何以抗巨灵而存</td><td>1,518</td><td class="token-count" data-article="dark_matter_galaxies" data-lang="classical_chinese">—</td></tr>
+                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>译文</td><td>暗质缺失之星系何以抗巨灵而存</td><td>1,518</td></tr>
             
-                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>译文</td><td>暗物质缺失星系如何对抗巨人并幸存</td><td>1,880</td><td class="token-count" data-article="dark_matter_galaxies" data-lang="modern_chinese">—</td></tr>
+                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>译文</td><td>暗物质缺失星系如何对抗巨人并幸存</td><td>1,880</td></tr>
             
-                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>原文</td><td>Cosmic Simulation Shows How Dark-Matter-Deficient Galaxies Confront Goliath and Survive</td><td>5,611</td><td class="token-count" data-article="dark_matter_galaxies" data-lang="english">—</td></tr>
+                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>原文</td><td>Cosmic Simulation Shows How Dark-Matter-Deficient Galaxies Confront Goliath and Survive</td><td>5,611</td></tr>
             
-                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>Simulación Cósmica Muestra Cómo Galaxias Deficientes en Materia Oscura Enfrentan a Goliat y Sobreviven</td><td>5,867</td><td class="token-count" data-article="dark_matter_galaxies" data-lang="spanish">—</td></tr>
+                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>Simulación Cósmica Muestra Cómo Galaxias Deficientes en Materia Oscura Enfrentan a Goliat y Sobreviven</td><td>5,867</td></tr>
             </tbody>
                 </table>
             </div>
@@ -1565,15 +1499,15 @@ Thompson: Para Ciencia de 60 segundos, soy Joanna Thompson.</pre>
             
             <div class="comparison">
                 <table>
-                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>Unicode 字符数</th><th class="token-col-header">词元数 <span class="tokenizer-name"></span></th></tr></thead>
+                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>Unicode 字符数</th></tr></thead>
                     <tbody>
-                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>原文</td><td>齐桓公葵丘会盟受胙不逾礼</td><td>135</td><td class="token-count" data-article="duke_huan_qi" data-lang="classical_chinese">—</td></tr>
+                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>原文</td><td>齐桓公葵丘会盟受胙不逾礼</td><td>135</td></tr>
             
-                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>译文</td><td>齐桓公在葵丘会盟接受祭肉而不违背礼制</td><td>238</td><td class="token-count" data-article="duke_huan_qi" data-lang="modern_chinese">—</td></tr>
+                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>译文</td><td>齐桓公在葵丘会盟接受祭肉而不违背礼制</td><td>238</td></tr>
             
-                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>译文</td><td>Duke Huan of Qi Accepts the Sacrificial Meat at Kuiqiu Without Breaching Ritual Propriety</td><td>1,066</td><td class="token-count" data-article="duke_huan_qi" data-lang="english">—</td></tr>
+                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>译文</td><td>Duke Huan of Qi Accepts the Sacrificial Meat at Kuiqiu Without Breaching Ritual Propriety</td><td>1,066</td></tr>
             
-                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>El Duque Huan de Qi Acepta la Carne Sacrificial en Kuiqiu sin Violar la Propriedad Ritual</td><td>1,195</td><td class="token-count" data-article="duke_huan_qi" data-lang="spanish">—</td></tr>
+                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>El Duque Huan de Qi Acepta la Carne Sacrificial en Kuiqiu sin Violar la Propriedad Ritual</td><td>1,195</td></tr>
             </tbody>
                 </table>
             </div>
@@ -1633,15 +1567,15 @@ Thompson: Para Ciencia de 60 segundos, soy Joanna Thompson.</pre>
             
             <div class="comparison">
                 <table>
-                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>Unicode 字符数</th><th class="token-col-header">词元数 <span class="tokenizer-name"></span></th></tr></thead>
+                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>Unicode 字符数</th></tr></thead>
                     <tbody>
-                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>原文</td><td>春秋·僖公二十八年</td><td>286</td><td class="token-count" data-article="duke_xi_28th_year" data-lang="classical_chinese">—</td></tr>
+                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>原文</td><td>春秋·僖公二十八年</td><td>286</td></tr>
             
-                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>译文</td><td>春秋·僖公二十八年</td><td>410</td><td class="token-count" data-article="duke_xi_28th_year" data-lang="modern_chinese">—</td></tr>
+                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>译文</td><td>春秋·僖公二十八年</td><td>410</td></tr>
             
-                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>译文</td><td>The Twenty-Eighth Year of Duke Xi of Lu in the Spring and Autumn Annals</td><td>1,793</td><td class="token-count" data-article="duke_xi_28th_year" data-lang="english">—</td></tr>
+                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>译文</td><td>The Twenty-Eighth Year of Duke Xi of Lu in the Spring and Autumn Annals</td><td>1,793</td></tr>
             
-                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>El Año Vigésimo Octavo del Duque Xi de Lu en los Anales de Primavera y Otoño</td><td>1,760</td><td class="token-count" data-article="duke_xi_28th_year" data-lang="spanish">—</td></tr>
+                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>El Año Vigésimo Octavo del Duque Xi de Lu en los Anales de Primavera y Otoño</td><td>1,760</td></tr>
             </tbody>
                 </table>
             </div>
@@ -1797,15 +1731,15 @@ En invierno, el Duque se reunió con el Marqués de Jin, el Marqués de Qi, el D
             
             <div class="comparison">
                 <table>
-                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>Unicode 字符数</th><th class="token-col-header">词元数 <span class="tokenizer-name"></span></th></tr></thead>
+                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>Unicode 字符数</th></tr></thead>
                     <tbody>
-                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>原文</td><td>钜鹿之战</td><td>246</td><td class="token-count" data-article="ju_lu_battle" data-lang="classical_chinese">—</td></tr>
+                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>原文</td><td>钜鹿之战</td><td>246</td></tr>
             
-                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>译文</td><td>钜鹿之战</td><td>401</td><td class="token-count" data-article="ju_lu_battle" data-lang="modern_chinese">—</td></tr>
+                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>译文</td><td>钜鹿之战</td><td>401</td></tr>
             
-                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>译文</td><td>The Battle of Julu</td><td>1,725</td><td class="token-count" data-article="ju_lu_battle" data-lang="english">—</td></tr>
+                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>译文</td><td>The Battle of Julu</td><td>1,725</td></tr>
             
-                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>La Batalla de Julu</td><td>1,939</td><td class="token-count" data-article="ju_lu_battle" data-lang="spanish">—</td></tr>
+                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>La Batalla de Julu</td><td>1,939</td></tr>
             </tbody>
                 </table>
             </div>
@@ -1901,15 +1835,15 @@ Después de derrotar completamente al ejército de Qin, Xiang Yu convocó a los 
             
             <div class="comparison">
                 <table>
-                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>Unicode 字符数</th><th class="token-col-header">词元数 <span class="tokenizer-name"></span></th></tr></thead>
+                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>Unicode 字符数</th></tr></thead>
                     <tbody>
-                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>译文</td><td>能书者与不能书者</td><td>682</td><td class="token-count" data-article="paulgraham" data-lang="classical_chinese">—</td></tr>
+                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>译文</td><td>能书者与不能书者</td><td>682</td></tr>
             
-                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>译文</td><td>会写的人与不会写的人</td><td>960</td><td class="token-count" data-article="paulgraham" data-lang="modern_chinese">—</td></tr>
+                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>译文</td><td>会写的人与不会写的人</td><td>960</td></tr>
             
-                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>原文</td><td>Writes and Write-Nots</td><td>3,112</td><td class="token-count" data-article="paulgraham" data-lang="english">—</td></tr>
+                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>原文</td><td>Writes and Write-Nots</td><td>3,112</td></tr>
             
-                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>Los que escriben y los que no</td><td>3,343</td><td class="token-count" data-article="paulgraham" data-lang="spanish">—</td></tr>
+                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>Los que escriben y los que no</td><td>3,343</td></tr>
             </tbody>
                 </table>
             </div>
@@ -2193,15 +2127,15 @@ Gracias a Jessica Livingston, Ben Miller y Robert Morris por leer borradores de 
             
             <div class="comparison">
                 <table>
-                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>Unicode 字符数</th><th class="token-col-header">词元数 <span class="tokenizer-name"></span></th></tr></thead>
+                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>Unicode 字符数</th></tr></thead>
                     <tbody>
-                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>译文</td><td>深度学习与科学革命论</td><td>1,436</td><td class="token-count" data-article="science_revolution_dl" data-lang="classical_chinese">—</td></tr>
+                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>译文</td><td>深度学习与科学革命论</td><td>1,436</td></tr>
             
-                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>原文</td><td>深度学习与科学革命</td><td>1,613</td><td class="token-count" data-article="science_revolution_dl" data-lang="modern_chinese">—</td></tr>
+                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>原文</td><td>深度学习与科学革命</td><td>1,613</td></tr>
             
-                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>译文</td><td>Deep Learning and the Scientific Revolution</td><td>5,022</td><td class="token-count" data-article="science_revolution_dl" data-lang="english">—</td></tr>
+                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>译文</td><td>Deep Learning and the Scientific Revolution</td><td>5,022</td></tr>
             
-                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>El Aprendizaje Profundo y la Revolución Científica</td><td>5,646</td><td class="token-count" data-article="science_revolution_dl" data-lang="spanish">—</td></tr>
+                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>El Aprendizaje Profundo y la Revolución Científica</td><td>5,646</td></tr>
             </tbody>
                 </table>
             </div>
@@ -2601,15 +2535,15 @@ Jim Gray navejó lejos y nunca regresó. Nuestra generación también está nave
             
             <div class="comparison">
                 <table>
-                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>Unicode 字符数</th><th class="token-col-header">词元数 <span class="tokenizer-name"></span></th></tr></thead>
+                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>Unicode 字符数</th></tr></thead>
                     <tbody>
-                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>译文</td><td>谏罢建造超大对撞机疏</td><td>1,237</td><td class="token-count" data-article="yangzhenning" data-lang="classical_chinese">—</td></tr>
+                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>译文</td><td>谏罢建造超大对撞机疏</td><td>1,237</td></tr>
             
-                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>原文</td><td>中国今天不宜建造超大对撞机</td><td>1,431</td><td class="token-count" data-article="yangzhenning" data-lang="modern_chinese">—</td></tr>
+                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>原文</td><td>中国今天不宜建造超大对撞机</td><td>1,431</td></tr>
             
-                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>译文</td><td>Why China Should Not Build a Super Collider Today</td><td>5,171</td><td class="token-count" data-article="yangzhenning" data-lang="english">—</td></tr>
+                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>译文</td><td>Why China Should Not Build a Super Collider Today</td><td>5,171</td></tr>
             
-                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>Por qué China no debería construir un supercolisionador hoy</td><td>5,701</td><td class="token-count" data-article="yangzhenning" data-lang="spanish">—</td></tr>
+                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>Por qué China no debería construir un supercolisionador hoy</td><td>5,701</td></tr>
             </tbody>
                 </table>
             </div>
@@ -2909,15 +2843,15 @@ Sin embargo, la búsqueda de partículas supersimétricas ha continuado durante 
             
             <div class="comparison">
                 <table>
-                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>Unicode 字符数</th><th class="token-col-header">词元数 <span class="tokenizer-name"></span></th></tr></thead>
+                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>Unicode 字符数</th></tr></thead>
                     <tbody>
-                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>译文</td><td>丘成桐议中国建高能对撞机</td><td>1,469</td><td class="token-count" data-article="yau_collider_opinions" data-lang="classical_chinese">—</td></tr>
+                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>译文</td><td>丘成桐议中国建高能对撞机</td><td>1,469</td></tr>
             
-                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>原文</td><td>丘成桐：对中国建设高能对撞机的意见</td><td>1,588</td><td class="token-count" data-article="yau_collider_opinions" data-lang="modern_chinese">—</td></tr>
+                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>原文</td><td>丘成桐：对中国建设高能对撞机的意见</td><td>1,588</td></tr>
             
-                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>译文</td><td>Yau Shing-Tung: Opinions on Building a High-Energy Collider in China</td><td>5,827</td><td class="token-count" data-article="yau_collider_opinions" data-lang="english">—</td></tr>
+                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>译文</td><td>Yau Shing-Tung: Opinions on Building a High-Energy Collider in China</td><td>5,827</td></tr>
             
-                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>Yau Shing-Tung: Opiniones sobre la Construcción de un Colisionador de Alta Energía en China</td><td>6,424</td><td class="token-count" data-article="yau_collider_opinions" data-lang="spanish">—</td></tr>
+                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>Yau Shing-Tung: Opiniones sobre la Construcción de un Colisionador de Alta Energía en China</td><td>6,424</td></tr>
             </tbody>
                 </table>
             </div>
@@ -3161,15 +3095,15 @@ Mi libro con Steve Nadis ya ha explicado claramente la importancia de construir 
             
             <div class="comparison">
                 <table>
-                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>Unicode 字符数</th><th class="token-col-header">词元数 <span class="tokenizer-name"></span></th></tr></thead>
+                    <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>Unicode 字符数</th></tr></thead>
                     <tbody>
-                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>原文</td><td>左传·晋文公流亡</td><td>1,165</td><td class="token-count" data-article="exile_of_duke_wen_of_jin" data-lang="classical_chinese">—</td></tr>
+                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>原文</td><td>左传·晋文公流亡</td><td>1,165</td></tr>
             
-                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>译文</td><td>晋文公流亡记</td><td>1,650</td><td class="token-count" data-article="exile_of_duke_wen_of_jin" data-lang="modern_chinese">—</td></tr>
+                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>译文</td><td>晋文公流亡记</td><td>1,650</td></tr>
             
-                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>译文</td><td>The Exile of Duke Wen of Jin</td><td>6,422</td><td class="token-count" data-article="exile_of_duke_wen_of_jin" data-lang="english">—</td></tr>
+                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>译文</td><td>The Exile of Duke Wen of Jin</td><td>6,422</td></tr>
             
-                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>El Exilio del Duque Wen de Jin</td><td>6,565</td><td class="token-count" data-article="exile_of_duke_wen_of_jin" data-lang="spanish">—</td></tr>
+                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>El Exilio del Duque Wen de Jin</td><td>6,565</td></tr>
             </tbody>
                 </table>
             </div>
@@ -3430,131 +3364,6 @@ En la primavera del vigésimo cuarto año, en el primer mes, el duque Mu de Qin 
                 }
             });
         });
-    </script>
-    <script>
-        // Precomputed token counts for open-source models (generated at build time)
-        window.PRECOMPUTED_TOKENS = {"open_source": {}};
-    </script>
-    
-    <!-- gpt-tokenizer encoding-specific UMD bundles -->
-    <script src="https://cdn.jsdelivr.net/npm/gpt-tokenizer@2.9.0/dist/o200k_base.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/gpt-tokenizer@2.9.0/dist/cl100k_base.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/gpt-tokenizer@2.9.0/dist/p50k_base.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/gpt-tokenizer@2.9.0/dist/r50k_base.js"></script>
-    
-    <script>
-        // ── Encoder map: tokenizer name → UMD global ──
-        const ENCODERS = {
-            'gpt-4o':             GPTTokenizer_o200k_base,
-            'gpt-4.1':            GPTTokenizer_o200k_base,
-            'gpt-4':              GPTTokenizer_cl100k_base,
-            'gpt-3.5-turbo':      GPTTokenizer_cl100k_base,
-            'text-davinci-003':   GPTTokenizer_p50k_base,
-            'davinci':            GPTTokenizer_r50k_base,
-            'o200k_base':         GPTTokenizer_o200k_base,
-            'cl100k_base':        GPTTokenizer_cl100k_base,
-            'p50k_base':          GPTTokenizer_p50k_base,
-            'r50k_base':          GPTTokenizer_r50k_base,
-        };
-
-        const OPEN_SOURCE_MODELS = [
-            'Qwen2.5-72B', 'Phi-2', 'Gemma-7B',
-            'DeepSeek-R1', 'Llama-3-8B', 'Llama-3-70B'
-        ];
-
-        function isOpenSource(name) {
-            return OPEN_SOURCE_MODELS.includes(name);
-        }
-
-        // ── Text cache: extract all <pre> texts once ──
-        const textCache = new Map();
-        function getTextKey(articleId, lang) {
-            return `${articleId}::${lang}`;
-        }
-        function getText(articleId, lang) {
-            const key = getTextKey(articleId, lang);
-            if (textCache.has(key)) return textCache.get(key);
-            const section = document.getElementById(articleId);
-            if (!section) return '';
-            const cards = section.querySelectorAll('.text-card');
-            for (const card of cards) {
-                const langClass = Array.from(card.classList).find(c =>
-                    c.startsWith('lang-') && !c.endsWith('-name'));
-                if (!langClass) continue;
-                const pre = card.querySelector('pre');
-                if (!pre) continue;
-                let cardLang = null;
-                if (langClass === 'lang-classical') cardLang = 'classical_chinese';
-                else if (langClass === 'lang-modern') cardLang = 'modern_chinese';
-                else if (langClass === 'lang-english') cardLang = 'english';
-                else if (langClass === 'lang-spanish') cardLang = 'spanish';
-                if (cardLang && cardLang === lang) {
-                    textCache.set(key, pre.textContent);
-                    return pre.textContent;
-                }
-            }
-            return '';
-        }
-
-        // ── Count tokens ──
-        function countTokens(text, tokenizerName) {
-            const encoder = ENCODERS[tokenizerName];
-            if (!encoder || typeof encoder.encode !== 'function') return -1;
-            try {
-                return encoder.encode(text).length;
-            } catch(e) {
-                return -1;
-            }
-        }
-
-        // ── Update all token cells ──
-        let currentTokenizer = 'gpt-4o';
-
-        function updateAllTokenCounts() {
-            const name = currentTokenizer;
-            document.querySelectorAll('.tokenizer-name').forEach(el => {
-                el.textContent = `(${name})`;
-            });
-
-            const cells = document.querySelectorAll('.token-count');
-            cells.forEach(cell => { cell.classList.add('loading'); cell.textContent = '...'; });
-
-            setTimeout(() => {
-                cells.forEach(cell => {
-                    const articleId = cell.dataset.article;
-                    const lang = cell.dataset.lang;
-                    cell.classList.remove('loading');
-
-                    if (isOpenSource(name)) {
-                        const pre = window.PRECOMPUTED_TOKENS;
-                        if (pre && pre.open_source && pre.open_source[name] &&
-                            pre.open_source[name][articleId] &&
-                            pre.open_source[name][articleId][lang] !== undefined) {
-                            cell.textContent = pre.open_source[name][articleId][lang].toLocaleString();
-                        } else {
-                            cell.textContent = '需预计算';
-                            cell.title = '运行 code/precompute_tokens.js 生成数据';
-                        }
-                        return;
-                    }
-
-                    const text = getText(articleId, lang);
-                    if (!text) { cell.textContent = '—'; return; }
-
-                    const count = countTokens(text, name);
-                    cell.textContent = count > 0 ? count.toLocaleString() : '—';
-                });
-            }, 10);
-        }
-
-        // ── Init ──
-        document.getElementById('tokenizer-select').addEventListener('change', function() {
-            currentTokenizer = this.value;
-            updateAllTokenCounts();
-        });
-
-        document.addEventListener('DOMContentLoaded', updateAllTokenCounts);
-        if (document.readyState !== 'loading') updateAllTokenCounts();
     </script>
 </body>
 </html>

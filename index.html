@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>用文言，可省词元乎？</title>
+    <title>词元消耗对比 — Token Consumption Comparison</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-body: #f8f9fa;
@@ -75,6 +78,7 @@
             padding: 1rem;
             display: flex;
             justify-content: center;
+            align-items: center;
             gap: 0.5rem;
             flex-wrap: wrap;
             position: sticky;
@@ -290,7 +294,7 @@
     <header>
         <button class="theme-toggle" onclick="toggleTheme()" title="切换主题"></button>
         <h1>用文言，可省词元乎？</h1>
-        <p>Token Consumption Analysis Corpus | 四种语言 · 12篇文章</p>
+        <p>Token Consumption Comparison · 四种语言 · 12篇文章 · 多分词器对比</p>
     </header>
     
     <nav>
@@ -299,15 +303,10 @@
             <label for="tokenizer-select">分词器：</label>
             <select id="tokenizer-select" class="tokenizer-select">
                 <optgroup label="OpenAI（实时）">
-                    <option value="gpt-4o" selected>gpt-4o (o200k_base)</option>
-                    <option value="gpt-4.1">gpt-4.1</option>
-                    <option value="gpt-4">gpt-4 / gpt-3.5-turbo (cl100k_base)</option>
-                    <option value="text-davinci-003">text-davinci-003 (p50k_base)</option>
-                    <option value="davinci">davinci (r50k_base)</option>
-                    <option value="o200k_base">o200k_base (编码)</option>
-                    <option value="cl100k_base">cl100k_base (编码)</option>
-                    <option value="p50k_base">p50k_base (编码)</option>
-                    <option value="r50k_base">r50k_base (编码)</option>
+                    <option value="r50k_base">r50k_base — davinci / GPT-3（2020）</option>
+                    <option value="p50k_base">p50k_base — text-davinci-003 / Codex（2021）</option>
+                    <option value="cl100k_base">cl100k_base — gpt-4 / gpt-3.5-turbo（2022）</option>
+                    <option value="o200k_base" selected>o200k_base — gpt-4o / gpt-4.1 / o1 / o3 / gpt-5.x（2024+）</option>
                 </optgroup>
                 <optgroup label="开源模型（预计算）">
                     <option value="Qwen2.5-72B">Qwen2.5-72B</option>
@@ -2080,7 +2079,7 @@ En la primavera del vigésimo cuarto año, en el primer mes, el duque Mu de Qin 
     </main>
     
     <footer>
-        <p>12×4 Multilingual Corpus | Generated for Token Consumption Analysis</p>
+        <p>12×4 Multilingual Corpus | Token Consumption Comparison</p>
         <div class="footer-links">
             <span>友情链接 / Friendly Links:</span>
             <a href="https://gpt-tokenizer.dev/" target="_blank" rel="noopener">GPT Tokenizer</a>
@@ -2122,8 +2121,8 @@ En la primavera del vigésimo cuarto año, en el primer mes, el duque Mu de Qin 
             const attr = document.documentElement.getAttribute('data-theme');
             let label, icon;
             if (attr === 'light') { icon = '☀️'; label = '浅色'; }
-            else if (attr === 'dark') { icon = '🌙'; label = '深色'; }
-            else { icon = '💻'; label = '跟随系统'; }
+            else if (attr === 'dark') { icon = '??'; label = '深色'; }
+            else { icon = '??'; label = '跟随系统'; }
             themeBtn.textContent = `${icon} ${label}`;
             const effective = getEffectiveTheme();
             themeBtn.title = `当前模式: ${label} (实际: ${effective === 'dark' ? '深色' : '浅色'}) — 点击切换`;
@@ -2146,29 +2145,18 @@ En la primavera del vigésimo cuarto año, en el primer mes, el duque Mu de Qin 
         applyTheme('system');
     </script>
     <script>
-        // Precomputed token counts for open-source models (generated at build time)
         window.PRECOMPUTED_TOKENS = {"open_source": {}};
     </script>
-    
-    <!-- gpt-tokenizer encoding-specific UMD bundles -->
     <script src="https://cdn.jsdelivr.net/npm/gpt-tokenizer@2.9.0/dist/o200k_base.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gpt-tokenizer@2.9.0/dist/cl100k_base.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gpt-tokenizer@2.9.0/dist/p50k_base.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gpt-tokenizer@2.9.0/dist/r50k_base.js"></script>
-    
     <script>
-        // ── Encoder map: tokenizer name → UMD global ──
         const ENCODERS = {
-            'gpt-4o':             GPTTokenizer_o200k_base,
-            'gpt-4.1':            GPTTokenizer_o200k_base,
-            'gpt-4':              GPTTokenizer_cl100k_base,
-            'gpt-3.5-turbo':      GPTTokenizer_cl100k_base,
-            'text-davinci-003':   GPTTokenizer_p50k_base,
-            'davinci':            GPTTokenizer_r50k_base,
-            'o200k_base':         GPTTokenizer_o200k_base,
-            'cl100k_base':        GPTTokenizer_cl100k_base,
-            'p50k_base':          GPTTokenizer_p50k_base,
-            'r50k_base':          GPTTokenizer_r50k_base,
+            'r50k_base':  GPTTokenizer_r50k_base,
+            'p50k_base':  GPTTokenizer_p50k_base,
+            'cl100k_base': GPTTokenizer_cl100k_base,
+            'o200k_base': GPTTokenizer_o200k_base,
         };
 
         const OPEN_SOURCE_MODELS = [
@@ -2176,24 +2164,17 @@ En la primavera del vigésimo cuarto año, en el primer mes, el duque Mu de Qin 
             'DeepSeek-R1', 'Llama-3-8B', 'Llama-3-70B'
         ];
 
-        function isOpenSource(name) {
-            return OPEN_SOURCE_MODELS.includes(name);
-        }
+        function isOpenSource(name) { return OPEN_SOURCE_MODELS.includes(name); }
 
-        // ── Text cache: extract all <pre> texts once ──
         const textCache = new Map();
-        function getTextKey(articleId, lang) {
-            return `${articleId}::${lang}`;
-        }
         function getText(articleId, lang) {
-            const key = getTextKey(articleId, lang);
+            const key = `${articleId}::${lang}`;
             if (textCache.has(key)) return textCache.get(key);
             const section = document.getElementById(articleId);
             if (!section) return '';
             const cards = section.querySelectorAll('.text-card');
             for (const card of cards) {
-                const langClass = Array.from(card.classList).find(c =>
-                    c.startsWith('lang-') && !c.endsWith('-name'));
+                const langClass = Array.from(card.classList).find(c => c.startsWith('lang-') && !c.endsWith('-name'));
                 if (!langClass) continue;
                 const pre = card.querySelector('pre');
                 if (!pre) continue;
@@ -2202,48 +2183,32 @@ En la primavera del vigésimo cuarto año, en el primer mes, el duque Mu de Qin 
                 else if (langClass === 'lang-modern') cardLang = 'modern_chinese';
                 else if (langClass === 'lang-english') cardLang = 'english';
                 else if (langClass === 'lang-spanish') cardLang = 'spanish';
-                if (cardLang && cardLang === lang) {
-                    textCache.set(key, pre.textContent);
-                    return pre.textContent;
-                }
+                if (cardLang === lang) { textCache.set(key, pre.textContent); return pre.textContent; }
             }
             return '';
         }
 
-        // ── Count tokens ──
         function countTokens(text, tokenizerName) {
             const encoder = ENCODERS[tokenizerName];
             if (!encoder || typeof encoder.encode !== 'function') return -1;
-            try {
-                return encoder.encode(text).length;
-            } catch(e) {
-                return -1;
-            }
+            try { return encoder.encode(text).length; } catch(e) { return -1; }
         }
 
-        // ── Update all token cells ──
-        let currentTokenizer = 'gpt-4o';
+        let currentTokenizer = 'o200k_base';
 
         function updateAllTokenCounts() {
             const name = currentTokenizer;
-            document.querySelectorAll('.tokenizer-name').forEach(el => {
-                el.textContent = `(${name})`;
-            });
-
+            document.querySelectorAll('.tokenizer-name').forEach(el => { el.textContent = `(${name})`; });
             const cells = document.querySelectorAll('.token-count');
             cells.forEach(cell => { cell.classList.add('loading'); cell.textContent = '...'; });
-
             setTimeout(() => {
                 cells.forEach(cell => {
                     const articleId = cell.dataset.article;
                     const lang = cell.dataset.lang;
                     cell.classList.remove('loading');
-
                     if (isOpenSource(name)) {
                         const pre = window.PRECOMPUTED_TOKENS;
-                        if (pre && pre.open_source && pre.open_source[name] &&
-                            pre.open_source[name][articleId] &&
-                            pre.open_source[name][articleId][lang] !== undefined) {
+                        if (pre && pre.open_source && pre.open_source[name] && pre.open_source[name][articleId] && pre.open_source[name][articleId][lang] !== undefined) {
                             cell.textContent = pre.open_source[name][articleId][lang].toLocaleString();
                         } else {
                             cell.textContent = '需预计算';
@@ -2251,17 +2216,14 @@ En la primavera del vigésimo cuarto año, en el primer mes, el duque Mu de Qin 
                         }
                         return;
                     }
-
                     const text = getText(articleId, lang);
                     if (!text) { cell.textContent = '—'; return; }
-
                     const count = countTokens(text, name);
                     cell.textContent = count > 0 ? count.toLocaleString() : '—';
                 });
             }, 10);
         }
 
-        // ── Init ──
         document.getElementById('tokenizer-select').addEventListener('change', function() {
             currentTokenizer = this.value;
             updateAllTokenCounts();
