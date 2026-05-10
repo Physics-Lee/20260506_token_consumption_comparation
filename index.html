@@ -288,6 +288,61 @@
             color: var(--text-secondary);
             font-style: italic;
         }
+        
+        /* ========== Mobile Responsive ========== */
+        @media (max-width: 768px) {
+            header { padding: 1.5rem 1rem; }
+            header h1 { font-size: 1.5rem; }
+            .theme-toggle { top: 1rem; right: 1rem; padding: 0.4rem 0.8rem; font-size: 0.8rem; }
+            
+            nav { padding: 0.5rem; gap: 0.4rem; }
+            .nav-btn { padding: 0.5rem 0.75rem; font-size: 0.85rem; }
+            .tokenizer-bar { 
+                width: 100%; 
+                margin-left: 0; 
+                padding-left: 0; 
+                padding-top: 0.5rem;
+                border-left: none; 
+                border-top: 1px solid var(--border);
+                justify-content: center;
+            }
+            
+            main { padding: 1rem; }
+            
+            .metadata { padding: 1rem; }
+            .metadata h2 { font-size: 1.25rem; }
+            .meta-grid { grid-template-columns: 1fr; gap: 0.75rem; }
+            
+            .comparison { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            .comparison table { min-width: 600px; font-size: 0.9rem; }
+            .comparison th, .comparison td { padding: 0.75rem 0.5rem; }
+            
+            .text-grid { gap: 1rem; }
+            .card-header { padding: 0.75rem 1rem; }
+            .card-body { padding: 1rem; max-height: 400px; }
+            .card-body h4 { font-size: 1rem; }
+            .card-body pre { font-size: 0.9rem; line-height: 1.7; }
+            .card-footer { padding: 0.75rem 1rem; }
+            
+            footer { padding: 1.5rem 1rem; }
+            .footer-links { display: flex; flex-direction: column; gap: 0.5rem; align-items: center; }
+            .footer-links a { margin: 0; }
+        }
+        
+        @media (max-width: 480px) {
+            header h1 { font-size: 1.25rem; }
+            header p { font-size: 0.85rem; }
+            .theme-toggle { position: static; margin-top: 0.5rem; display: inline-block; }
+            
+            .nav-btn { padding: 0.4rem 0.6rem; font-size: 0.8rem; border-radius: 6px; }
+            .tokenizer-select { font-size: 0.85rem; padding: 0.4rem 0.75rem; }
+            
+            .comparison table { min-width: 500px; font-size: 0.85rem; }
+            .comparison th, .comparison td { padding: 0.6rem 0.4rem; }
+            
+            .card-body { max-height: 350px; }
+            .card-body pre { font-size: 0.85rem; }
+        }
     </style>
 </head>
 <body>
@@ -310,12 +365,10 @@
                 </optgroup>
                 <optgroup label="开源模型（预计算）">
                     <option value="GPT-2">GPT-2 (2019)</option>
+                    <option value="DeepSeek-R1">DeepSeek-R1</option>
                     <option value="Qwen2.5-72B">Qwen2.5-72B</option>
                     <option value="Phi-2">Phi-2</option>
-                    <option value="Gemma-7B">Gemma-7B</option>
-                    <option value="DeepSeek-R1">DeepSeek-R1</option>
-                    <option value="Llama-3-8B">Llama-3-8B</option>
-                    <option value="Llama-3-70B">Llama-3-70B</option>
+                    <option value="Claude-3.5-Sonnet">Claude 3.5 Sonnet *</option>
                 </optgroup>
             </select>
         </div>
@@ -2182,7 +2235,7 @@ En la primavera del vigésimo cuarto año, en el primer mes, el duque Mu de Qin 
         applyTheme('system');
     </script>
     <script>
-        window.PRECOMPUTED_TOKENS = {"open_source": {"DeepSeek-R1": {"allende": {"classical_chinese": 16, "modern_chinese": 20, "english": 939, "spanish": 1196}, "assassination_qin": {"classical_chinese": 5, "modern_chinese": 5, "english": 749, "spanish": 987}, "bird_migration": {"classical_chinese": 30, "modern_chinese": 44, "english": 1425, "spanish": 1943}, "dark_matter_galaxies": {"classical_chinese": 120, "modern_chinese": 125, "english": 1455, "spanish": 1902}, "duke_huan_qi": {"classical_chinese": 3, "modern_chinese": 3, "english": 286, "spanish": 390}, "duke_xi_28th_year": {"classical_chinese": 0, "modern_chinese": 0, "english": 513, "spanish": 629}, "ju_lu_battle": {"classical_chinese": 0, "modern_chinese": 0, "english": 466, "spanish": 609}, "paulgraham": {"classical_chinese": 6, "modern_chinese": 20, "english": 756, "spanish": 1031}, "science_revolution_dl": {"classical_chinese": 84, "modern_chinese": 123, "english": 1225, "spanish": 1766}, "yangzhenning": {"classical_chinese": 11, "modern_chinese": 32, "english": 1246, "spanish": 1799}, "yau_collider_opinions": {"classical_chinese": 6, "modern_chinese": 6, "english": 1313, "spanish": 1953}, "exile_of_duke_wen_of_jin": {"classical_chinese": 19, "modern_chinese": 19, "english": 1805, "spanish": 2263}}, "Qwen2.5-72B": {"allende": {"classical_chinese": 658, "modern_chinese": 712, "english": 795, "spanish": 1042}, "assassination_qin": {"classical_chinese": 439, "modern_chinese": 554, "english": 636, "spanish": 885}, "bird_migration": {"classical_chinese": 929, "modern_chinese": 1041, "english": 1210, "spanish": 1690}, "dark_matter_galaxies": {"classical_chinese": 1014, "modern_chinese": 1093, "english": 1255, "spanish": 1592}, "duke_huan_qi": {"classical_chinese": 129, "modern_chinese": 196, "english": 240, "spanish": 339}, "duke_xi_28th_year": {"classical_chinese": 266, "modern_chinese": 339, "english": 477, "spanish": 604}, "ju_lu_battle": {"classical_chinese": 230, "modern_chinese": 298, "english": 360, "spanish": 543}, "paulgraham": {"classical_chinese": 585, "modern_chinese": 592, "english": 664, "spanish": 857}, "science_revolution_dl": {"classical_chinese": 989, "modern_chinese": 985, "english": 1031, "spanish": 1514}, "yangzhenning": {"classical_chinese": 935, "modern_chinese": 918, "english": 1034, "spanish": 1447}, "yau_collider_opinions": {"classical_chinese": 1014, "modern_chinese": 962, "english": 1106, "spanish": 1567}, "exile_of_duke_wen_of_jin": {"classical_chinese": 1063, "modern_chinese": 1323, "english": 1549, "spanish": 2083}}, "Phi-2": {"allende": {"classical_chinese": 1702, "modern_chinese": 2209, "english": 820, "spanish": 1348}, "assassination_qin": {"classical_chinese": 1039, "modern_chinese": 1581, "english": 637, "spanish": 1081}, "bird_migration": {"classical_chinese": 2368, "modern_chinese": 3294, "english": 1243, "spanish": 2199}, "dark_matter_galaxies": {"classical_chinese": 2613, "modern_chinese": 3381, "english": 1287, "spanish": 2103}, "duke_huan_qi": {"classical_chinese": 284, "modern_chinese": 521, "english": 239, "spanish": 419}, "duke_xi_28th_year": {"classical_chinese": 591, "modern_chinese": 860, "english": 483, "spanish": 653}, "ju_lu_battle": {"classical_chinese": 546, "modern_chinese": 886, "english": 361, "spanish": 681}, "paulgraham": {"classical_chinese": 1326, "modern_chinese": 1852, "english": 696, "spanish": 1195}, "science_revolution_dl": {"classical_chinese": 2744, "modern_chinese": 2993, "english": 1038, "spanish": 1958}, "yangzhenning": {"classical_chinese": 2557, "modern_chinese": 2872, "english": 1084, "spanish": 1966}, "yau_collider_opinions": {"classical_chinese": 3070, "modern_chinese": 3288, "english": 1136, "spanish": 2188}, "exile_of_duke_wen_of_jin": {"classical_chinese": 2365, "modern_chinese": 3446, "english": 1566, "spanish": 2479}}, "GPT-2": {"allende": {"classical_chinese": 1702, "modern_chinese": 2209, "english": 820, "spanish": 1348}, "assassination_qin": {"classical_chinese": 1039, "modern_chinese": 1581, "english": 637, "spanish": 1081}, "bird_migration": {"classical_chinese": 2368, "modern_chinese": 3294, "english": 1243, "spanish": 2199}, "dark_matter_galaxies": {"classical_chinese": 2613, "modern_chinese": 3381, "english": 1287, "spanish": 2103}, "duke_huan_qi": {"classical_chinese": 284, "modern_chinese": 521, "english": 239, "spanish": 419}, "duke_xi_28th_year": {"classical_chinese": 591, "modern_chinese": 860, "english": 483, "spanish": 653}, "ju_lu_battle": {"classical_chinese": 546, "modern_chinese": 886, "english": 361, "spanish": 681}, "paulgraham": {"classical_chinese": 1326, "modern_chinese": 1852, "english": 696, "spanish": 1195}, "science_revolution_dl": {"classical_chinese": 2744, "modern_chinese": 2997, "english": 1040, "spanish": 1960}, "yangzhenning": {"classical_chinese": 2557, "modern_chinese": 2872, "english": 1084, "spanish": 1966}, "yau_collider_opinions": {"classical_chinese": 3070, "modern_chinese": 3288, "english": 1136, "spanish": 2188}, "exile_of_duke_wen_of_jin": {"classical_chinese": 2365, "modern_chinese": 3446, "english": 1566, "spanish": 2479}}}};
+        window.PRECOMPUTED_TOKENS = {"open_source": {"DeepSeek-R1": {"allende": {"classical_chinese": 16, "modern_chinese": 20, "english": 939, "spanish": 1196}, "assassination_qin": {"classical_chinese": 5, "modern_chinese": 5, "english": 749, "spanish": 987}, "bird_migration": {"classical_chinese": 30, "modern_chinese": 44, "english": 1425, "spanish": 1943}, "dark_matter_galaxies": {"classical_chinese": 120, "modern_chinese": 125, "english": 1455, "spanish": 1902}, "duke_huan_qi": {"classical_chinese": 3, "modern_chinese": 3, "english": 286, "spanish": 390}, "duke_xi_28th_year": {"classical_chinese": 0, "modern_chinese": 0, "english": 513, "spanish": 629}, "ju_lu_battle": {"classical_chinese": 0, "modern_chinese": 0, "english": 466, "spanish": 609}, "paulgraham": {"classical_chinese": 6, "modern_chinese": 20, "english": 756, "spanish": 1031}, "science_revolution_dl": {"classical_chinese": 84, "modern_chinese": 123, "english": 1225, "spanish": 1766}, "yangzhenning": {"classical_chinese": 11, "modern_chinese": 32, "english": 1246, "spanish": 1799}, "yau_collider_opinions": {"classical_chinese": 6, "modern_chinese": 6, "english": 1313, "spanish": 1953}, "exile_of_duke_wen_of_jin": {"classical_chinese": 19, "modern_chinese": 19, "english": 1805, "spanish": 2263}}, "Qwen2.5-72B": {"allende": {"classical_chinese": 658, "modern_chinese": 712, "english": 795, "spanish": 1042}, "assassination_qin": {"classical_chinese": 439, "modern_chinese": 554, "english": 636, "spanish": 885}, "bird_migration": {"classical_chinese": 929, "modern_chinese": 1041, "english": 1210, "spanish": 1690}, "dark_matter_galaxies": {"classical_chinese": 1014, "modern_chinese": 1093, "english": 1255, "spanish": 1592}, "duke_huan_qi": {"classical_chinese": 129, "modern_chinese": 196, "english": 240, "spanish": 339}, "duke_xi_28th_year": {"classical_chinese": 266, "modern_chinese": 339, "english": 477, "spanish": 604}, "ju_lu_battle": {"classical_chinese": 230, "modern_chinese": 298, "english": 360, "spanish": 543}, "paulgraham": {"classical_chinese": 585, "modern_chinese": 592, "english": 664, "spanish": 857}, "science_revolution_dl": {"classical_chinese": 989, "modern_chinese": 985, "english": 1031, "spanish": 1514}, "yangzhenning": {"classical_chinese": 935, "modern_chinese": 918, "english": 1034, "spanish": 1447}, "yau_collider_opinions": {"classical_chinese": 1014, "modern_chinese": 962, "english": 1106, "spanish": 1567}, "exile_of_duke_wen_of_jin": {"classical_chinese": 1063, "modern_chinese": 1323, "english": 1549, "spanish": 2083}}, "Phi-2": {"allende": {"classical_chinese": 1702, "modern_chinese": 2209, "english": 820, "spanish": 1348}, "assassination_qin": {"classical_chinese": 1039, "modern_chinese": 1581, "english": 637, "spanish": 1081}, "bird_migration": {"classical_chinese": 2368, "modern_chinese": 3294, "english": 1243, "spanish": 2199}, "dark_matter_galaxies": {"classical_chinese": 2613, "modern_chinese": 3381, "english": 1287, "spanish": 2103}, "duke_huan_qi": {"classical_chinese": 284, "modern_chinese": 521, "english": 239, "spanish": 419}, "duke_xi_28th_year": {"classical_chinese": 591, "modern_chinese": 860, "english": 483, "spanish": 653}, "ju_lu_battle": {"classical_chinese": 546, "modern_chinese": 886, "english": 361, "spanish": 681}, "paulgraham": {"classical_chinese": 1326, "modern_chinese": 1852, "english": 696, "spanish": 1195}, "science_revolution_dl": {"classical_chinese": 2744, "modern_chinese": 2993, "english": 1038, "spanish": 1958}, "yangzhenning": {"classical_chinese": 2557, "modern_chinese": 2872, "english": 1084, "spanish": 1966}, "yau_collider_opinions": {"classical_chinese": 3070, "modern_chinese": 3288, "english": 1136, "spanish": 2188}, "exile_of_duke_wen_of_jin": {"classical_chinese": 2365, "modern_chinese": 3446, "english": 1566, "spanish": 2479}}, "Claude-3.5-Sonnet": {"allende": {"classical_chinese": 1174, "modern_chinese": 1375, "english": 833, "spanish": 1184}, "assassination_qin": {"classical_chinese": 740, "modern_chinese": 1016, "english": 658, "spanish": 970}, "bird_migration": {"classical_chinese": 1671, "modern_chinese": 2085, "english": 1264, "spanish": 1885}, "dark_matter_galaxies": {"classical_chinese": 1665, "modern_chinese": 1962, "english": 1296, "spanish": 1800}, "duke_huan_qi": {"classical_chinese": 221, "modern_chinese": 364, "english": 246, "spanish": 370}, "duke_xi_28th_year": {"classical_chinese": 457, "modern_chinese": 616, "english": 499, "spanish": 635}, "ju_lu_battle": {"classical_chinese": 415, "modern_chinese": 596, "english": 386, "spanish": 606}, "paulgraham": {"classical_chinese": 910, "modern_chinese": 1096, "english": 704, "spanish": 1014}, "science_revolution_dl": {"classical_chinese": 1624, "modern_chinese": 1659, "english": 1028, "spanish": 1688}, "yangzhenning": {"classical_chinese": 1593, "modern_chinese": 1670, "english": 1080, "spanish": 1687}, "yau_collider_opinions": {"classical_chinese": 1868, "modern_chinese": 1869, "english": 1145, "spanish": 1845}, "exile_of_duke_wen_of_jin": {"classical_chinese": 1804, "modern_chinese": 2342, "english": 1625, "spanish": 2260}}, "GPT-2": {"allende": {"classical_chinese": 1702, "modern_chinese": 2209, "english": 820, "spanish": 1348}, "assassination_qin": {"classical_chinese": 1039, "modern_chinese": 1581, "english": 637, "spanish": 1081}, "bird_migration": {"classical_chinese": 2368, "modern_chinese": 3294, "english": 1243, "spanish": 2199}, "dark_matter_galaxies": {"classical_chinese": 2613, "modern_chinese": 3381, "english": 1287, "spanish": 2103}, "duke_huan_qi": {"classical_chinese": 284, "modern_chinese": 521, "english": 239, "spanish": 419}, "duke_xi_28th_year": {"classical_chinese": 591, "modern_chinese": 860, "english": 483, "spanish": 653}, "ju_lu_battle": {"classical_chinese": 546, "modern_chinese": 886, "english": 361, "spanish": 681}, "paulgraham": {"classical_chinese": 1326, "modern_chinese": 1852, "english": 696, "spanish": 1195}, "science_revolution_dl": {"classical_chinese": 2744, "modern_chinese": 2997, "english": 1040, "spanish": 1960}, "yangzhenning": {"classical_chinese": 2557, "modern_chinese": 2872, "english": 1084, "spanish": 1966}, "yau_collider_opinions": {"classical_chinese": 3070, "modern_chinese": 3288, "english": 1136, "spanish": 2188}, "exile_of_duke_wen_of_jin": {"classical_chinese": 2365, "modern_chinese": 3446, "english": 1566, "spanish": 2479}}}};
     </script>
     <script src="https://cdn.jsdelivr.net/npm/gpt-tokenizer@2.9.0/dist/o200k_base.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gpt-tokenizer@2.9.0/dist/cl100k_base.js"></script>
@@ -2198,8 +2251,8 @@ En la primavera del vigésimo cuarto año, en el primer mes, el duque Mu de Qin 
 
         const OPEN_SOURCE_MODELS = [
             'GPT-2',
-            'Qwen2.5-72B', 'Phi-2', 'Gemma-7B',
-            'DeepSeek-R1', 'Llama-3-8B', 'Llama-3-70B'
+            'DeepSeek-R1', 'Qwen2.5-72B', 'Phi-2',
+            'Claude-3.5-Sonnet'
         ];
 
         function isOpenSource(name) { return OPEN_SOURCE_MODELS.includes(name); }

@@ -412,6 +412,61 @@ def build_index():
             color: var(--text-secondary);
             font-style: italic;
         }}
+        
+        /* ========== Mobile Responsive ========== */
+        @media (max-width: 768px) {{
+            header {{ padding: 1.5rem 1rem; }}
+            header h1 {{ font-size: 1.5rem; }}
+            .theme-toggle {{ top: 1rem; right: 1rem; padding: 0.4rem 0.8rem; font-size: 0.8rem; }}
+            
+            nav {{ padding: 0.5rem; gap: 0.4rem; }}
+            .nav-btn {{ padding: 0.5rem 0.75rem; font-size: 0.85rem; }}
+            .tokenizer-bar {{ 
+                width: 100%; 
+                margin-left: 0; 
+                padding-left: 0; 
+                padding-top: 0.5rem;
+                border-left: none; 
+                border-top: 1px solid var(--border);
+                justify-content: center;
+            }}
+            
+            main {{ padding: 1rem; }}
+            
+            .metadata {{ padding: 1rem; }}
+            .metadata h2 {{ font-size: 1.25rem; }}
+            .meta-grid {{ grid-template-columns: 1fr; gap: 0.75rem; }}
+            
+            .comparison {{ overflow-x: auto; -webkit-overflow-scrolling: touch; }}
+            .comparison table {{ min-width: 600px; font-size: 0.9rem; }}
+            .comparison th, .comparison td {{ padding: 0.75rem 0.5rem; }}
+            
+            .text-grid {{ gap: 1rem; }}
+            .card-header {{ padding: 0.75rem 1rem; }}
+            .card-body {{ padding: 1rem; max-height: 400px; }}
+            .card-body h4 {{ font-size: 1rem; }}
+            .card-body pre {{ font-size: 0.9rem; line-height: 1.7; }}
+            .card-footer {{ padding: 0.75rem 1rem; }}
+            
+            footer {{ padding: 1.5rem 1rem; }}
+            .footer-links {{ display: flex; flex-direction: column; gap: 0.5rem; align-items: center; }}
+            .footer-links a {{ margin: 0; }}
+        }}
+        
+        @media (max-width: 480px) {{
+            header h1 {{ font-size: 1.25rem; }}
+            header p {{ font-size: 0.85rem; }}
+            .theme-toggle {{ position: static; margin-top: 0.5rem; display: inline-block; }}
+            
+            .nav-btn {{ padding: 0.4rem 0.6rem; font-size: 0.8rem; border-radius: 6px; }}
+            .tokenizer-select {{ font-size: 0.85rem; padding: 0.4rem 0.75rem; }}
+            
+            .comparison table {{ min-width: 500px; font-size: 0.85rem; }}
+            .comparison th, .comparison td {{ padding: 0.6rem 0.4rem; }}
+            
+            .card-body {{ max-height: 350px; }}
+            .card-body pre {{ font-size: 0.85rem; }}
+        }}
     </style>
 </head>
 <body>
