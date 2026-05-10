@@ -27,8 +27,7 @@ OPEN_SOURCE_MODELS = {
     # Qwen timeline: vocab grew from 150K → 151K → 248K
     "Qwen-7B (2023)": "Qwen/Qwen-7B",
     "Qwen2.5-72B (2024)": "Qwen/Qwen2.5-72B",
-    # "Qwen3.5-27B (2026)": "Qwen/Qwen3.5-27B",  # HF download fails on GFW; download tokenizer.json manually:
-    #   https://huggingface.co/Qwen/Qwen3.5-27B/resolve/main/tokenizer.json
+    "Qwen3.5-27B (2026)": "Qwen/Qwen3.5-27B",
     # DeepSeek timeline: vocab jumped from 32K → 128K
     "DeepSeek-V2 (2024.05)": "deepseek-ai/DeepSeek-V2-Lite",
     "DeepSeek-V3/R1 (2024.12)": "deepseek-ai/DeepSeek-V3",

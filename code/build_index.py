@@ -55,10 +55,40 @@ def build_index():
     
     # Build navigation
     nav_items = []
+    # Summary button first
+    nav_items.append(f'<button class="nav-btn active" data-id="summary">总结</button>')
     for i, article in enumerate(articles):
-        active = 'active' if i == 0 else ''
         classical_title = next((t['title'] for t in article['texts'] if t['language'] == 'classical_chinese'), article['metadata']['title_zh'])
-        nav_items.append(f'<button class="nav-btn {active}" data-id="{article["id"]}">{classical_title}</button>')
+        nav_items.append(f'<button class="nav-btn" data-id="{article["id"]}">{classical_title}</button>')
+    
+    # Build summary section (cross-table: articles × languages)
+    lang_order = ['classical_chinese', 'modern_chinese', 'english', 'spanish']
+    summary_rows = []
+    for article in articles:
+        classical_title = next((t['title'] for t in article['texts'] if t['language'] == 'classical_chinese'), article['metadata']['title_zh'])
+        cells = []
+        for lang in lang_order:
+            cells.append(f'<td class="token-count" data-article="{article["id"]}" data-lang="{lang}">—</td>')
+        summary_rows.append(f'<tr><td class="summary-article-name">{classical_title}</td>{"".join(cells)}</tr>')
+    
+    summary_section = f'''
+        <section id="summary" class="article-section active">
+            <div class="summary-intro">
+                <h2>Token 消耗总览</h2>
+                <p>12 篇文章 × 4 种语言的 token 消耗对比。右上角切换分词器，查看不同模型对同一批文本的编码效率。</p>
+            </div>
+            <div class="summary-table-wrap">
+                <table class="summary-table">
+                    <thead>
+                        <tr><th>文章</th><th class="token-col-header">文言</th><th class="token-col-header">现代汉语</th><th class="token-col-header">English</th><th class="token-col-header">Español</th></tr>
+                    </thead>
+                    <tbody>{"".join(summary_rows)}</tbody>
+                </table>
+            </div>
+        </section>
+    '''
+    
+    sections.insert(0, summary_section)
     
     # Build article sections
     sections = []
@@ -493,7 +523,7 @@ def build_index():
                 <optgroup label="开源预计算 — Qwen 词表演变">
                     <option value="Qwen-7B (2023)">Qwen-7B — 150K 词表 (2023)</option>
                     <option value="Qwen2.5-72B (2024)">Qwen2.5 — 151K 词表 (2024)</option>
-                    <option value="Qwen3.5-27B (2026)" disabled>Qwen3.5 — 248K 词表 (2026) ※需下载</option>
+                    <option value="Qwen3.5-27B (2026)">Qwen3.5 — 248K 词表 (2026)</option>
                 </optgroup>
                 <optgroup label="开源预计算 — DeepSeek 词表演变">
                     <option value="DeepSeek-V2 (2024.05)">DeepSeek-V2 — 32K 词表 (2024.05)</option>
@@ -609,7 +639,7 @@ def build_index():
         }};
 
         const OPEN_SOURCE_MODELS = [
-            'Qwen-7B (2023)', 'Qwen2.5-72B (2024)', 'Qwen3.5-9B (2026)',
+            'Qwen-7B (2023)', 'Qwen2.5-72B (2024)', 'Qwen3.5-27B (2026)',
             'DeepSeek-V2 (2024.05)', 'DeepSeek-V3/R1 (2024.12)',
             'GPT-2', 'Phi-2'
         ];
