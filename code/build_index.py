@@ -434,12 +434,10 @@ def build_index():
                 </optgroup>
                 <optgroup label="开源模型（预计算）">
                     <option value="GPT-2">GPT-2 (2019)</option>
+                    <option value="DeepSeek-R1">DeepSeek-R1</option>
                     <option value="Qwen2.5-72B">Qwen2.5-72B</option>
                     <option value="Phi-2">Phi-2</option>
-                    <option value="Gemma-7B">Gemma-7B</option>
-                    <option value="DeepSeek-R1">DeepSeek-R1</option>
-                    <option value="Llama-3-8B">Llama-3-8B</option>
-                    <option value="Llama-3-70B">Llama-3-70B</option>
+                    <option value="Claude-3.5-Sonnet">Claude 3.5 Sonnet *</option>
                 </optgroup>
             </select>
         </div>
@@ -532,8 +530,8 @@ def build_index():
 
         const OPEN_SOURCE_MODELS = [
             'GPT-2',
-            'Qwen2.5-72B', 'Phi-2', 'Gemma-7B',
-            'DeepSeek-R1', 'Llama-3-8B', 'Llama-3-70B'
+            'DeepSeek-R1', 'Qwen2.5-72B', 'Phi-2',
+            'Claude-3.5-Sonnet'
         ];
 
         function isOpenSource(name) {{ return OPEN_SOURCE_MODELS.includes(name); }}

@@ -19,13 +19,16 @@ import sys
 from pathlib import Path
 
 # --- Configuration ---
+# Models needing non-default tokenizer loading
+MODEL_LOAD_KWARGS = {
+    "Xenova/claude-tokenizer": {"use_fast": True},
+}
+
 OPEN_SOURCE_MODELS = {
-    "DeepSeek-R1": "deepseek-ai/DeepSeek-R1",
-    "Llama-3-8B": "meta-llama/Meta-Llama-3-8B",
-    "Llama-3-70B": "meta-llama/Meta-Llama-3-70B",
+    "DeepSeek-R1": "deepseek-ai/DeepSeek-V3",
     "Qwen2.5-72B": "Qwen/Qwen2.5-72B",
     "Phi-2": "microsoft/phi-2",
-    "Gemma-7B": "google/gemma-7b",
+    "Claude-3.5-Sonnet": "Xenova/claude-tokenizer",
 }
 
 DATA_DIR = Path("data")
@@ -57,12 +60,19 @@ def compute_token_counts(corpus):
         print(f"{'='*60}")
 
         try:
-            tokenizer = AutoTokenizer.from_pretrained(
-                model_id, trust_remote_code=True
-            )
+            kwargs = {"trust_remote_code": True}
+            kwargs.update(MODEL_LOAD_KWARGS.get(model_id, {}))
+            tokenizer = AutoTokenizer.from_pretrained(model_id, **kwargs)
         except Exception as e:
             print(f"  [SKIP] Failed to load {model_id}: {e}")
             continue
+
+        # Quick sanity check on first Chinese text
+        first_article = next(iter(corpus.values()))
+        first_cn = next((t['content'][:20] for t in first_article['texts'] if t['language'] == 'classical_chinese'), '')
+        if first_cn:
+            test_tokens = tokenizer.encode(first_cn)
+            print(f"  Sanity: '{first_cn[:20]}' → {len(test_tokens)} tokens (expect 10-20 for Chinese)")
 
         model_counts = {}
         for article_id, article in corpus.items():
@@ -71,8 +81,8 @@ def compute_token_counts(corpus):
                 lang = text["language"]
                 content = text["content"]
                 try:
-                    tokens = tokenizer.encode(content)
-                    text_counts[lang] = len(tokens)
+                    result = tokenizer(content, add_special_tokens=False)
+                    text_counts[lang] = len(result["input_ids"])
                 except Exception as e:
                     print(f"  [ERR] {article_id}/{lang}: {e}")
                     text_counts[lang] = -1

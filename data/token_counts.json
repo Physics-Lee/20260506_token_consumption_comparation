@@ -222,6 +222,80 @@
         "spanish": 2479
       }
     },
+    "Claude-3.5-Sonnet": {
+      "allende": {
+        "classical_chinese": 1174,
+        "modern_chinese": 1375,
+        "english": 833,
+        "spanish": 1184
+      },
+      "assassination_qin": {
+        "classical_chinese": 740,
+        "modern_chinese": 1016,
+        "english": 658,
+        "spanish": 970
+      },
+      "bird_migration": {
+        "classical_chinese": 1671,
+        "modern_chinese": 2085,
+        "english": 1264,
+        "spanish": 1885
+      },
+      "dark_matter_galaxies": {
+        "classical_chinese": 1665,
+        "modern_chinese": 1962,
+        "english": 1296,
+        "spanish": 1800
+      },
+      "duke_huan_qi": {
+        "classical_chinese": 221,
+        "modern_chinese": 364,
+        "english": 246,
+        "spanish": 370
+      },
+      "duke_xi_28th_year": {
+        "classical_chinese": 457,
+        "modern_chinese": 616,
+        "english": 499,
+        "spanish": 635
+      },
+      "ju_lu_battle": {
+        "classical_chinese": 415,
+        "modern_chinese": 596,
+        "english": 386,
+        "spanish": 606
+      },
+      "paulgraham": {
+        "classical_chinese": 910,
+        "modern_chinese": 1096,
+        "english": 704,
+        "spanish": 1014
+      },
+      "science_revolution_dl": {
+        "classical_chinese": 1624,
+        "modern_chinese": 1659,
+        "english": 1028,
+        "spanish": 1688
+      },
+      "yangzhenning": {
+        "classical_chinese": 1593,
+        "modern_chinese": 1670,
+        "english": 1080,
+        "spanish": 1687
+      },
+      "yau_collider_opinions": {
+        "classical_chinese": 1868,
+        "modern_chinese": 1869,
+        "english": 1145,
+        "spanish": 1845
+      },
+      "exile_of_duke_wen_of_jin": {
+        "classical_chinese": 1804,
+        "modern_chinese": 2342,
+        "english": 1625,
+        "spanish": 2260
+      }
+    },
     "GPT-2": {
       "allende": {
         "classical_chinese": 1702,
