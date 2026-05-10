@@ -492,7 +492,6 @@ def build_index():
                     <option value="DeepSeek-R1">DeepSeek-R1</option>
                     <option value="Qwen2.5-72B">Qwen2.5-72B</option>
                     <option value="Phi-2">Phi-2</option>
-                    <option value="Claude-3.5-Sonnet">Claude 3.5 Sonnet *</option>
                 </optgroup>
             </select>
         </div>
@@ -585,8 +584,7 @@ def build_index():
 
         const OPEN_SOURCE_MODELS = [
             'GPT-2',
-            'DeepSeek-R1', 'Qwen2.5-72B', 'Phi-2',
-            'Claude-3.5-Sonnet'
+            'DeepSeek-R1', 'Qwen2.5-72B', 'Phi-2'
         ];
 
         function isOpenSource(name) {{ return OPEN_SOURCE_MODELS.includes(name); }}

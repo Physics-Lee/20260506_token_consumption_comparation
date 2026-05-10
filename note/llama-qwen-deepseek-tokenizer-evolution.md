@@ -1,4 +1,4 @@
-# Llama / Qwen / DeepSeek 分词器演变史
+# 主流 LLM 分词器演变史（截至 2026 年 5 月）
 
 截至 2026 年 5 月，三家模型的分词器演化路径。
 
@@ -79,14 +79,34 @@ Qwen 3.5（2026 年最新版）做了一个迟到的大膨胀——从 152K 直�
 
 ---
 
-## 三家并排
+## 全部并排（2026.05）
 
 ```
-        2023    2024         2025         2026
-Llama:   32K ── 128K ────── 200K ──────── 200K
-Qwen:   150K ── 152K ────── 152K ──────── 248K
-DeepSeek:       32K → 128K ── 128K ─────── 128K
+              2022     2023     2024          2025          2026
+
+Llama           32K ── 32K ── 128K ──────── 200K ───────── 200K
+Qwen                  150K ── 152K ──────── 152K ───────── 248K
+DeepSeek                        32K → 128K ── 128K ──────── 128K
+GLM              130K ── 130K ── 150K ──────── 150K ──────── 150K
+Kimi                                         闭源 ───→ 160K（K2 开源）
+MiniMax                                            200K ──→ 200K
+豆包                                                                闭源
+
+OpenAI     r50K ── p50K ── cl100K ───────── o200K ───────── o200K
+             50K     50K     100K             200K             200K
 ```
+
+### 共同规律
+
+1. **32K 已被证明是严重瓶颈。** 没有任何一家当前模型低于 128K。
+
+2. **每次大跳跃都和训练语料多样化同步。** Llama 3 跳 4 倍是为了多语言，DeepSeek V3 跳 4 倍是为了数学+编程+多语言，Qwen 3.5 跳 63% 是社区投诉推动的多语言优化。
+
+3. **跳跃之后趋于稳定。** GLM 四代没动过 vocab，DeepSeek V3→V4 没动过，MiniMax 两代没动过——换 tokenizer 意味着所有 embedding 层要重训，代价太大。
+
+4. **行业向 200K 收敛。** Llama 4（200K）、Qwen 3.5（248K）、MiniMax（200K）、OpenAI o200k（200K）都在 200K 这个量级。
+
+5. **唯一全闭源的两家：Anthropic（Claude）和字节（豆包）。** 一个在旧金山，一个在北京。
 
 ### 共同规律
 
@@ -97,3 +117,89 @@ DeepSeek:       32K → 128K ── 128K ─────── 128K
 3. **跳跃之后趋于稳定。** 一旦找到合适的词汇量，后续几代模型倾向于沿用同一个 tokenizer，因为换 tokenizer 意味着所有已训练的 embedding 层要重来。
 
 4. **行业正在向 200K+ 收敛。** Llama 4（200K）、Qwen 3.5（248K）、OpenAI o200k_base（200K）都在 200K 这个量级。DeepSeek（128K）最保守，可能会在下一代做跳跃。
+
+---
+
+## GLM（智谱）：混合 tiktoken + 自训练
+
+```
+2022.08  GLM-130B       BPE               ~130K   基础，中英双语
+2023.03  ChatGLM-6B     BPE               ~130K   开源，社区爆发
+2023.06  ChatGLM2-6B    BPE               ~130K   上下文 2K → 32K
+2023.10  ChatGLM3-6B    BPE               ~130K
+         ─────────────── 分水岭 ───────────────
+2024.01  GLM-4          混合 BPE           150K    首次大改
+2024.06  GLM-4-9B       混合 BPE           151,552 开源版
+```
+
+### 关键转折
+
+GLM-4 做了一个**全世界独一无二的操作**——它没有自己从头训 BPE，而是：
+
+> "employ the byte-level BPE algorithm to separately learn Chinese and multilingual tokens, then merge them with the tokens of the cl100k_base tokenizer in tiktoken into a unified vocabulary with a size of 150,000"
+> — ChatGLM 论文
+
+意思就是：拿 OpenAI 的 cl100k_base 词表当底座，自己训练中文和多语言 BPE 合并进去。等于给英文用 OpenAI 的现成编码表，中文部分自己造——偷懒但聪明。
+
+前三代 ChatGLM（6B → 6B2 → 6B3）词汇量稳定在 ~130K，GLM-4 才涨到 150K。之后没有再动过。
+
+> **来源**：[ChatGLM 论文](https://openreview.net/forum?id=iEaNXS7cQd) (vocab_size=150,000) · [GLM-4 HuggingFace](https://huggingface.co/docs/transformers/main/model_doc/glm) (vocab_size=151,552) · [zai-org/glm-4-9b](https://huggingface.co/zai-org/glm-4-9b)
+
+---
+
+## Kimi（月之暗面）：突然转向开源
+
+```
+2023.10  Kimi K1        闭源           ？      完全不公开
+         ─────────────── 分水岭 ───────────────
+2025.07  Kimi K2        基于 tiktoken   160K    突然开源，1T 总参、32B 激活
+```
+
+### 关键转折
+
+K1 时代完全闭源。K2 一口气全公开：权重、tokenizer、推理代码全部上 HuggingFace。
+
+K2 的 tokenizer 完全基于 OpenAI 的 tiktoken 格式——直接用 `tiktoken.model` 文件，`load_tiktoken_bpe()` 函数加载，和 OpenAI 的编码表同一套 API。特殊之处是它的 `pat_str` regex 里加了 `[\p{Han}]+` 单独匹配中文字符段，对中文做了显式优化。
+
+160K 词汇量，介于 OpenAI 的 cl100k_base（100K）和 o200k_base（200K）之间。
+
+> **来源**：[moonshotai/Kimi-K2](https://github.com/moonshotai/kimi-k2) · [HuggingFace Kimi-K2-Instruct](https://huggingface.co/moonshotai/Kimi-K2-Instruct) tokenization_kimi.py
+
+---
+
+## MiniMax：200K 开局，两代保持不变
+
+```
+2025.01  MiniMax-Text-01    BPE    200,064   456B 总参，45.9B 激活
+2025.10  MiniMax-M2         BPE    200,064   230B 总参，10B 激活（同 tokenizer）
+```
+
+### 关键转折
+
+没有转折。MiniMax 开局就定在 200K 词汇量——直接对标 OpenAI o200k_base 和 Llama 4 的量级。两代模型用了完全相同的 tokenizer，没有迭代。
+
+> **来源**：[MiniMax-Text-01 Model Card](https://github.com/MiniMax-AI/MiniMax-01) (vocab=200,064) · [MiniMax-M2 HuggingFace](https://huggingface.co/docs/transformers/en/model_doc/minimax_m2) (vocab=200,064)
+
+---
+
+## 豆包（字节）：API 专供，全黑箱
+
+```
+2024.??  Doubao-pro       ？    ？    权重、tokenizer、训练数据一概不公开
+```
+
+国内七家主流 LLM 公司中唯一不开源的。和 Anthropic 一样——只能通过 API 使用，无法获取 tokenizer。要算豆包的 token 数，只能调 API 让服务端返回 usage 数据。
+
+---
+
+## 中国七家 tokenizer 公开情况总表
+
+| 公司 | 模型 | 开源 | Tokenizer 公开 | 词汇量 |
+|------|------|:---:|:---:|:---:|
+| 阿里 | Qwen 1.0 ~ 3.5 | ✅ | ✅ HuggingFace | 152K → 248K |
+| 智谱 | GLM-130B ~ GLM-4 | ✅ | ✅ HuggingFace | ~130K → 151K |
+| DeepSeek | V2 ~ V4 | ✅ | ✅ HuggingFace | 32K → 128K |
+| 月之暗面 | K2 | ✅ | ✅ HuggingFace (tiktoken) | 160K |
+| MiniMax | Text-01 / M2 | ✅ | ✅ HuggingFace | 200K |
+| 百川 | Baichuan | ✅ | ✅ HuggingFace | — |
+| 字节 | 豆包 | ❌ | ❌ | 不公开 |

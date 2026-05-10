@@ -14,7 +14,7 @@ Reads all `data/*.json` files and generates `index.html` — the main Token Cons
 
 ### Runtime
 ```bash
-conda run -n base python code/build_index.py
+conda run -n token_analysis python code/build_index.py
 ```
 
 ---
@@ -30,19 +30,17 @@ Computes token counts for all articles × all languages, across multiple tokeniz
 | DeepSeek-R1 | deepseek-ai/DeepSeek-V3 | HuggingFace AutoTokenizer |
 | Qwen2.5-72B | Qwen/Qwen2.5-72B | HuggingFace AutoTokenizer |
 | Phi-2 | microsoft/phi-2 | HuggingFace AutoTokenizer |
-| Claude-3.5-Sonnet | Xenova/claude-tokenizer | Community approximation |
 | GPT-2 | tiktoken `gpt2` encoding | tiktoken.get_encoding |
-
-> Claude tokenizer is a community approximation (Xenova/claude-tokenizer), not the official Anthropic tokenizer.
 
 ### Requirements
 ```bash
 pip install transformers tiktoken
+# Python 3.11 + transformers<5 (5.x breaks DeepSeek tokenizer)
 ```
 
 ### Runtime
 ```bash
-conda run -n base python code/precompute_tokens.py
+conda run -n token_analysis python code/precompute_tokens.py
 ```
 
 ---
@@ -95,5 +93,5 @@ node code/precompute_tokens.js
 
 ### How to add a new article
 1. Create a JSON file in `data/` following the schema above
-2. Run `conda run -n base python code/precompute_tokens.py` to recompute token counts
-3. Run `conda run -n base python code/build_index.py` to regenerate `index.html`
+2. Run `conda run -n token_analysis python code/precompute_tokens.py` to recompute token counts
+3. Run `conda run -n token_analysis python code/build_index.py` to regenerate `index.html`

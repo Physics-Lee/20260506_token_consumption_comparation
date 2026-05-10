@@ -21,14 +21,12 @@ from pathlib import Path
 # --- Configuration ---
 # Models needing non-default tokenizer loading
 MODEL_LOAD_KWARGS = {
-    "Xenova/claude-tokenizer": {"use_fast": True},
 }
 
 OPEN_SOURCE_MODELS = {
     "DeepSeek-R1": "deepseek-ai/DeepSeek-V3",
     "Qwen2.5-72B": "Qwen/Qwen2.5-72B",
     "Phi-2": "microsoft/phi-2",
-    "Claude-3.5-Sonnet": "Xenova/claude-tokenizer",
 }
 
 DATA_DIR = Path("data")
@@ -81,8 +79,14 @@ def compute_token_counts(corpus):
                 lang = text["language"]
                 content = text["content"]
                 try:
-                    result = tokenizer(content, add_special_tokens=False)
-                    text_counts[lang] = len(result["input_ids"])
+                    # DeepSeek tokenizer has issues with `tokenizer(text)` for Chinese;
+                    # fallback to .encode() which handles it correctly
+                    if "DeepSeek" in display_name:
+                        tokens = tokenizer.encode(content)
+                        text_counts[lang] = len(tokens) if isinstance(tokens, list) else len(tokens.ids)
+                    else:
+                        tok_out = tokenizer(content, add_special_tokens=False)
+                        text_counts[lang] = len(tok_out["input_ids"])
                 except Exception as e:
                     print(f"  [ERR] {article_id}/{lang}: {e}")
                     text_counts[lang] = -1
