@@ -209,7 +209,10 @@ def build_index():
             top: 0;
             z-index: 100;
             border-bottom: 1px solid var(--border);
-            transition: background 0.3s;
+            transition: background 0.3s, transform 0.35s ease;
+        }}
+        nav.nav-hidden {{
+            transform: translateY(-100%);
         }}
         .nav-btn {{
             padding: 0.75rem 1.5rem;
@@ -487,11 +490,18 @@ def build_index():
 <option value="cl100k_base">cl100k_base — gpt-3.5-turbo / gpt-4（2022-）</option>
 <option value="o200k_base" selected>o200k_base — gpt-4o / gpt-4.1 / o1 / o3 / gpt-5.x（2024-）</option>
                 </optgroup>
-                <optgroup label="开源模型（预计算）">
+                <optgroup label="开源预计算 — Qwen 词表演变">
+                    <option value="Qwen-7B (2023)">Qwen-7B — 150K 词表 (2023)</option>
+                    <option value="Qwen2.5-72B (2024)">Qwen2.5 — 151K 词表 (2024)</option>
+                    <option value="Qwen3.5-27B (2026)" disabled>Qwen3.5 — 248K 词表 (2026) ※需下载</option>
+                </optgroup>
+                <optgroup label="开源预计算 — DeepSeek 词表演变">
+                    <option value="DeepSeek-V2 (2024.05)">DeepSeek-V2 — 32K 词表 (2024.05)</option>
+                    <option value="DeepSeek-V3/R1 (2024.12)">DeepSeek-V3/R1 — 128K 词表 (2024.12)</option>
+                </optgroup>
+                <optgroup label="开源预计算 — 参考基线">
                     <option value="GPT-2">GPT-2 (2019)</option>
-                    <option value="DeepSeek-R1">DeepSeek-R1</option>
-                    <option value="Qwen2.5-72B">Qwen2.5-72B</option>
-                    <option value="Phi-2">Phi-2</option>
+                    <option value="Phi-2">Phi-2 (2023)</option>
                 </optgroup>
             </select>
         </div>
@@ -513,6 +523,22 @@ def build_index():
     </footer>
     
     <script>
+        let lastScrollY = window.scrollY;
+        const nav = document.querySelector('nav');
+        const NAV_HIDE_THRESHOLD = 80;
+
+        window.addEventListener('scroll', () => {{
+            const currentScrollY = window.scrollY;
+            if (currentScrollY < NAV_HIDE_THRESHOLD) {{
+                nav.classList.remove('nav-hidden');
+            }} else if (currentScrollY > lastScrollY) {{
+                nav.classList.add('nav-hidden');
+            }} else {{
+                nav.classList.remove('nav-hidden');
+            }}
+            lastScrollY = currentScrollY;
+        }}, {{ passive: true }});
+
         document.querySelectorAll('.nav-btn').forEach(btn => {{
             btn.addEventListener('click', function() {{
                 document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -583,8 +609,9 @@ def build_index():
         }};
 
         const OPEN_SOURCE_MODELS = [
-            'GPT-2',
-            'DeepSeek-R1', 'Qwen2.5-72B', 'Phi-2'
+            'Qwen-7B (2023)', 'Qwen2.5-72B (2024)', 'Qwen3.5-9B (2026)',
+            'DeepSeek-V2 (2024.05)', 'DeepSeek-V3/R1 (2024.12)',
+            'GPT-2', 'Phi-2'
         ];
 
         function isOpenSource(name) {{ return OPEN_SOURCE_MODELS.includes(name); }}

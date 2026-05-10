@@ -85,7 +85,10 @@
             top: 0;
             z-index: 100;
             border-bottom: 1px solid var(--border);
-            transition: background 0.3s;
+            transition: background 0.3s, transform 0.35s ease;
+        }
+        nav.nav-hidden {
+            transform: translateY(-100%);
         }
         .nav-btn {
             padding: 0.75rem 1.5rem;
@@ -363,11 +366,18 @@
 <option value="cl100k_base">cl100k_base — gpt-3.5-turbo / gpt-4（2022-）</option>
 <option value="o200k_base" selected>o200k_base — gpt-4o / gpt-4.1 / o1 / o3 / gpt-5.x（2024-）</option>
                 </optgroup>
-                <optgroup label="开源模型（预计算）">
+                <optgroup label="开源预计算 — Qwen 词表演变">
+                    <option value="Qwen-7B (2023)">Qwen-7B — 150K 词表 (2023)</option>
+                    <option value="Qwen2.5-72B (2024)">Qwen2.5 — 151K 词表 (2024)</option>
+                    <option value="Qwen3.5-27B (2026)" disabled>Qwen3.5 — 248K 词表 (2026) ※需下载</option>
+                </optgroup>
+                <optgroup label="开源预计算 — DeepSeek 词表演变">
+                    <option value="DeepSeek-V2 (2024.05)">DeepSeek-V2 — 32K 词表 (2024.05)</option>
+                    <option value="DeepSeek-V3/R1 (2024.12)">DeepSeek-V3/R1 — 128K 词表 (2024.12)</option>
+                </optgroup>
+                <optgroup label="开源预计算 — 参考基线">
                     <option value="GPT-2">GPT-2 (2019)</option>
-                    <option value="DeepSeek-R1">DeepSeek-R1</option>
-                    <option value="Qwen2.5-72B">Qwen2.5-72B</option>
-                    <option value="Phi-2">Phi-2</option>
+                    <option value="Phi-2">Phi-2 (2023)</option>
                 </optgroup>
             </select>
         </div>
@@ -1423,13 +1433,13 @@ Mi libro con Steve Nadis ya ha explicado claramente la importancia de construir 
                 <table>
                     <thead><tr><th>语言</th><th>角色</th><th>标题</th><th>Unicode 字符数</th><th class="token-col-header">词元数 <span class="tokenizer-name"></span></th></tr></thead>
                     <tbody>
-                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>译文</td><td>深度学习与科学革命论</td><td>1,436</td><td class="token-count" data-article="science_revolution_dl" data-lang="classical_chinese">—</td></tr>
+                <tr><td><span class="dot" style="background:#ffd700"></span>文言</td><td>译文</td><td>深度学习与科学革命论</td><td>1,615</td><td class="token-count" data-article="science_revolution_dl" data-lang="classical_chinese">—</td></tr>
             
-                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>原文</td><td>深度学习与科学革命</td><td>1,613</td><td class="token-count" data-article="science_revolution_dl" data-lang="modern_chinese">—</td></tr>
+                <tr><td><span class="dot" style="background:#4ecdc4"></span>现代汉语</td><td>原文</td><td>深度学习与科学革命</td><td>1,816</td><td class="token-count" data-article="science_revolution_dl" data-lang="modern_chinese">—</td></tr>
             
-                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>译文</td><td>Deep Learning and the Scientific Revolution</td><td>5,022</td><td class="token-count" data-article="science_revolution_dl" data-lang="english">—</td></tr>
+                <tr><td><span class="dot" style="background:#a5d6ff"></span>English</td><td>译文</td><td>Deep Learning and the Scientific Revolution</td><td>5,529</td><td class="token-count" data-article="science_revolution_dl" data-lang="english">—</td></tr>
             
-                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>El Aprendizaje Profundo y la Revolución Científica</td><td>5,646</td><td class="token-count" data-article="science_revolution_dl" data-lang="spanish">—</td></tr>
+                <tr><td><span class="dot" style="background:#ff7b72"></span>Español</td><td>译文</td><td>El Aprendizaje Profundo y la Revolución Científica</td><td>6,223</td><td class="token-count" data-article="science_revolution_dl" data-lang="spanish">—</td></tr>
             </tbody>
                 </table>
             </div>
@@ -1474,6 +1484,7 @@ Jim Gray 极富洞见。二零零七年，彼提出——吾辈正历第四次�
 甲）人类能理解二原子间之相互作用（以牛顿方程或薛定谔方程模拟）。然基于物理定律之法于预测蛋白质结构上完败于深度学习（二零二零，AlphaFold 2）。
 
 乙）人类能理解单神经元并预测动作电位波形（Hodgkin-Huxley），亦能预测初级视觉皮层神经元对于视觉刺激之响应（Hubel-Wiesel）。然基于传统规律之法于预测高级视觉皮层神经元响应上完败于深度学习（二零一九，DiCarlo Lab）。
+   丙）利用RNN或Transformer及其变体，三异实验室已可自中风或ALS患者运动皮层信号中实时解码患者欲言（二零二三，Chang Lab；二零二三，Shenoy Lab；二零二四，Stavisky Lab）。RNN与Transformer犹翻译机，将患者之脑信号译为英文。整个过程唯一所用之神经科学知识乃运动皮层所在，全无用到毫厘理论神经科学。
 
 三次革命后，学者不抛弃过往之传统，乃继承之：
 
@@ -1482,7 +1493,7 @@ Jim Gray 极富洞见。二零零七年，彼提出——吾辈正历第四次�
 二、自今往后，学者亦须判断实验结果与理论所预测是否一致。然预测不再由简数句数学或自然语言给出，乃由人工神经网络给出。
 
 Jim Gray 扬帆远去，不复归。吾辈亦正驶向一未知之海域，舟上载一连吾辈自身亦不能解之翻译机器。</pre></div>
-                    <div class="card-footer">1,436 字符</div>
+                    <div class="card-footer">1,615 字符</div>
                 </div>
             
                 <div class="text-card lang-modern">
@@ -1522,6 +1533,7 @@ Jim Gray 极富洞察。2007年，他提出——我们正在经历第四次科�
 3. 2012年至今深度学习的进展。这意味着一种人类和自然界之间"翻译软件"。上帝的语言真的是数学吗？自然界的规律真的都可以用简单的数学语言描述吗？——也许答案是否定的。到目前为止，人类能理解的规律要么能用几句数学语言描述、要么能用几句自然语言描述。但复杂系统也许不能。当系统足够复杂时，我们也许永远无法用人类可理解的语言来概括其规律，但我们**已经**可以训练一个神经网络来充当"翻译软件"。深度学习已开始充当人类和自然界（特别是复杂系统）的"翻译软件"，并且这个翻译软件的能力越来越强。例如：
    甲） 人类能理解两个原子之间的相互作用（用牛顿方程或薛定谔方程模拟）。但基于物理定律的方法在预测蛋白质结构上完败于深度学习（2020, AlphaFold 2）。
    乙） 人类能理解单神经元并预测动作电位波形（Hodgkin-Huxley），也能预测初级视觉皮层神经元对于视觉刺激的响应（Hubel-Wiesel）。但基于传统规律的方法在预测高级视觉皮层神经元响应上完败于深度学习（2019, DiCarlo Lab）。
+   丙） 利用RNN或Transformer及其变体，三个不同的实验室已经可以从中风或ALS患者运动皮层信号中实时解码出患者想说的话 (2023, Chang Lab; 2023, Shenoy Lab; 2024, Stavisky Lab)。RNN和Transformer就像翻译机，把患者的脑信号翻译成了英文。整个过程唯一用到的神经科学知识是运动皮层在哪里，完全没有用到哪怕一丁点理论神经科学。
 
 三次革命后，学者们不会抛弃过往的传统，而是继承：
 
@@ -1530,7 +1542,7 @@ Jim Gray 极富洞察。2007年，他提出——我们正在经历第四次科�
 2. 从今往后，学者们也依然要判断实验结果和理论给出的预测是否一致。只不过，预测不再由简单的几句数学或自然语言给出，而是由人工神经网络给出。
 
 Jim Gray 扬帆远去，没有归来。我们这一代人也正在驶向一片未知的海域，船上载着一个连我们自己也无法理解的翻译机器。</pre></div>
-                    <div class="card-footer">1,613 字符</div>
+                    <div class="card-footer">1,816 字符</div>
                 </div>
             
                 <div class="text-card lang-english">
@@ -1570,6 +1582,7 @@ I believe there have been three scientific revolutions in human history:
 3. The progress of deep learning from 2012 to the present. This represents a "translation software" between humanity and nature. Is God's language truly mathematics? Can all laws of nature be described in simple mathematical language?—Perhaps the answer is no. To date, laws that humans can understand can be described either in a few lines of mathematical language or in a few lines of natural language. But complex systems may not be so. When a system is sufficiently complex, we may never be able to summarize its laws in human-comprehensible language, but we can already train a neural network to serve as "translation software." Deep learning has already begun to serve as a "translation software" between humanity and nature (particularly complex systems), and its capabilities are growing ever stronger. For example:
    (A) Humans can understand the interaction between two atoms (simulated using Newton's equations or the Schrödinger equation). Yet methods based on physical laws were completely defeated by deep learning in predicting protein structures (2020, AlphaFold 2).
    (B) Humans can understand a single neuron and predict action potential waveforms (Hodgkin-Huxley), and can also predict the responses of primary visual cortex neurons to visual stimuli (Hubel-Wiesel). Yet methods based on traditional laws were completely defeated by deep learning in predicting the responses of higher visual cortex neurons (2019, DiCarlo Lab).
+   C) Using RNNs or Transformers and their variants, three different laboratories have already decoded what stroke or ALS patients want to say in real time from signals in their motor cortex (2023, Chang Lab; 2023, Shenoy Lab; 2024, Stavisky Lab). RNNs and Transformers act like translation machines, converting the patients' brain signals into English. The only neuroscience knowledge used in the entire process was where the motor cortex is located; not a shred of theoretical neuroscience was employed.
 
 After these three revolutions, scholars will not abandon past traditions but will inherit them:
 
@@ -1578,7 +1591,7 @@ After these three revolutions, scholars will not abandon past traditions but wil
 2. From now on, scholars must still judge whether experimental results match theoretical predictions. Only the predictions will no longer be given in a few simple lines of mathematics or natural language, but by artificial neural networks.
 
 Jim Gray sailed far away and never returned. Our generation too is sailing toward an unknown sea, carrying on board a translation machine that even we ourselves cannot understand.</pre></div>
-                    <div class="card-footer">5,022 字符</div>
+                    <div class="card-footer">5,529 字符</div>
                 </div>
             
                 <div class="text-card lang-spanish">
@@ -1618,6 +1631,7 @@ Creo que ha habido tres revoluciones científicas en la historia humana:
 3. El progreso del aprendizaje profundo desde 2012 hasta el presente. Esto representa un "software de traducción" entre la humanidad y la naturaleza. ¿Es realmente matemáticas el lenguaje de Dios? ¿Todas las leyes de la naturaleza pueden describirse en lenguaje matemático simple?—Quizás la respuesta es no. Hasta la fecha, las leyes que los humanos pueden entender pueden describirse ya sea en unas pocas líneas de lenguaje matemático o en unas pocas líneas de lenguaje natural. Pero los sistemas complejos pueden no ser así. Cuando un sistema es suficientemente complejo, quizás nunca podamos resumir sus leyes en lenguaje comprensible para humanos, pero ya podemos entrenar una red neuronal para servir como "software de traducción." El aprendizaje profundo ya ha comenzado a servir como "software de traducción" entre la humanidad y la naturaleza (particularmente sistemas complejos), y sus capacidades se vuelven cada vez más fuertes. Por ejemplo:
    (A) Los humanos pueden entender la interacción entre dos átomos (simulada usando las ecuaciones de Newton o la ecuación de Schrödinger). Sin embargo, los métodos basados en leyes físicas fueron completamente derrotados por el aprendizaje profundo en la predicción de estructuras de proteínas (2020, AlphaFold 2).
    (B) Los humanos pueden entender una sola neurona y predecir las formas de onda de potencial de acción (Hodgkin-Huxley), y también pueden predecir las respuestas de neuronas de la corteza visual primaria a estímulos visuales (Hubel-Wiesel). Sin embargo, los métodos basados en leyes tradicionales fueron completamente derrotados por el aprendizaje profundo en la predicción de las respuestas de neuronas de la corteza visual superior (2019, DiCarlo Lab).
+   C) Utilizando RNNs o Transformers y sus variantes, tres laboratorios diferentes ya han logrado decodificar en tiempo real lo que pacientes de accidente cerebrovascular o ELA quieren decir a partir de señales en su corteza motora (2023, Chang Lab; 2023, Shenoy Lab; 2024, Stavisky Lab). Las RNN y los Transformers actúan como máquinas de traducción, convirtiendo las señales cerebrales de los pacientes en inglés. El único conocimiento de neurociencia utilizado en todo el proceso fue dónde se encuentra la corteza motora; no se empleó ni una pizca de neurociencia teórica.
 
 Después de estas tres revoluciones, los eruditos no abandonarán las tradiciones pasadas sino que las heredarán:
 
@@ -1626,7 +1640,7 @@ Después de estas tres revoluciones, los eruditos no abandonarán las tradicione
 2. De ahora en adelante, los eruditos aún deben juzgar si los resultados experimentales coinciden con las predicciones teóricas. Solo que las predicciones ya no serán dadas en unas pocas líneas simples de matemáticas o lenguaje natural, sino por redes neuronales artificiales.
 
 Jim Gray navejó lejos y nunca regresó. Nuestra generación también está navegando hacia un mar desconocido, llevando a bordo una máquina de traducción que incluso nosotros mismos no podemos entender.</pre></div>
-                    <div class="card-footer">5,646 字符</div>
+                    <div class="card-footer">6,223 字符</div>
                 </div>
             </div>
         </section>
@@ -2179,6 +2193,22 @@ En la primavera del vigésimo cuarto año, en el primer mes, el duque Mu de Qin 
     </footer>
     
     <script>
+        let lastScrollY = window.scrollY;
+        const nav = document.querySelector('nav');
+        const NAV_HIDE_THRESHOLD = 80;
+
+        window.addEventListener('scroll', () => {
+            const currentScrollY = window.scrollY;
+            if (currentScrollY < NAV_HIDE_THRESHOLD) {
+                nav.classList.remove('nav-hidden');
+            } else if (currentScrollY > lastScrollY) {
+                nav.classList.add('nav-hidden');
+            } else {
+                nav.classList.remove('nav-hidden');
+            }
+            lastScrollY = currentScrollY;
+        }, { passive: true });
+
         document.querySelectorAll('.nav-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -2234,7 +2264,7 @@ En la primavera del vigésimo cuarto año, en el primer mes, el duque Mu de Qin 
         applyTheme('system');
     </script>
     <script>
-        window.PRECOMPUTED_TOKENS = {"open_source": {"DeepSeek-R1": {"allende": {"classical_chinese": 629, "modern_chinese": 654, "english": 795, "spanish": 1017}, "assassination_qin": {"classical_chinese": 429, "modern_chinese": 504, "english": 634, "spanish": 867}, "bird_migration": {"classical_chinese": 878, "modern_chinese": 925, "english": 1188, "spanish": 1616}, "dark_matter_galaxies": {"classical_chinese": 969, "modern_chinese": 1007, "english": 1226, "spanish": 1523}, "duke_huan_qi": {"classical_chinese": 123, "modern_chinese": 179, "english": 240, "spanish": 338}, "duke_xi_28th_year": {"classical_chinese": 262, "modern_chinese": 323, "english": 453, "spanish": 569}, "ju_lu_battle": {"classical_chinese": 223, "modern_chinese": 277, "english": 357, "spanish": 528}, "paulgraham": {"classical_chinese": 562, "modern_chinese": 560, "english": 663, "spanish": 822}, "science_revolution_dl": {"classical_chinese": 936, "modern_chinese": 905, "english": 1005, "spanish": 1387}, "yangzhenning": {"classical_chinese": 873, "modern_chinese": 844, "english": 1042, "spanish": 1390}, "yau_collider_opinions": {"classical_chinese": 973, "modern_chinese": 906, "english": 1102, "spanish": 1512}, "exile_of_duke_wen_of_jin": {"classical_chinese": 1041, "modern_chinese": 1225, "english": 1517, "spanish": 2011}}, "Qwen2.5-72B": {"allende": {"classical_chinese": 658, "modern_chinese": 712, "english": 795, "spanish": 1042}, "assassination_qin": {"classical_chinese": 439, "modern_chinese": 554, "english": 636, "spanish": 885}, "bird_migration": {"classical_chinese": 929, "modern_chinese": 1041, "english": 1210, "spanish": 1690}, "dark_matter_galaxies": {"classical_chinese": 1014, "modern_chinese": 1093, "english": 1255, "spanish": 1592}, "duke_huan_qi": {"classical_chinese": 129, "modern_chinese": 196, "english": 240, "spanish": 339}, "duke_xi_28th_year": {"classical_chinese": 266, "modern_chinese": 339, "english": 477, "spanish": 604}, "ju_lu_battle": {"classical_chinese": 230, "modern_chinese": 298, "english": 360, "spanish": 543}, "paulgraham": {"classical_chinese": 585, "modern_chinese": 592, "english": 664, "spanish": 857}, "science_revolution_dl": {"classical_chinese": 989, "modern_chinese": 985, "english": 1031, "spanish": 1514}, "yangzhenning": {"classical_chinese": 935, "modern_chinese": 918, "english": 1034, "spanish": 1447}, "yau_collider_opinions": {"classical_chinese": 1014, "modern_chinese": 962, "english": 1106, "spanish": 1567}, "exile_of_duke_wen_of_jin": {"classical_chinese": 1063, "modern_chinese": 1323, "english": 1549, "spanish": 2083}}, "Phi-2": {"allende": {"classical_chinese": 1702, "modern_chinese": 2209, "english": 820, "spanish": 1348}, "assassination_qin": {"classical_chinese": 1039, "modern_chinese": 1581, "english": 637, "spanish": 1081}, "bird_migration": {"classical_chinese": 2368, "modern_chinese": 3294, "english": 1243, "spanish": 2199}, "dark_matter_galaxies": {"classical_chinese": 2613, "modern_chinese": 3381, "english": 1287, "spanish": 2103}, "duke_huan_qi": {"classical_chinese": 284, "modern_chinese": 521, "english": 239, "spanish": 419}, "duke_xi_28th_year": {"classical_chinese": 591, "modern_chinese": 860, "english": 483, "spanish": 653}, "ju_lu_battle": {"classical_chinese": 546, "modern_chinese": 886, "english": 361, "spanish": 681}, "paulgraham": {"classical_chinese": 1326, "modern_chinese": 1852, "english": 696, "spanish": 1195}, "science_revolution_dl": {"classical_chinese": 2744, "modern_chinese": 2993, "english": 1038, "spanish": 1958}, "yangzhenning": {"classical_chinese": 2557, "modern_chinese": 2872, "english": 1084, "spanish": 1966}, "yau_collider_opinions": {"classical_chinese": 3070, "modern_chinese": 3288, "english": 1136, "spanish": 2188}, "exile_of_duke_wen_of_jin": {"classical_chinese": 2365, "modern_chinese": 3446, "english": 1566, "spanish": 2479}}, "GPT-2": {"allende": {"classical_chinese": 1702, "modern_chinese": 2209, "english": 820, "spanish": 1348}, "assassination_qin": {"classical_chinese": 1039, "modern_chinese": 1581, "english": 637, "spanish": 1081}, "bird_migration": {"classical_chinese": 2368, "modern_chinese": 3294, "english": 1243, "spanish": 2199}, "dark_matter_galaxies": {"classical_chinese": 2613, "modern_chinese": 3381, "english": 1287, "spanish": 2103}, "duke_huan_qi": {"classical_chinese": 284, "modern_chinese": 521, "english": 239, "spanish": 419}, "duke_xi_28th_year": {"classical_chinese": 591, "modern_chinese": 860, "english": 483, "spanish": 653}, "ju_lu_battle": {"classical_chinese": 546, "modern_chinese": 886, "english": 361, "spanish": 681}, "paulgraham": {"classical_chinese": 1326, "modern_chinese": 1852, "english": 696, "spanish": 1195}, "science_revolution_dl": {"classical_chinese": 2744, "modern_chinese": 2997, "english": 1040, "spanish": 1960}, "yangzhenning": {"classical_chinese": 2557, "modern_chinese": 2872, "english": 1084, "spanish": 1966}, "yau_collider_opinions": {"classical_chinese": 3070, "modern_chinese": 3288, "english": 1136, "spanish": 2188}, "exile_of_duke_wen_of_jin": {"classical_chinese": 2365, "modern_chinese": 3446, "english": 1566, "spanish": 2479}}}};
+        window.PRECOMPUTED_TOKENS = {"open_source": {"Qwen-7B (2023)": {"allende": {"classical_chinese": 658, "modern_chinese": 712, "english": 795, "spanish": 1042}, "assassination_qin": {"classical_chinese": 439, "modern_chinese": 554, "english": 636, "spanish": 885}, "bird_migration": {"classical_chinese": 929, "modern_chinese": 1041, "english": 1210, "spanish": 1690}, "dark_matter_galaxies": {"classical_chinese": 1014, "modern_chinese": 1093, "english": 1255, "spanish": 1592}, "duke_huan_qi": {"classical_chinese": 129, "modern_chinese": 196, "english": 240, "spanish": 339}, "duke_xi_28th_year": {"classical_chinese": 266, "modern_chinese": 339, "english": 477, "spanish": 604}, "ju_lu_battle": {"classical_chinese": 230, "modern_chinese": 298, "english": 360, "spanish": 543}, "paulgraham": {"classical_chinese": 585, "modern_chinese": 592, "english": 664, "spanish": 857}, "science_revolution_dl": {"classical_chinese": 989, "modern_chinese": 985, "english": 1031, "spanish": 1514}, "yangzhenning": {"classical_chinese": 935, "modern_chinese": 918, "english": 1034, "spanish": 1447}, "yau_collider_opinions": {"classical_chinese": 1014, "modern_chinese": 962, "english": 1106, "spanish": 1567}, "exile_of_duke_wen_of_jin": {"classical_chinese": 1063, "modern_chinese": 1323, "english": 1549, "spanish": 2083}}, "Qwen2.5-72B (2024)": {"allende": {"classical_chinese": 658, "modern_chinese": 712, "english": 795, "spanish": 1042}, "assassination_qin": {"classical_chinese": 439, "modern_chinese": 554, "english": 636, "spanish": 885}, "bird_migration": {"classical_chinese": 929, "modern_chinese": 1041, "english": 1210, "spanish": 1690}, "dark_matter_galaxies": {"classical_chinese": 1014, "modern_chinese": 1093, "english": 1255, "spanish": 1592}, "duke_huan_qi": {"classical_chinese": 129, "modern_chinese": 196, "english": 240, "spanish": 339}, "duke_xi_28th_year": {"classical_chinese": 266, "modern_chinese": 339, "english": 477, "spanish": 604}, "ju_lu_battle": {"classical_chinese": 230, "modern_chinese": 298, "english": 360, "spanish": 543}, "paulgraham": {"classical_chinese": 585, "modern_chinese": 592, "english": 664, "spanish": 857}, "science_revolution_dl": {"classical_chinese": 989, "modern_chinese": 985, "english": 1031, "spanish": 1514}, "yangzhenning": {"classical_chinese": 935, "modern_chinese": 918, "english": 1034, "spanish": 1447}, "yau_collider_opinions": {"classical_chinese": 1014, "modern_chinese": 962, "english": 1106, "spanish": 1567}, "exile_of_duke_wen_of_jin": {"classical_chinese": 1063, "modern_chinese": 1323, "english": 1549, "spanish": 2083}}, "DeepSeek-V2 (2024.05)": {"allende": {"classical_chinese": 693, "modern_chinese": 740, "english": 828, "spanish": 1171}, "assassination_qin": {"classical_chinese": 474, "modern_chinese": 589, "english": 652, "spanish": 963}, "bird_migration": {"classical_chinese": 999, "modern_chinese": 1117, "english": 1276, "spanish": 1839}, "dark_matter_galaxies": {"classical_chinese": 1063, "modern_chinese": 1120, "english": 1303, "spanish": 1736}, "duke_huan_qi": {"classical_chinese": 137, "modern_chinese": 198, "english": 240, "spanish": 372}, "duke_xi_28th_year": {"classical_chinese": 287, "modern_chinese": 367, "english": 471, "spanish": 633}, "ju_lu_battle": {"classical_chinese": 242, "modern_chinese": 311, "english": 371, "spanish": 585}, "paulgraham": {"classical_chinese": 617, "modern_chinese": 621, "english": 713, "spanish": 950}, "science_revolution_dl": {"classical_chinese": 1047, "modern_chinese": 1020, "english": 1049, "spanish": 1603}, "yangzhenning": {"classical_chinese": 968, "modern_chinese": 943, "english": 1083, "spanish": 1683}, "yau_collider_opinions": {"classical_chinese": 1045, "modern_chinese": 980, "english": 1149, "spanish": 1824}, "exile_of_duke_wen_of_jin": {"classical_chinese": 1137, "modern_chinese": 1388, "english": 1555, "spanish": 2218}}, "DeepSeek-V3/R1 (2024.12)": {"allende": {"classical_chinese": 629, "modern_chinese": 654, "english": 795, "spanish": 1017}, "assassination_qin": {"classical_chinese": 429, "modern_chinese": 504, "english": 634, "spanish": 867}, "bird_migration": {"classical_chinese": 878, "modern_chinese": 925, "english": 1188, "spanish": 1616}, "dark_matter_galaxies": {"classical_chinese": 969, "modern_chinese": 1007, "english": 1226, "spanish": 1523}, "duke_huan_qi": {"classical_chinese": 123, "modern_chinese": 179, "english": 240, "spanish": 338}, "duke_xi_28th_year": {"classical_chinese": 262, "modern_chinese": 323, "english": 453, "spanish": 569}, "ju_lu_battle": {"classical_chinese": 223, "modern_chinese": 277, "english": 357, "spanish": 528}, "paulgraham": {"classical_chinese": 562, "modern_chinese": 560, "english": 663, "spanish": 822}, "science_revolution_dl": {"classical_chinese": 936, "modern_chinese": 905, "english": 1005, "spanish": 1387}, "yangzhenning": {"classical_chinese": 873, "modern_chinese": 844, "english": 1042, "spanish": 1390}, "yau_collider_opinions": {"classical_chinese": 973, "modern_chinese": 906, "english": 1102, "spanish": 1512}, "exile_of_duke_wen_of_jin": {"classical_chinese": 1041, "modern_chinese": 1225, "english": 1517, "spanish": 2011}}, "Phi-2": {"allende": {"classical_chinese": 1702, "modern_chinese": 2209, "english": 820, "spanish": 1348}, "assassination_qin": {"classical_chinese": 1039, "modern_chinese": 1581, "english": 637, "spanish": 1081}, "bird_migration": {"classical_chinese": 2368, "modern_chinese": 3294, "english": 1243, "spanish": 2199}, "dark_matter_galaxies": {"classical_chinese": 2613, "modern_chinese": 3381, "english": 1287, "spanish": 2103}, "duke_huan_qi": {"classical_chinese": 284, "modern_chinese": 521, "english": 239, "spanish": 419}, "duke_xi_28th_year": {"classical_chinese": 591, "modern_chinese": 860, "english": 483, "spanish": 653}, "ju_lu_battle": {"classical_chinese": 546, "modern_chinese": 886, "english": 361, "spanish": 681}, "paulgraham": {"classical_chinese": 1326, "modern_chinese": 1852, "english": 696, "spanish": 1195}, "science_revolution_dl": {"classical_chinese": 2744, "modern_chinese": 2993, "english": 1038, "spanish": 1958}, "yangzhenning": {"classical_chinese": 2557, "modern_chinese": 2872, "english": 1084, "spanish": 1966}, "yau_collider_opinions": {"classical_chinese": 3070, "modern_chinese": 3288, "english": 1136, "spanish": 2188}, "exile_of_duke_wen_of_jin": {"classical_chinese": 2365, "modern_chinese": 3446, "english": 1566, "spanish": 2479}}, "GPT-2": {"allende": {"classical_chinese": 1702, "modern_chinese": 2209, "english": 820, "spanish": 1348}, "assassination_qin": {"classical_chinese": 1039, "modern_chinese": 1581, "english": 637, "spanish": 1081}, "bird_migration": {"classical_chinese": 2368, "modern_chinese": 3294, "english": 1243, "spanish": 2199}, "dark_matter_galaxies": {"classical_chinese": 2613, "modern_chinese": 3381, "english": 1287, "spanish": 2103}, "duke_huan_qi": {"classical_chinese": 284, "modern_chinese": 521, "english": 239, "spanish": 419}, "duke_xi_28th_year": {"classical_chinese": 591, "modern_chinese": 860, "english": 483, "spanish": 653}, "ju_lu_battle": {"classical_chinese": 546, "modern_chinese": 886, "english": 361, "spanish": 681}, "paulgraham": {"classical_chinese": 1326, "modern_chinese": 1852, "english": 696, "spanish": 1195}, "science_revolution_dl": {"classical_chinese": 2744, "modern_chinese": 2997, "english": 1040, "spanish": 1960}, "yangzhenning": {"classical_chinese": 2557, "modern_chinese": 2872, "english": 1084, "spanish": 1966}, "yau_collider_opinions": {"classical_chinese": 3070, "modern_chinese": 3288, "english": 1136, "spanish": 2188}, "exile_of_duke_wen_of_jin": {"classical_chinese": 2365, "modern_chinese": 3446, "english": 1566, "spanish": 2479}}}};
     </script>
     <script src="https://cdn.jsdelivr.net/npm/gpt-tokenizer@2.9.0/dist/o200k_base.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gpt-tokenizer@2.9.0/dist/cl100k_base.js"></script>
@@ -2249,8 +2279,9 @@ En la primavera del vigésimo cuarto año, en el primer mes, el duque Mu de Qin 
         };
 
         const OPEN_SOURCE_MODELS = [
-            'GPT-2',
-            'DeepSeek-R1', 'Qwen2.5-72B', 'Phi-2'
+            'Qwen-7B (2023)', 'Qwen2.5-72B (2024)', 'Qwen3.5-9B (2026)',
+            'DeepSeek-V2 (2024.05)', 'DeepSeek-V3/R1 (2024.12)',
+            'GPT-2', 'Phi-2'
         ];
 
         function isOpenSource(name) { return OPEN_SOURCE_MODELS.includes(name); }
