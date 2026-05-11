@@ -364,6 +364,34 @@ def build_index():
     except Exception as e:
         print(f"  [WARN] OpenAI p-value computation failed: {e}")
     
+    # BH correction — within each tokenizer (m=3 language pairs per tokenizer)
+    for group in ['cc', 'other']:
+        for name in pvalue_data[group]:
+            langs = ['modern_chinese', 'english', 'spanish']
+            # Fisher p-values
+            fisher_ps = [pvalue_data[group][name][l]['fisher_p'] for l in langs]
+            order = sorted(range(3), key=lambda i: fisher_ps[i])
+            adj = [0.0] * 3
+            for rank, idx in enumerate(order, 1):
+                adj[idx] = min(fisher_ps[idx] * 3 / rank, 1.0)
+            for i in range(1, -1, -1):
+                adj[order[i]] = min(adj[order[i]], adj[order[i + 1]])
+            for i, l in enumerate(langs):
+                pvalue_data[group][name][l]['fisher_bh'] = round(adj[i], 4)
+            # Wilcoxon p-values
+            wilc_ps = []
+            for l in langs:
+                wp = pvalue_data[group][name][l]['wilcoxon_p']
+                wilc_ps.append(wp if wp == wp else 1.0)
+            w_order = sorted(range(3), key=lambda i: wilc_ps[i])
+            w_adj = [0.0] * 3
+            for rank, idx in enumerate(w_order, 1):
+                w_adj[idx] = min(wilc_ps[idx] * 3 / rank, 1.0)
+            for i in range(1, -1, -1):
+                w_adj[w_order[i]] = min(w_adj[w_order[i]], w_adj[w_order[i + 1]])
+            for i, l in enumerate(langs):
+                pvalue_data[group][name][l]['wilcoxon_bh'] = round(w_adj[i], 4)
+    
     pvalue_json = json.dumps(pvalue_data, ensure_ascii=False)
     
     # Build article sections
@@ -1058,7 +1086,15 @@ def build_index():
                 for (const l of langs) {{
                     const fp = d[l].fisher_p < 0.0001 ? '&lt;0.0001' : d[l].fisher_p.toFixed(4);
                     const wp = isNaN(d[l].wilcoxon_p) ? '—' : (d[l].wilcoxon_p < 0.0001 ? '&lt;0.0001' : d[l].wilcoxon_p.toFixed(4));
+                    const fbh = d[l].fisher_bh < 0.0001 ? '&lt;0.0001' : d[l].fisher_bh.toFixed(4);
+                    const wbh = d[l].wilcoxon_bh < 0.0001 ? '&lt;0.0001' : d[l].wilcoxon_bh.toFixed(4);
                     html += '<td>' + fp + '</td><td>' + wp + '</td>';
+                }}
+                html += '</tr><tr class="bh-row"><td class="summary-article-name" style="font-weight:400;color:var(--text-secondary)">↳ BH 校正</td>';
+                for (const l of langs) {{
+                    const fbh = d[l].fisher_bh < 0.0001 ? '&lt;0.0001' : d[l].fisher_bh.toFixed(4);
+                    const wbh = d[l].wilcoxon_bh < 0.0001 ? '&lt;0.0001' : d[l].wilcoxon_bh.toFixed(4);
+                    html += '<td style="color:var(--text-secondary)">' + fbh + '</td><td style="color:var(--text-secondary)">' + wbh + '</td>';
                 }}
                 body.innerHTML = html + '</tr>';
             }});
