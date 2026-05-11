@@ -40,9 +40,11 @@ def build_index():
     token_counts_json = "{}"
     try:
         with open('./data/token_counts.json', 'r', encoding='utf-8') as f:
-            token_counts_json = json.dumps(json.load(f), ensure_ascii=False)
+            tc_data = json.load(f)
+            token_counts_json = json.dumps(tc_data, ensure_ascii=False)
         print("Loaded precomputed token counts")
     except FileNotFoundError:
+        tc_data = {}
         print("No token_counts.json — open-source tokenizers will show placeholder")
     
     # Language configuration
@@ -55,21 +57,29 @@ def build_index():
     
     # Build navigation
     nav_items = []
-    # Summary button first
-    nav_items.append(f'<button class="nav-btn active" data-id="summary">总结</button>')
     for i, article in enumerate(articles):
         classical_title = next((t['title'] for t in article['texts'] if t['language'] == 'classical_chinese'), article['metadata']['title_zh'])
         nav_items.append(f'<button class="nav-btn" data-id="{article["id"]}">{classical_title}</button>')
+    # Totals and summary buttons at end
+    nav_items.append(f'<button class="nav-btn" data-id="totals">词元总数</button>')
+    nav_items.append(f'<button class="nav-btn active" data-id="summary">总结</button>')
     
     # Build summary section (cross-table: articles × languages)
     lang_order = ['classical_chinese', 'modern_chinese', 'english', 'spanish']
     summary_rows = []
+    ratio_rows = []
     for article in articles:
         classical_title = next((t['title'] for t in article['texts'] if t['language'] == 'classical_chinese'), article['metadata']['title_zh'])
         cells = []
+        ratio_cells = []
         for lang in lang_order:
             cells.append(f'<td class="token-count" data-article="{article["id"]}" data-lang="{lang}">—</td>')
+            if lang == 'classical_chinese':
+                ratio_cells.append(f'<td class="ratio-cell" data-ratio-article="{article["id"]}">1</td>')
+            else:
+                ratio_cells.append(f'<td class="ratio-cell" data-ratio-article="{article["id"]}" data-ratio-lang="{lang}">—</td>')
         summary_rows.append(f'<tr><td class="summary-article-name">{classical_title}</td>{"".join(cells)}</tr>')
+        ratio_rows.append(f'<tr><td class="summary-article-name">{classical_title}</td>{"".join(ratio_cells)}</tr>')
     
     summary_section = f'''
         <section id="summary" class="article-section active">
@@ -85,15 +95,110 @@ def build_index():
                     <tbody>{"".join(summary_rows)}</tbody>
                 </table>
             </div>
+            <div class="summary-intro" style="margin-top:2rem">
+                <h2>相对比例（文言=1）</h2>
+                <p>各语言 token 数 ÷ 文言 token 数。比例 >1 表示比文言费 token，<1 表示比文言省。</p>
+            </div>
+            <div class="summary-table-wrap">
+                <table class="summary-table ratio-table">
+                    <thead>
+                        <tr><th>文章</th><th class="token-col-header">文言</th><th class="token-col-header">现代汉语</th><th class="token-col-header">English</th><th class="token-col-header">Español</th></tr>
+                    </thead>
+                    <tbody>{"".join(ratio_rows)}</tbody>
+                </table>
+            </div>
         </section>
     '''
     
-    sections.insert(0, summary_section)
+    # Build totals section (per-model token totals from precomputed data)
+    totals_rows = []
+    os_data = tc_data.get("open_source", {})
+    model_totals = {}
+    for model_name, articles_data in os_data.items():
+        total = 0
+        for aid, langs in articles_data.items():
+            for count in langs.values():
+                if isinstance(count, (int, float)) and count > 0:
+                    total += count
+        model_totals[model_name] = total
+    
+    # Labels for display
+    OPENAI_LABELS = {
+        'r50k_base': 'r50k_base (2020-)',
+        'p50k_base': 'p50k_base (2021-)',
+        'cl100k_base': 'cl100k_base (2022-)',
+        'o200k_base': 'o200k_base (2024-)',
+    }
+    def totals_label(key):
+        if key == 'GPT-2': return 'GPT-2 (2019-)'
+        if key == 'Phi-2': return 'Phi-2 (2023-)'
+        return key
+    
+    # Second table baseline (same as precomputed, just exclude classical_chinese)
+    no_cc_totals = {}
+    exclude_lang = 'classical_chinese'
+    for model_name, articles_data in os_data.items():
+        total = 0
+        for aid, langs in articles_data.items():
+            for lang, count in langs.items():
+                if lang != exclude_lang and isinstance(count, (int, float)) and count > 0:
+                    total += count
+        no_cc_totals[model_name] = total
+    
+    # Compute OpenAI tokenizer totals (for both tables at once)
+    try:
+        import tiktoken
+        for enc_name in ['r50k_base', 'p50k_base', 'cl100k_base', 'o200k_base']:
+            enc = tiktoken.get_encoding(enc_name)
+            total_all = 0
+            total_no_cc = 0
+            for article in articles:
+                for text in article['texts']:
+                    n = len(enc.encode(text['content']))
+                    total_all += n
+                    if text['language'] != exclude_lang:
+                        total_no_cc += n
+            label = OPENAI_LABELS[enc_name]
+            model_totals[label] = total_all
+            no_cc_totals[label] = total_no_cc
+    except ImportError:
+        pass
+    
+    for key, total in sorted(model_totals.items(), key=lambda x: x[1]):
+        totals_rows.append(f'<tr><td class="summary-article-name">{totals_label(key)}</td><td>{total:,}</td></tr>')
+    
+    no_cc_rows = []
+    for key, total in sorted(no_cc_totals.items(), key=lambda x: x[1]):
+        no_cc_rows.append(f'<tr><td class="summary-article-name">{totals_label(key)}</td><td>{total:,}</td></tr>')
+    
+    totals_section = f'''
+        <section id="totals" class="article-section">
+            <div class="summary-intro">
+                <h2>词元总数</h2>
+                <p>各分词器对全部 48 段文本（12 篇 × 4 语言）编码后的 token 总数。在 token 单价相同的情况下，数字越小 = 编码越紧凑 = 越省钱。</p>
+            </div>
+            <div class="summary-table-wrap" style="max-width:600px; margin:0 auto;">
+                <table class="summary-table">
+                    <thead><tr><th>分词器</th><th>Token 总数</th></tr></thead>
+                    <tbody>{"".join(totals_rows)}</tbody>
+                </table>
+            </div>
+            <div class="summary-intro" style="margin-top:2rem">
+                <h2>词元总数（不含文言）</h2>
+                <p>仅统计现代汉语、English、Español 三种语言。排除文言后，观察各分词器对日常语言的编码效率。</p>
+            </div>
+            <div class="summary-table-wrap" style="max-width:600px; margin:0 auto;">
+                <table class="summary-table">
+                    <thead><tr><th>分词器</th><th>Token 总数（不含文言）</th></tr></thead>
+                    <tbody>{"".join(no_cc_rows)}</tbody>
+                </table>
+            </div>
+        </section>
+    '''
     
     # Build article sections
-    sections = []
+    sections = [summary_section, totals_section]
     for i, article in enumerate(articles):
-        active = 'active' if i == 0 else ''
         meta = article['metadata']
         texts = article['texts']
         
@@ -127,7 +232,7 @@ def build_index():
             ''')
         
         sections.append(f'''
-        <section id="{article['id']}" class="article-section {active}">
+        <section id="{article['id']}" class="article-section">
             <div class="metadata">
                 <h2>{classical_title}</h2>
                 <div class="meta-grid">
@@ -446,6 +551,45 @@ def build_index():
             font-style: italic;
         }}
         
+        /* Summary page */
+        .summary-intro {{
+            background: var(--bg-card);
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border);
+            text-align: center;
+        }}
+        .summary-intro h2 {{ color: var(--accent); font-size: 1.5rem; margin-bottom: 0.5rem; }}
+        .summary-intro p {{ color: var(--text-secondary); }}
+        .summary-table-wrap {{
+            background: var(--bg-card);
+            border-radius: 12px;
+            overflow-x: auto;
+            border: 1px solid var(--border);
+        }}
+        .summary-table {{ width: 100%; border-collapse: collapse; }}
+        .summary-table th {{
+            background: var(--bg-card-inner);
+            padding: 1rem;
+            text-align: center;
+            color: var(--accent);
+            font-weight: 600;
+            border-bottom: 2px solid var(--border);
+        }}
+        .summary-table td {{
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+            text-align: center;
+            transition: background 0.2s;
+        }}
+        .summary-table tr:hover td {{ background: var(--hover-bg); }}
+        .summary-article-name {{
+            text-align: center !important;
+            font-weight: 500;
+            white-space: nowrap;
+        }}
+        .ratio-cell {{ font-variant-numeric: tabular-nums; }}
         /* ========== Mobile Responsive ========== */
         @media (max-width: 768px) {{
             header {{ padding: 1.5rem 1rem; }}
@@ -521,17 +665,17 @@ def build_index():
 <option value="o200k_base" selected>o200k_base — gpt-4o / gpt-4.1 / o1 / o3 / gpt-5.x（2024-）</option>
                 </optgroup>
                 <optgroup label="开源预计算 — Qwen 词表演变">
-                    <option value="Qwen-7B (2023)">Qwen-7B — 150K 词表 (2023)</option>
-                    <option value="Qwen2.5-72B (2024)">Qwen2.5 — 151K 词表 (2024)</option>
-                    <option value="Qwen3.5-27B (2026)">Qwen3.5 — 248K 词表 (2026)</option>
+<option value="Qwen-7B (2023-)">Qwen 1~2 — 150K 词表 (2023-2024)</option>
+<option value="Qwen2.5-72B (2024-)">Qwen 2.5~3 — 151K 词表 (2024-2025)</option>
+<option value="Qwen3.5-27B (2026-)">Qwen 3.5 — 248K 词表 (2026-)</option>
                 </optgroup>
                 <optgroup label="开源预计算 — DeepSeek 词表演变">
-                    <option value="DeepSeek-V2 (2024.05)">DeepSeek-V2 — 32K 词表 (2024.05)</option>
-                    <option value="DeepSeek-V3/R1 (2024.12)">DeepSeek-V3/R1 — 128K 词表 (2024.12)</option>
+<option value="DeepSeek-V2 (2024.05-)">DeepSeek-V2 — 32K 词表 (2024.05-)</option>
+<option value="DeepSeek-V3/R1/V4 (2024.12-)">DeepSeek-V3/R1/V4 — 128K 词表 (2024.12-)</option>
                 </optgroup>
-                <optgroup label="开源预计算 — 参考基线">
-                    <option value="GPT-2">GPT-2 (2019)</option>
-                    <option value="Phi-2">Phi-2 (2023)</option>
+                <optgroup label="开源预计算 — 其它">
+<option value="GPT-2">GPT-2 (2019-)</option>
+<option value="Phi-2">Phi-2 (2023-)</option>
                 </optgroup>
             </select>
         </div>
@@ -639,8 +783,8 @@ def build_index():
         }};
 
         const OPEN_SOURCE_MODELS = [
-            'Qwen-7B (2023)', 'Qwen2.5-72B (2024)', 'Qwen3.5-27B (2026)',
-            'DeepSeek-V2 (2024.05)', 'DeepSeek-V3/R1 (2024.12)',
+            'Qwen-7B (2023-)', 'Qwen2.5-72B (2024-)', 'Qwen3.5-27B (2026-)',
+            'DeepSeek-V2 (2024.05-)', 'DeepSeek-V3/R1/V4 (2024.12-)',
             'GPT-2', 'Phi-2'
         ];
 
@@ -700,6 +844,28 @@ def build_index():
                     if (!text) {{ cell.textContent = '\u2014'; return; }}
                     const count = countTokens(text, name);
                     cell.textContent = count > 0 ? count.toLocaleString() : '\u2014';
+                }});
+                // Update ratio table
+                document.querySelectorAll('.ratio-cell[data-ratio-lang]').forEach(cell => {{
+                    const articleId = cell.dataset.ratioArticle;
+                    const lang = cell.dataset.ratioLang;
+                    const classicalText = getText(articleId, 'classical_chinese');
+                    const langText = getText(articleId, lang);
+                    if (!classicalText || !langText) {{ cell.textContent = '\u2014'; return; }}
+                    let classicalCount, langCount;
+                    if (isOpenSource(name)) {{
+                        const pre = window.PRECOMPUTED_TOKENS;
+                        classicalCount = pre?.open_source?.[name]?.[articleId]?.['classical_chinese'];
+                        langCount = pre?.open_source?.[name]?.[articleId]?.[lang];
+                    }} else {{
+                        classicalCount = countTokens(classicalText, name);
+                        langCount = countTokens(langText, name);
+                    }}
+                    if (classicalCount > 0 && langCount > 0) {{
+                        cell.textContent = (langCount / classicalCount).toFixed(2);
+                    }} else {{
+                        cell.textContent = '\u2014';
+                    }}
                 }});
             }}, 10);
         }}

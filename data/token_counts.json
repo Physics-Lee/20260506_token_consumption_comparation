@@ -1,6 +1,6 @@
 {
   "open_source": {
-    "Qwen-7B (2023)": {
+    "Qwen-7B (2023-)": {
       "allende": {
         "classical_chinese": 658,
         "modern_chinese": 712,
@@ -74,7 +74,7 @@
         "spanish": 2083
       }
     },
-    "Qwen2.5-72B (2024)": {
+    "Qwen2.5-72B (2024-)": {
       "allende": {
         "classical_chinese": 658,
         "modern_chinese": 712,
@@ -148,7 +148,7 @@
         "spanish": 2083
       }
     },
-    "Qwen3.5-27B (2026)": {
+    "Qwen3.5-27B (2026-)": {
       "allende": {
         "classical_chinese": 624,
         "modern_chinese": 650,
@@ -222,7 +222,7 @@
         "spanish": 1843
       }
     },
-    "DeepSeek-V2 (2024.05)": {
+    "DeepSeek-V2 (2024.05-)": {
       "allende": {
         "classical_chinese": 693,
         "modern_chinese": 740,
@@ -296,7 +296,7 @@
         "spanish": 2218
       }
     },
-    "DeepSeek-V3/R1 (2024.12)": {
+    "DeepSeek-V3/R1/V4 (2024.12-)": {
       "allende": {
         "classical_chinese": 629,
         "modern_chinese": 654,
