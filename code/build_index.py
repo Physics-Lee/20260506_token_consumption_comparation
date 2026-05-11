@@ -377,7 +377,7 @@ def build_index():
             for i in range(1, -1, -1):
                 adj[order[i]] = min(adj[order[i]], adj[order[i + 1]])
             for i, l in enumerate(langs):
-                pvalue_data[group][name][l]['fisher_bh'] = round(adj[i], 4)
+                pvalue_data[group][name][l]['fisher_bh'] = adj[i]  # 保留原始值，JS 端格式化
             # Wilcoxon p-values
             wilc_ps = []
             for l in langs:
@@ -390,7 +390,7 @@ def build_index():
             for i in range(1, -1, -1):
                 w_adj[w_order[i]] = min(w_adj[w_order[i]], w_adj[w_order[i + 1]])
             for i, l in enumerate(langs):
-                pvalue_data[group][name][l]['wilcoxon_bh'] = round(w_adj[i], 4)
+                pvalue_data[group][name][l]['wilcoxon_bh'] = w_adj[i]  # 保留原始值，JS 端格式化
     
     pvalue_json = json.dumps(pvalue_data, ensure_ascii=False)
     
