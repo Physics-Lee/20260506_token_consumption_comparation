@@ -8,7 +8,7 @@ OpenAI 和其他公司的 tokenizer 文件格式几乎一样——都是 BPE 词
 
 ## gpt-tokenizer 的来历
 
-- 作者：Bazyli Brzoska（GitHub: niieani），独立开发者，不是 OpenAI 员工
+- 作者：Bazyli Brzoska（GitHub: niieani），**独立开发者，不是 OpenAI 员工**
 - 做的事：把 OpenAI 开源的 tiktoken（Python/Rust）用纯 JS 重写，词表编译进 JS 文件，上传 npm 和 jsdelivr CDN
 - 产物：4 个 UMD 文件（o200k_base.js / cl100k_base.js / p50k_base.js / r50k_base.js），每个 ~2MB
 - 动机：让前端开发者不用 WASM、不用后端就能算 token 数
