@@ -29,6 +29,7 @@ OPEN_SOURCE_MODELS = {
     "Qwen2.5-72B (2024-)": "Qwen/Qwen2.5-72B",
     "Qwen3.5-27B (2026-)": "Qwen/Qwen3.5-27B",
     # DeepSeek timeline: vocab jumped from 32K → 128K
+    "DeepSeek LLM (2023.11-)": "deepseek-ai/deepseek-llm-7b-base",
     "DeepSeek-V2 (2024.05-)": "deepseek-ai/DeepSeek-V2-Lite",
     "DeepSeek-V3/R1/V4 (2024.12-)": "deepseek-ai/DeepSeek-V3",
     "Phi-2": "microsoft/phi-2",

@@ -222,6 +222,80 @@
         "spanish": 1843
       }
     },
+    "DeepSeek LLM (2023.11-)": {
+      "allende": {
+        "classical_chinese": 693,
+        "modern_chinese": 740,
+        "english": 828,
+        "spanish": 1174
+      },
+      "assassination_qin": {
+        "classical_chinese": 474,
+        "modern_chinese": 589,
+        "english": 652,
+        "spanish": 963
+      },
+      "bird_migration": {
+        "classical_chinese": 999,
+        "modern_chinese": 1117,
+        "english": 1276,
+        "spanish": 1839
+      },
+      "dark_matter_galaxies": {
+        "classical_chinese": 1063,
+        "modern_chinese": 1120,
+        "english": 1303,
+        "spanish": 1736
+      },
+      "duke_huan_qi": {
+        "classical_chinese": 137,
+        "modern_chinese": 198,
+        "english": 240,
+        "spanish": 372
+      },
+      "duke_xi_28th_year": {
+        "classical_chinese": 287,
+        "modern_chinese": 367,
+        "english": 471,
+        "spanish": 633
+      },
+      "ju_lu_battle": {
+        "classical_chinese": 242,
+        "modern_chinese": 311,
+        "english": 371,
+        "spanish": 585
+      },
+      "paulgraham": {
+        "classical_chinese": 617,
+        "modern_chinese": 621,
+        "english": 713,
+        "spanish": 950
+      },
+      "science_revolution_dl": {
+        "classical_chinese": 1152,
+        "modern_chinese": 1126,
+        "english": 1162,
+        "spanish": 1774
+      },
+      "yangzhenning": {
+        "classical_chinese": 968,
+        "modern_chinese": 943,
+        "english": 1083,
+        "spanish": 1685
+      },
+      "yau_collider_opinions": {
+        "classical_chinese": 1045,
+        "modern_chinese": 980,
+        "english": 1149,
+        "spanish": 1825
+      },
+      "exile_of_duke_wen_of_jin": {
+        "classical_chinese": 1137,
+        "modern_chinese": 1388,
+        "english": 1555,
+        "spanish": 2218
+      }
+    },
     "DeepSeek-V2 (2024.05-)": {
       "allende": {
         "classical_chinese": 693,

@@ -1,8 +1,8 @@
 ---
 type: entity
 entity_type: organization
-source_count: 15
-last_updated: 2026-05-10
+source_count: 17
+last_updated: 2026-05-11
 tags: [openai, gpt, tokenizer, api]
 ---
 
@@ -21,8 +21,10 @@ OpenAI is unique among LLM providers for having gone through all three major pro
 - Released GPT-3 API in June 2020 with four model tiers named after scientists: ada (350M), babbage (1.3B), curie (6.7B), davinci (175B)
 - Launched ChatGPT web interface in November 2022; API followed in March 2023
 - GPT-4 released March 2023; GPT-4o released May 2024 with o200k_base encoding
+- GPT-5 series (2025+) also uses o200k_base; gpt-oss-* uses experimental o200k_harmony
 - tiktoken library permanently preserves all historical encodings even after models are deprecated
 - Pricing strategy for gpt-3.5-turbo ($0.002/1K tokens) was deliberately set at 1/10 of davinci's price to capture developer market
+- tiktoken uses prefix matching (MODEL_PREFIX_TO_ENCODING) for new model versions without requiring library updates
 
 ## Mentioned in
 
@@ -39,6 +41,8 @@ OpenAI is unique among LLM providers for having gone through all three major pro
 - [[source - Why Deprecated Models Still Work]] — tiktoken's permanent encoding preservation
 - [[source - LLM Tokenizer Evolution]] — OpenAI as the industry reference point
 - [[source - Tokenizer Iteration Ranking]] — 5 tokenizer iterations, highest count
+- [[source - Tokenizers Is All You Need]] — comprehensive tokenizer reference for the project
+- [[source - Tiktoken Model.py Mapping]] — MODEL_TO_ENCODING and MODEL_PREFIX_TO_ENCODING tables
 
 ## Related
 

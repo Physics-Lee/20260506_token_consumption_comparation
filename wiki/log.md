@@ -77,7 +77,38 @@ Bulk ingestion of the complete note/ directory. Created the full wiki structure 
 - Doubao (ByteDance) is only fully closed tokenizer among major Chinese LLMs
 - OpenAI's 4 encodings cover 60+ models; encoding names outlive products
 
+---
+
+## [2026-05-11] ingest | Ingest 4 new note/ files + update existing pages
+
+### New source pages created (4)
+- source - Tokenizers Is All You Need — Complete tokenizer reference with UMD loading details
+- source - Tiktoken Model.py Mapping — Full encoding mapping tables with prefix matching explanation
+- source - Tokenizer Cache Locations — HuggingFace cache on user's Windows machine
+- source - DeepSeek-V2 Vocab Mystery — V2 vocabulary may be 100K not 32K
+
+### Entity pages updated
+- [[DeepSeek]] — Added contradiction: V2 vocab is 100K (paper) vs 32K (HuggingFace Config default). Changes V2→V3 jump narrative from 4x to ~28%.
+- [[OpenAI]] — Added gpt-oss-* using o200k_harmony, prefix matching system
+- [[HuggingFace]] — Added cache locations and Config class default value pitfall
+
+### Concept pages updated
+- [[OpenAI Encoding Timeline]] — Added o200k_harmony for gpt-oss open-source models
+
+### Key findings
+- DeepSeek-V2 vocabulary contradiction: paper says 100K, HuggingFace DeepseekV2Config shows placeholder 32000
+- If V2 was 100K, the "most dramatic jump" narrative (32K→128K, 4x) is incorrect—actual jump may be ~28%
+- UMD builds of gpt-tokenizer are pure JS (not WASM), ~2MB per encoding, cached by browser
+- tiktoken uses prefix matching (MODEL_PREFIX_TO_ENCODING) so new model versions don't require library updates
+- All OpenAI models since GPT-4o share o200k_base; only exception is gpt-oss-* with o200k_harmony
+
+### Contradictions found
+- [[source - LLM Tokenizer Evolution]] and [[source - Tokenizer Iteration Ranking]] both claim DeepSeek V2→V3 was "32K→128K, 4x" — but [[source - DeepSeek-V2 Vocab Mystery]] shows V2 was likely 100K all along
+- This affects the "most dramatic single jump" claim attributed to DeepSeek
+
 ### Suggested follow-ups
+- Verify DeepSeek-V1 vocabulary size to confirm V1→V2→V3 progression
+- Update project documentation if V2 was indeed 100K (not 32K)
 - Monitor for new tokenizer versions (especially DeepSeek potential jump to 200K)
 - Resolve HuggingFace firewall issue for precomputation
 - Consider adding output page comparing tokenizer efficiency across all covered models

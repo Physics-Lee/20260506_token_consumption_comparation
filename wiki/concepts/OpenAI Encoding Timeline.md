@@ -1,7 +1,7 @@
 ---
 type: concept
-source_count: 8
-last_updated: 2026-05-10
+source_count: 10
+last_updated: 2026-05-11
 tags: [openai, encoding, history, r50k, p50k, cl100k, o200k]
 ---
 
@@ -29,10 +29,12 @@ OpenAI has released five major encodings across six years, each corresponding to
 | r50k_base | 2020 | r=raw | 50K | Common Crawl + Books + Wikipedia | davinci, curie, babbage, ada |
 | p50k_base | 2021 | p=prompt | 50K | Text + GitHub code | text-davinci-003, Codex |
 | cl100k_base | 2022 | cl=Chat Language | 100K | Chat-optimized | GPT-3.5, GPT-4, text-embedding-3 |
-| o200k_base | 2024 | o=omni | 200K | Multimodal + multilingual | GPT-4o, GPT-5.x, o1, o3 |
+| o200k_base | 2024 | o=omni | 200K | Multimodal + multilingual | GPT-4o, GPT-4.1, GPT-5.x, o1, o3 |
+| o200k_harmony | 2025 | o=omni | ~200K | OpenAI open-source (gpt-oss-*) | gpt-oss-20b, gpt-oss-120b |
 
 Encoding-to-model mapping (not one-to-one):
-- o200k_base ← GPT-4o, GPT-4.1, o1, o3, GPT-5.x
+- o200k_base ← GPT-4o, GPT-4.1, GPT-4.5, o1, o3, o4-mini, GPT-5.x
+- o200k_harmony ← gpt-oss-* (open-source models)
 - cl100k_base ← GPT-4, GPT-3.5-turbo, text-embedding-3, davinci-002
 - p50k_base ← text-davinci-003, Codex, code-davinci-002
 - r50k_base ← davinci, curie, babbage, ada (GPT-3 base)
@@ -42,6 +44,7 @@ Encoding-to-model mapping (not one-to-one):
 - p50k_base had a variant (p50k_edit) for the deprecated Edit API, demonstrating why _base suffix exists
 - gpt2 encoding remains in tiktoken purely for backward compatibility despite no active models
 - davinci has three meanings with three different encodings, causing confusion
+- gpt-oss-* uses experimental o200k_harmony, not o200k_base
 
 ## Sources
 
@@ -52,6 +55,8 @@ Encoding-to-model mapping (not one-to-one):
 - [[source - r50k_base vs p50k_base]] — code corpus addition driving new encoding
 - [[source - Davinci-002 and Embedding Encoding]] — why "old" names use new encodings
 - [[source - Why Deprecated Models Still Work]] — encoding preservation after model deprecation
+- [[source - Tokenizers Is All You Need]] — comprehensive model-to-encoding mapping
+- [[source - Tiktoken Model.py Mapping]] — prefix matching logic for new model versions
 
 ## Related
 

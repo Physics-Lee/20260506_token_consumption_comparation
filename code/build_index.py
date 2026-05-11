@@ -61,6 +61,7 @@ def build_index():
         classical_title = next((t['title'] for t in article['texts'] if t['language'] == 'classical_chinese'), article['metadata']['title_zh'])
         nav_items.append(f'<button class="nav-btn" data-id="{article["id"]}">{classical_title}</button>')
     # Totals and summary buttons at end
+    nav_items.append(f'<button class="nav-btn" data-id="stats">统计分析</button>')
     nav_items.append(f'<button class="nav-btn" data-id="totals">词元总数</button>')
     nav_items.append(f'<button class="nav-btn active" data-id="summary">总结</button>')
     
@@ -106,6 +107,9 @@ def build_index():
                     </thead>
                     <tbody>{"".join(ratio_rows)}</tbody>
                 </table>
+            </div>
+            <div style="text-align:center; margin-top:2rem">
+                <button class="nav-btn" onclick="document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));document.querySelectorAll('.article-section').forEach(s=>s.classList.remove('active'));document.querySelector('[data-id=stats]').classList.add('active');document.getElementById('stats').classList.add('active')">详细统计分析（假设检验等） →</button>
             </div>
         </section>
     '''
@@ -196,8 +200,51 @@ def build_index():
         </section>
     '''
     
+    # Build stats section (split by original language)
+    cc_articles = [a for a in articles if a['metadata'].get('original_language') == 'classical_chinese']
+    other_articles = [a for a in articles if a['metadata'].get('original_language') != 'classical_chinese']
+    
+    def build_ratio_table(article_list, title, desc):
+        ratio_rows = []
+        for article in article_list:
+            classical_title = next((t['title'] for t in article['texts'] if t['language'] == 'classical_chinese'), article['metadata']['title_zh'])
+            cells = [f'<td class="summary-article-name">{classical_title}</td>']
+            for lang in ['classical_chinese', 'modern_chinese', 'english', 'spanish']:
+                if lang == 'classical_chinese':
+                    cells.append(f'<td class="ratio-cell" data-ratio-article="{article["id"]}">1</td>')
+                else:
+                    cells.append(f'<td class="ratio-cell" data-ratio-article="{article["id"]}" data-ratio-lang="{lang}">—</td>')
+            ratio_rows.append('<tr>{}</tr>'.format(''.join(cells)))
+        return f'''
+            <div class="summary-intro">
+                <h3>{title}（{len(article_list)} 篇）</h3>
+                <p>{desc}</p>
+            </div>
+            <div class="summary-table-wrap">
+                <table class="summary-table ratio-table">
+                    <thead><tr><th>文章</th><th>文言</th><th>现代汉语</th><th>English</th><th>Español</th></tr></thead>
+                    <tbody>{"".join(ratio_rows)}</tbody>
+                </table>
+            </div>
+        '''
+    
+    stats_section = f'''
+        <section id="stats" class="article-section">
+            <div class="summary-intro">
+                <h2>详细统计分析</h2>
+                <p>按原文语言分组，观察"原文→译文"方向的 token 膨胀。切换右上角分词器查看不同模型表现。</p>
+            </div>
+            {build_ratio_table(cc_articles, "原文为文言", "这 {len(cc_articles)} 篇文章的原文是文言，现代汉语/英语/西班牙语为译文。比例 = 译文 token ÷ 文言 token。")}
+            <div style="margin-top:2rem"></div>
+            {build_ratio_table(other_articles, "原文为非文言", "这 {len(other_articles)} 篇文章的原文是现代汉语/英语/西班牙语之一，文言为译文。比例 = 各语言 token ÷ 文言 token。")}
+            <div style="text-align:center; margin-top:2rem">
+                <p style="color:var(--text-secondary)">待补充：假设检验、置信区间、显著性分析</p>
+            </div>
+        </section>
+    '''
+    
     # Build article sections
-    sections = [summary_section, totals_section]
+    sections = [summary_section, totals_section, stats_section]
     for i, article in enumerate(articles):
         meta = article['metadata']
         texts = article['texts']
@@ -665,13 +712,14 @@ def build_index():
 <option value="o200k_base" selected>o200k_base — gpt-4o / gpt-4.1 / o1 / o3 / gpt-5.x（2024-）</option>
                 </optgroup>
                 <optgroup label="开源预计算 — Qwen 词表演变">
-<option value="Qwen-7B (2023-)">Qwen 1~2 — 150K 词表 (2023-2024)</option>
-<option value="Qwen2.5-72B (2024-)">Qwen 2.5~3 — 151K 词表 (2024-2025)</option>
+<option value="Qwen-7B (2023-)">Qwen 1.0 / 1.5 / 2.0 — 150K 词表 (2023-)</option>
+<option value="Qwen2.5-72B (2024-)">Qwen 2.5 / 3.0 — 151K 词表 (2024-)</option>
 <option value="Qwen3.5-27B (2026-)">Qwen 3.5 — 248K 词表 (2026-)</option>
                 </optgroup>
                 <optgroup label="开源预计算 — DeepSeek 词表演变">
-<option value="DeepSeek-V2 (2024.05-)">DeepSeek-V2 — 32K 词表 (2024.05-)</option>
-<option value="DeepSeek-V3/R1/V4 (2024.12-)">DeepSeek-V3/R1/V4 — 128K 词表 (2024.12-)</option>
+                    <option value="DeepSeek LLM (2023.11-)">DeepSeek LLM — 100K 词表 (2023.11-)</option>
+                    <option value="DeepSeek-V2 (2024.05-)">DeepSeek-V2 — 100K 词表 (2024.05-)</option>
+                    <option value="DeepSeek-V3/R1/V4 (2024.12-)">DeepSeek-V3/R1/V4 — 128K 词表 (2024.12-)</option>
                 </optgroup>
                 <optgroup label="开源预计算 — 其它">
 <option value="GPT-2">GPT-2 (2019-)</option>
@@ -784,7 +832,7 @@ def build_index():
 
         const OPEN_SOURCE_MODELS = [
             'Qwen-7B (2023-)', 'Qwen2.5-72B (2024-)', 'Qwen3.5-27B (2026-)',
-            'DeepSeek-V2 (2024.05-)', 'DeepSeek-V3/R1/V4 (2024.12-)',
+            'DeepSeek LLM (2023.11-)', 'DeepSeek-V2 (2024.05-)', 'DeepSeek-V3/R1/V4 (2024.12-)',
             'GPT-2', 'Phi-2'
         ];
 

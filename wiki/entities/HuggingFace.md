@@ -1,8 +1,8 @@
 ---
 type: entity
 entity_type: organization
-source_count: 8
-last_updated: 2026-05-10
+source_count: 10
+last_updated: 2026-05-11
 tags: [huggingface, transformers, tokenizer, open-source]
 ---
 
@@ -23,6 +23,8 @@ For the project, HuggingFace is the primary source of open-source tokenizer data
 - transformers 5.x introduced breaking changes that affected DeepSeek Chinese tokenization
 - Some models require authentication tokens (Llama, DeepSeek)
 - transformers.js (by Xenova) enables browser-side tokenizer loading
+- Config class default values (e.g., DeepseekV2Config.vocab_size=32000) are placeholders overridden by config.json—auto-generated docs may show incorrect values
+- Cache on user's Windows machine: C:\Users\Dell\.cache\huggingface\hub\ with models--{org}--{repo} naming
 
 ## Mentioned in
 
@@ -32,6 +34,8 @@ For the project, HuggingFace is the primary source of open-source tokenizer data
 - [[source - Update Workflow]] — HuggingFace account required for some models
 - [[source - LLM Tokenizer Evolution]] — official config sources cited for vocabulary sizes
 - [[source - Tokenizer Browser Strategy]] — HuggingFace as tokenizer.json source
+- [[source - Tokenizer Cache Locations]] — local cache directory structure
+- [[source - DeepSeek-V2 Vocab Mystery]] — Config class default value pitfall
 
 ## Related
 

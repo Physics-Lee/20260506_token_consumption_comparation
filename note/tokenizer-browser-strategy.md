@@ -29,12 +29,15 @@ Qwen/Qwen2.5-72B                → tokenizer.json  (151,643 词表)
 Qwen/Qwen3.5-xxx                → tokenizer.json  (248,320 词表)
   └─ 首次大幅膨胀 63%
 
-DeepSeek 演化（2 个关键版本）:
+DeepSeek 演化（3 个关键版本）:
 
-deepseek-ai/DeepSeek-V2-Lite    → tokenizer.json  (32K 词表)
-  └─ DeepSeek-V2 时代
+deepseek-ai/deepseek-llm-7b-base   → tokenizer.json  (100K 词表)
+  └─ DeepSeek LLM (2023.11)
 
-deepseek-ai/DeepSeek-V3         → tokenizer.json  (128K 词表)
+deepseek-ai/DeepSeek-V2-Lite       → tokenizer.json  (100K 词表)
+  └─ DeepSeek-V2 时代，沿用 LLM 的词表
+
+deepseek-ai/DeepSeek-V3            → tokenizer.json  (128K 词表)
   └─ V3 / R1 / V3.1 / V3.2 / V4 全部沿用
 ```
 

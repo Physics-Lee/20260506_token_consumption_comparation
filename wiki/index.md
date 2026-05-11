@@ -49,6 +49,12 @@ Project notes and research materials from `note/`.
 - [[source - LLM Tokenizer Evolution]] — Cross-family evolution as of May 2026
 - [[source - Tokenizer Iteration Ranking]] — Companies ranked by tokenizer change frequency
 
+### Project Reference
+- [[source - Tokenizers Is All You Need]] — Complete tokenizer reference for corpus_reader.html (16 tokenizers)
+- [[source - Tiktoken Model.py Mapping]] — Complete MODEL_TO_ENCODING / MODEL_PREFIX_TO_ENCODING tables
+- [[source - Tokenizer Cache Locations]] — HuggingFace cache directory on user's Windows machine
+- [[source - DeepSeek-V2 Vocab Mystery]] — Investigation: V2 vocab is 100K not 32K
+
 ---
 
 ## Entities
@@ -60,7 +66,7 @@ Pages about specific organizations, models, and tools.
 - [[HuggingFace]] — Model hub and transformers library
 - [[Meta]] — Llama family (32K→128K→200K)
 - [[Alibaba]] — Qwen family (150K→248K)
-- [[DeepSeek]] — DeepSeek family (32K→128K, most dramatic jump)
+- [[DeepSeek]] — DeepSeek family (V2 may be 100K not 32K; V3 at 128K)
 - [[Zhipu AI]] — GLM/ChatGLM (unique hybrid vocabulary)
 - [[Moonshot AI]] — Kimi (closed K1→open K2)
 - [[MiniMax]] — Started at 200K, no changes since
@@ -95,4 +101,4 @@ Pages about ideas, methods, and theories.
 
 ---
 
-*Index last updated: 2026-05-10*
+*Index last updated: 2026-05-11*
