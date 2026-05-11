@@ -403,7 +403,7 @@
 <option value="r50k_base">r50k_base — gpt-3 / text-davinci-001（2020-）</option>
 <option value="p50k_base">p50k_base — code-davinci-002 / text-davinci-003（2021-）</option>
 <option value="cl100k_base">cl100k_base — gpt-3.5-turbo / gpt-4（2022-）</option>
-<option value="o200k_base" selected>o200k_base — gpt-4o / gpt-4.1 / o1 / o3 / gpt-5.x（2024-）</option>
+<option value="o200k_base">o200k_base — gpt-4o / gpt-4.1 / o1 / o3 / gpt-5.x（2024-）</option>
                 </optgroup>
                 <optgroup label="开源预计算 — Qwen 词表演变">
 <option value="Qwen-7B (2023-)">Qwen 1.0 / 1.5 / 2.0 — 150K 词表 (2023-)</option>
@@ -413,7 +413,7 @@
                 <optgroup label="开源预计算 — DeepSeek 词表演变">
                     <option value="DeepSeek LLM (2023.11-)">DeepSeek LLM — 100K 词表 (2023.11-)</option>
                     <option value="DeepSeek-V2 (2024.05-)">DeepSeek-V2 — 100K 词表 (2024.05-)</option>
-                    <option value="DeepSeek-V3/R1/V4 (2024.12-)">DeepSeek-V3/R1/V4 — 128K 词表 (2024.12-)</option>
+                    <option value="DeepSeek-V3/R1/V4 (2024.12-)" selected>DeepSeek-V3/R1/V4 — 128K 词表 (2024.12-)</option>
                 </optgroup>
                 <optgroup label="开源预计算 — 其它">
 <option value="GPT-2">GPT-2 (2019-)</option>
@@ -2494,7 +2494,7 @@ En la primavera del vigésimo cuarto año, en el primer mes, el duque Mu de Qin 
             try { return encoder.encode(text).length; } catch(e) { return -1; }
         }
 
-        let currentTokenizer = 'o200k_base';
+        let currentTokenizer = 'DeepSeek-V3/R1/V4 (2024.12-)';
 
         function updateAllTokenCounts() {
             const name = currentTokenizer;
