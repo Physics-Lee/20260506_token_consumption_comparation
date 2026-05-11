@@ -255,6 +255,13 @@ def build_index():
 
                 <b>4. 这里的检验就是女士品茶吗？</b><br>
                 不是同一检验——精神一致。女士品茶（Fisher 原版）是 2×2 列联表，超几何分布 C(8,4)=70；本页是配对差值翻符号，2<sup>n</sup> 种。                共性：零分布均由随机化设计自然导出，不依赖关于数据分布的假设。
+                <br><br>
+                <b>5. 多重检验矫正</b><br>
+                每个分词器同时做 3 次单边检验。三选项：<br>
+                (a) Bonferroni：均分 α 到三次检验——过于保守，n=5 时本就极有限的检验效力被彻底消灭。<br>
+                (b) Holm-Bonferroni：逐步版 Bonferroni，同样控 FWER。n=5 时功效不减反无。<br>
+                (c) Benjamini-Hochberg（BH）：控 FDR，不控 FWER。校正粒度为每个分词器内 m=3，不跨分词器。n=5 时仍保留检出能力——选用。<br>
+                理由：探索性语料库分析，假发现率控制更匹配研究目的。FWER 控制将消灭小样本组全部信号。
                 </p>
             </div>
             
@@ -377,7 +384,18 @@ def build_index():
             for i in range(1, -1, -1):
                 adj[order[i]] = min(adj[order[i]], adj[order[i + 1]])
             for i, l in enumerate(langs):
-                pvalue_data[group][name][l]['fisher_bh'] = adj[i]  # 保留原始值，JS 端格式化
+                pvalue_data[group][name][l]['fisher_bh'] = adj[i]
+                pvalue_data[group][name][l]['fisher_bonf'] = min(fisher_ps[i] * 3, 1.0)
+            # Holm-Bonferroni (step-down)
+            sf = sorted(enumerate(fisher_ps), key=lambda x: x[1])  # (orig_idx, p)
+            holm_f = [0.0] * 3
+            cur_max = 0.0
+            for rank, (orig_idx, p) in enumerate(sf, 1):
+                adj = min(p * (4 - rank), 1.0)  # m=3: rank 1→×3, rank 2→×2, rank 3→×1
+                cur_max = max(cur_max, adj)
+                holm_f[orig_idx] = cur_max
+            for i, l in enumerate(langs):
+                pvalue_data[group][name][l]['fisher_holm'] = holm_f[i]
             # Wilcoxon p-values
             wilc_ps = []
             for l in langs:
@@ -390,7 +408,18 @@ def build_index():
             for i in range(1, -1, -1):
                 w_adj[w_order[i]] = min(w_adj[w_order[i]], w_adj[w_order[i + 1]])
             for i, l in enumerate(langs):
-                pvalue_data[group][name][l]['wilcoxon_bh'] = w_adj[i]  # 保留原始值，JS 端格式化
+                pvalue_data[group][name][l]['wilcoxon_bh'] = w_adj[i]
+                pvalue_data[group][name][l]['wilcoxon_bonf'] = min(wilc_ps[i] * 3, 1.0)
+            # Holm-Bonferroni for Wilcoxon
+            sw = sorted(enumerate(wilc_ps), key=lambda x: x[1])
+            holm_w = [0.0] * 3
+            cur_max = 0.0
+            for rank, (orig_idx, p) in enumerate(sw, 1):
+                adj = min(p * (4 - rank), 1.0)
+                cur_max = max(cur_max, adj)
+                holm_w[orig_idx] = cur_max
+            for i, l in enumerate(langs):
+                pvalue_data[group][name][l]['wilcoxon_holm'] = holm_w[i]
     
     pvalue_json = json.dumps(pvalue_data, ensure_ascii=False)
     
@@ -1090,7 +1119,25 @@ def build_index():
                     const wbh = d[l].wilcoxon_bh < 0.0001 ? '&lt;0.0001' : d[l].wilcoxon_bh.toFixed(4);
                     html += '<td>' + fp + '</td><td>' + wp + '</td>';
                 }}
-                html += '</tr><tr class="bh-row"><td class="summary-article-name" style="font-weight:400;color:var(--text-secondary)">↳ BH 校正</td>';
+                html += '</tr>';
+                // Bonferroni row (strictest)
+                html += '<tr class="bh-row"><td class="summary-article-name" style="font-weight:400;color:var(--text-secondary)">↳ Bonferroni</td>';
+                for (const l of langs) {{
+                    const fb = d[l].fisher_bonf < 0.0001 ? '&lt;0.0001' : d[l].fisher_bonf.toFixed(4);
+                    const wb = d[l].wilcoxon_bonf < 0.0001 ? '&lt;0.0001' : d[l].wilcoxon_bonf.toFixed(4);
+                    html += '<td style="color:var(--text-secondary)">' + fb + '</td><td style="color:var(--text-secondary)">' + wb + '</td>';
+                }}
+                html += '</tr>';
+                // Holm row
+                html += '<tr class="bh-row"><td class="summary-article-name" style="font-weight:400;color:var(--text-secondary)">↳ Holm</td>';
+                for (const l of langs) {{
+                    const fh = d[l].fisher_holm < 0.0001 ? '&lt;0.0001' : d[l].fisher_holm.toFixed(4);
+                    const wh = d[l].wilcoxon_holm < 0.0001 ? '&lt;0.0001' : d[l].wilcoxon_holm.toFixed(4);
+                    html += '<td style="color:var(--text-secondary)">' + fh + '</td><td style="color:var(--text-secondary)">' + wh + '</td>';
+                }}
+                html += '</tr>';
+                // BH row (most lenient)
+                html += '<tr class="bh-row"><td class="summary-article-name" style="font-weight:400;color:var(--text-secondary)">↳ BH 校正</td>';
                 for (const l of langs) {{
                     const fbh = d[l].fisher_bh < 0.0001 ? '&lt;0.0001' : d[l].fisher_bh.toFixed(4);
                     const wbh = d[l].wilcoxon_bh < 0.0001 ? '&lt;0.0001' : d[l].wilcoxon_bh.toFixed(4);
