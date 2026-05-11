@@ -109,7 +109,7 @@ def build_index():
                 </table>
             </div>
             <div style="text-align:center; margin-top:2rem">
-                <button class="nav-btn" onclick="document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));document.querySelectorAll('.article-section').forEach(s=>s.classList.remove('active'));document.querySelector('[data-id=stats]').classList.add('active');document.getElementById('stats').classList.add('active')">详细统计分析（假设检验等） →</button>
+                <button class="nav-btn" data-id="stats">详细统计分析（假设检验等） →</button>
             </div>
         </section>
     '''
@@ -234,14 +234,137 @@ def build_index():
                 <h2>详细统计分析</h2>
                 <p>按原文语言分组，观察"原文→译文"方向的 token 膨胀。切换右上角分词器查看不同模型表现。</p>
             </div>
-            {build_ratio_table(cc_articles, "原文为文言", "这 {len(cc_articles)} 篇文章的原文是文言，现代汉语/英语/西班牙语为译文。比例 = 译文 token ÷ 文言 token。")}
+            {build_ratio_table(cc_articles, "原文为文言", f"这 {len(cc_articles)} 篇文章的原文是文言，现代汉语/英语/西班牙语为译文。比例 = 译文 token ÷ 文言 token。")}
             <div style="margin-top:2rem"></div>
-            {build_ratio_table(other_articles, "原文为非文言", "这 {len(other_articles)} 篇文章的原文是现代汉语/英语/西班牙语之一，文言为译文。比例 = 各语言 token ÷ 文言 token。")}
+            {build_ratio_table(other_articles, "原文为非文言", f"这 {len(other_articles)} 篇文章的原文是现代汉语/英语/西班牙语之一，文言为译文。比例 = 各语言 token ÷ 文言 token。")}
             <div style="text-align:center; margin-top:2rem">
-                <p style="color:var(--text-secondary)">待补充：假设检验、置信区间、显著性分析</p>
+                <p style="color:var(--text-secondary); font-size:0.8rem; line-height:1.8">
+                <b>方法论说明</b><br><br>
+
+                <b>1. 为何用单边检验？</b><br>
+                研究问题是"文言能否省 token"，不是"文言 token 数是否等同于其他语言"。前者是单边（H₀：文言 ≥ 某语言，H₁：文言 &lt; 某语言），后者是双边。<br><br>
+
+                <b>2. α=0.05 是超参数</b><br>
+                α=0.05 是 Fisher 在 1925 年《研究工作者的统计方法》中建议的一个"便利参考线"。它不是来自数学推导，也不是来自实际需求——纯粹是一个约定俗成的超参数。n 太小时即便真实效应存在，p 值也很难跨过 0.05，此时不应纠结"是否显著"，而应关注效应量和 p 值本身。<br><br>
+
+                <b>3. 四种检验方法的取舍</b><br>
+                (a) t 检验：假设差值正态分布。n<10 时 Shapiro-Wilk 检验功效太低，无法验证正态性——"测不出来偏离"不等于"真的正态"。中心极限定理在 n&lt;30 不起作用。不可用。<br>
+                (b) Fisher 精确检验（置换检验）：不假设任何分布。穷举所有 2<sup>n</sup> 种符号排列，计算观察到同样或更极端均值的排列比例 = p 值。n=5 仅 2<sup>5</sup>=32 种排列，信息量有限但不假设分布。选用。<br>
+                (c) Wilcoxon 符号秩检验：也不假设分布。把差值排秩（1~n），看正号秩和落在哪。比 Fisher 多一层"秩加权"——对差值大小更敏感，但对符号方向同样受限。选用。<br>
+                (d) Bootstrap：有放回重抽样做置信区间，n=5 时反复抽来抽去就 5 个点，宽到没有参考价值；若用于打乱标签做置换检验则与 Fisher 完全等价——Fisher 已穷举全部 2<sup>n</sup> 种排列，再抽样是画蛇添足。不用。<br><br>
+
+                <b>4. 这里的 Fisher 精确检验就是女士品茶吗？</b><br>
+                是。
+                </p>
+            </div>
+            
+            <div class="summary-table-wrap" style="margin-top:2rem">
+                <h3 style="text-align:center;color:var(--accent);margin-bottom:0.5rem">假设检验 — 原文为文言（n={len(cc_articles)}）</h3>
+                <table class="summary-table">
+                    <thead><tr><th>分词器</th><th colspan="2" style="text-align:center">vs 现代汉语<br><small style="color:var(--text-secondary);font-weight:400">H₀：文言 ≥ 现代汉语<br>H₁：文言 &lt; 现代汉语</small></th><th colspan="2" style="text-align:center">vs English<br><small style="color:var(--text-secondary);font-weight:400">H₀：文言 ≥ English<br>H₁：文言 &lt; English</small></th><th colspan="2" style="text-align:center">vs Español<br><small style="color:var(--text-secondary);font-weight:400">H₀：文言 ≥ Español<br>H₁：文言 &lt; Español</small></th></tr>
+                    <tr><th></th><th>Fisher 精确检验 p</th><th>Wilcoxon 符号秩 p</th><th>Fisher 精确检验 p</th><th>Wilcoxon 符号秩 p</th><th>Fisher 精确检验 p</th><th>Wilcoxon 符号秩 p</th></tr></thead>
+                    <tbody id="pv-cc"><tr><td colspan="7" style="text-align:center;color:var(--text-secondary)">—</td></tr></tbody>
+                </table>
+            </div>
+            <div class="summary-table-wrap" style="margin-top:2rem">
+                <h3 style="text-align:center;color:var(--accent);margin-bottom:0.5rem">效应量 — 原文为文言（n={len(cc_articles)}）</h3>
+                <table class="summary-table">
+                    <thead><tr><th>分词器</th><th colspan="2" style="text-align:center">vs 现代汉语</th><th colspan="2" style="text-align:center">vs English</th><th colspan="2" style="text-align:center">vs Español</th></tr>
+                    <tr><th></th><th>Cohen's d</th><th>Hedge's g</th><th>Cohen's d</th><th>Hedge's g</th><th>Cohen's d</th><th>Hedge's g</th></tr></thead>
+                    <tbody id="ef-cc"><tr><td colspan="7" style="text-align:center;color:var(--text-secondary)">—</td></tr></tbody>
+                </table>
+                <p style="text-align:center;color:var(--text-secondary);font-size:0.7rem;margin-top:0.3rem">d / g ≥ 0.2 小，≥ 0.5 中，≥ 0.8 大。Hedge's g 对小样本做偏差修正。</p>
+            </div>
+            <div class="summary-table-wrap" style="margin-top:2rem">
+                <h3 style="text-align:center;color:var(--accent);margin-bottom:0.5rem">假设检验 — 原文为非文言（n={len(other_articles)}）</h3>
+                <table class="summary-table">
+                    <thead><tr><th>分词器</th><th colspan="2" style="text-align:center">vs 现代汉语<br><small style="color:var(--text-secondary);font-weight:400">H₀：文言 ≥ 现代汉语<br>H₁：文言 &lt; 现代汉语</small></th><th colspan="2" style="text-align:center">vs English<br><small style="color:var(--text-secondary);font-weight:400">H₀：文言 ≥ English<br>H₁：文言 &lt; English</small></th><th colspan="2" style="text-align:center">vs Español<br><small style="color:var(--text-secondary);font-weight:400">H₀：文言 ≥ Español<br>H₁：文言 &lt; Español</small></th></tr>
+                    <tr><th></th><th>Fisher 精确检验 p</th><th>Wilcoxon 符号秩 p</th><th>Fisher 精确检验 p</th><th>Wilcoxon 符号秩 p</th><th>Fisher 精确检验 p</th><th>Wilcoxon 符号秩 p</th></tr></thead>
+                    <tbody id="pv-other"><tr><td colspan="7" style="text-align:center;color:var(--text-secondary)">—</td></tr></tbody>
+                </table>
+            </div>
+            <div class="summary-table-wrap" style="margin-top:2rem">
+                <h3 style="text-align:center;color:var(--accent);margin-bottom:0.5rem">效应量 — 原文为非文言（n={len(other_articles)}）</h3>
+                <table class="summary-table">
+                    <thead><tr><th>分词器</th><th colspan="2" style="text-align:center">vs 现代汉语</th><th colspan="2" style="text-align:center">vs English</th><th colspan="2" style="text-align:center">vs Español</th></tr>
+                    <tr><th></th><th>Cohen's d</th><th>Hedge's g</th><th>Cohen's d</th><th>Hedge's g</th><th>Cohen's d</th><th>Hedge's g</th></tr></thead>
+                    <tbody id="ef-other"><tr><td colspan="7" style="text-align:center;color:var(--text-secondary)">—</td></tr></tbody>
+                </table>
             </div>
         </section>
     '''
+    
+    # Compute p-values for all tokenizers, split by original language
+    import itertools
+    from scipy.stats import wilcoxon
+    
+    def compute_pvalues(token_counts_by_lang, aids):
+        """Compute paired permutation and Wilcoxon p-values for classical vs other."""
+        results = {}
+        classical = [token_counts_by_lang[aid]['classical_chinese'] for aid in aids if aid in token_counts_by_lang]
+        n = len(classical)
+        for compare_lang in ['modern_chinese', 'english', 'spanish']:
+            compare = [token_counts_by_lang[aid][compare_lang] for aid in aids if aid in token_counts_by_lang]
+            diffs = [c - cp for c, cp in zip(classical, compare)]
+            obs_mean = sum(diffs) / n if n > 0 else 0
+            
+            # Exhaustive Fisher exact (permutation) test — one-sided: H₁: 文言 < X
+            count_extreme = 0
+            total = 0
+            for signs in itertools.product([1, -1], repeat=n):
+                perm_mean = sum(s * d for s, d in zip(signs, diffs)) / n
+                if perm_mean <= obs_mean:
+                    count_extreme += 1
+                total += 1
+            fisher_p = count_extreme / total
+            
+            # Wilcoxon signed-rank — one-sided: H₁: 文言 < X
+            diffs_nz = [d for d in diffs if d != 0]
+            wp = float('nan')
+            if len(diffs_nz) >= 3:
+                try:
+                    _, wp = wilcoxon(diffs_nz, method='exact', alternative='less')
+                except Exception:
+                    _, wp = wilcoxon(diffs_nz, alternative='less')
+            results[compare_lang] = {'fisher_p': fisher_p, 'wilcoxon_p': wp, 'n': n}
+            
+            # Effect size (Cohen's d, Hedge's g) — paired
+            mean_d = sum(diffs) / n
+            sd_d = (sum((d - mean_d)**2 for d in diffs) / (n - 1)) ** 0.5 if n > 1 else 1
+            d_val = abs(mean_d / sd_d) if sd_d > 0 else 0
+            g_val = d_val * (1 - 3/(4*n - 9)) if n > 2 else d_val
+            results[compare_lang]['cohens_d'] = d_val
+            results[compare_lang]['hedges_g'] = g_val
+        return results
+    
+    article_ids = [a['id'] for a in articles]
+    cc_ids = [a['id'] for a in cc_articles]
+    ot_ids = [a['id'] for a in other_articles]
+    
+    pvalue_data = {'cc': {}, 'other': {}}
+    
+    # Precomputed models
+    for name, articles_data in tc_data.get('open_source', {}).items():
+        pvalue_data['cc'][name] = compute_pvalues(articles_data, cc_ids)
+        pvalue_data['other'][name] = compute_pvalues(articles_data, ot_ids)
+    
+    # OpenAI encodings
+    try:
+        import tiktoken
+        for enc_name in ['r50k_base', 'p50k_base', 'cl100k_base', 'o200k_base']:
+            enc = tiktoken.get_encoding(enc_name)
+            counts = {}
+            for article in articles:
+                aid = article['id']
+                counts[aid] = {}
+                for text in article['texts']:
+                    counts[aid][text['language']] = len(enc.encode(text['content']))
+            pvalue_data['cc'][enc_name] = compute_pvalues(counts, cc_ids)
+            pvalue_data['other'][enc_name] = compute_pvalues(counts, ot_ids)
+    except Exception as e:
+        print(f"  [WARN] OpenAI p-value computation failed: {e}")
+    
+    pvalue_json = json.dumps(pvalue_data, ensure_ascii=False)
     
     # Build article sections
     sections = [summary_section, totals_section, stats_section]
@@ -309,7 +432,7 @@ def build_index():
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>词元消耗对比 — Token Consumption Comparison</title>
+    <title>用文言，可省词元乎？</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
@@ -817,6 +940,7 @@ def build_index():
     </script>
     <script>
         window.PRECOMPUTED_TOKENS = {token_counts_json};
+        window.PVALUES = {pvalue_json};
     </script>
     <script src="https://cdn.jsdelivr.net/npm/gpt-tokenizer@2.9.0/dist/o200k_base.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gpt-tokenizer@2.9.0/dist/cl100k_base.js"></script>
@@ -916,6 +1040,44 @@ def build_index():
                     }}
                 }});
             }}, 10);
+
+            // Update p-value + effect size tables
+            updatePvalues(name);
+            updateEffects(name);
+        }}
+
+        function updatePvalues(name) {{
+            ['cc', 'other'].forEach(group => {{
+                const body = document.getElementById('pv-' + group);
+                if (!body) return;
+                const gd = window.PVALUES?.[group];
+                if (!gd || !gd[name]) {{ body.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-secondary)">—</td></tr>'; return; }}
+                const d = gd[name];
+                const langs = ['modern_chinese', 'english', 'spanish'];
+                let html = '<tr><td class="summary-article-name">' + name + '</td>';
+                for (const l of langs) {{
+                    const fp = d[l].fisher_p < 0.0001 ? '&lt;0.0001' : d[l].fisher_p.toFixed(4);
+                    const wp = isNaN(d[l].wilcoxon_p) ? '—' : (d[l].wilcoxon_p < 0.0001 ? '&lt;0.0001' : d[l].wilcoxon_p.toFixed(4));
+                    html += '<td>' + fp + '</td><td>' + wp + '</td>';
+                }}
+                body.innerHTML = html + '</tr>';
+            }});
+        }}
+
+        function updateEffects(name) {{
+            ['cc', 'other'].forEach(group => {{
+                const body = document.getElementById('ef-' + group);
+                if (!body) return;
+                const gd = window.PVALUES?.[group];
+                if (!gd || !gd[name]) {{ body.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-secondary)">—</td></tr>'; return; }}
+                const d = gd[name];
+                const langs = ['modern_chinese', 'english', 'spanish'];
+                let html = '<tr><td class="summary-article-name">' + name + '</td>';
+                for (const l of langs) {{
+                    html += '<td>' + d[l].cohens_d.toFixed(2) + '</td><td>' + d[l].hedges_g.toFixed(2) + '</td>';
+                }}
+                body.innerHTML = html + '</tr>';
+            }});
         }}
 
         document.getElementById('tokenizer-select').addEventListener('change', function() {{
