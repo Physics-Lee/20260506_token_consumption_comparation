@@ -520,12 +520,12 @@
 
                 <b>3. 四种检验方法的取舍</b><br>
                 (a) t 检验：假设差值正态分布。n<10 时 Shapiro-Wilk 检验功效太低，无法验证正态性——"测不出来偏离"不等于"真的正态"。中心极限定理在 n&lt;30 不起作用。不可用。<br>
-                (b) Fisher 精确检验（置换检验）：不假设任何分布。穷举所有 2<sup>n</sup> 种符号排列，计算观察到同样或更极端均值的排列比例 = p 值。n=5 仅 2<sup>5</sup>=32 种排列，信息量有限但不假设分布。选用。<br>
-                (c) Wilcoxon 符号秩检验：也不假设分布。把差值排秩（1~n），看正号秩和落在哪。比 Fisher 多一层"秩加权"——对差值大小更敏感，但对符号方向同样受限。选用。<br>
-                (d) Bootstrap：有放回重抽样做置信区间，n=5 时反复抽来抽去就 5 个点，宽到没有参考价值；若用于打乱标签做置换检验则与 Fisher 完全等价——Fisher 已穷举全部 2<sup>n</sup> 种排列，再抽样是画蛇添足。不用。<br><br>
+                (b) 精确置换检验：不假设任何分布。穷举所有 2<sup>n</sup> 种符号排列，计算观察到同样或更极端均值的排列比例 = p 值。n=5 仅 2<sup>5</sup>=32 种排列，信息量有限但不假设分布。选用。<br>
+                (c) Wilcoxon 符号秩检验：也不假设分布。把差值排秩（1~n），看正号秩和落在哪。比精确置换检验多一层"秩加权"——对差值大小更敏感，但对符号方向同样受限。选用。<br>
+                (d) Bootstrap：有放回重抽样做置信区间，n=5 时反复抽来抽去就 5 个点，宽到没有参考价值；若用于打乱标签做置换检验则与精确置换检验完全等价——精确置换检验已穷举全部 2<sup>n</sup> 种排列，再抽样是画蛇添足。不用。<br><br>
 
-                <b>4. 这里的 Fisher 精确检验就是女士品茶吗？</b><br>
-                是。
+                <b>4. 这里的检验就是女士品茶吗？</b><br>
+                不是同一检验——精神一致。女士品茶（Fisher 原版）是 2×2 列联表，超几何分布 C(8,4)=70；本页是配对差值翻符号，2<sup>n</sup> 种。                共性：零分布均由随机化设计自然导出，不依赖关于数据分布的假设。
                 </p>
             </div>
             
@@ -533,7 +533,7 @@
                 <h3 style="text-align:center;color:var(--accent);margin-bottom:0.5rem">假设检验 — 原文为文言（n=5）</h3>
                 <table class="summary-table">
                     <thead><tr><th>分词器</th><th colspan="2" style="text-align:center">vs 现代汉语<br><small style="color:var(--text-secondary);font-weight:400">H₀：文言 ≥ 现代汉语<br>H₁：文言 &lt; 现代汉语</small></th><th colspan="2" style="text-align:center">vs English<br><small style="color:var(--text-secondary);font-weight:400">H₀：文言 ≥ English<br>H₁：文言 &lt; English</small></th><th colspan="2" style="text-align:center">vs Español<br><small style="color:var(--text-secondary);font-weight:400">H₀：文言 ≥ Español<br>H₁：文言 &lt; Español</small></th></tr>
-                    <tr><th></th><th>Fisher 精确检验 p</th><th>Wilcoxon 符号秩 p</th><th>Fisher 精确检验 p</th><th>Wilcoxon 符号秩 p</th><th>Fisher 精确检验 p</th><th>Wilcoxon 符号秩 p</th></tr></thead>
+                    <tr><th></th><th>置换检验 p</th><th>Wilcoxon 符号秩 p</th><th>置换检验 p</th><th>Wilcoxon 符号秩 p</th><th>置换检验 p</th><th>Wilcoxon 符号秩 p</th></tr></thead>
                     <tbody id="pv-cc"><tr><td colspan="7" style="text-align:center;color:var(--text-secondary)">—</td></tr></tbody>
                 </table>
             </div>
@@ -550,7 +550,7 @@
                 <h3 style="text-align:center;color:var(--accent);margin-bottom:0.5rem">假设检验 — 原文为非文言（n=7）</h3>
                 <table class="summary-table">
                     <thead><tr><th>分词器</th><th colspan="2" style="text-align:center">vs 现代汉语<br><small style="color:var(--text-secondary);font-weight:400">H₀：文言 ≥ 现代汉语<br>H₁：文言 &lt; 现代汉语</small></th><th colspan="2" style="text-align:center">vs English<br><small style="color:var(--text-secondary);font-weight:400">H₀：文言 ≥ English<br>H₁：文言 &lt; English</small></th><th colspan="2" style="text-align:center">vs Español<br><small style="color:var(--text-secondary);font-weight:400">H₀：文言 ≥ Español<br>H₁：文言 &lt; Español</small></th></tr>
-                    <tr><th></th><th>Fisher 精确检验 p</th><th>Wilcoxon 符号秩 p</th><th>Fisher 精确检验 p</th><th>Wilcoxon 符号秩 p</th><th>Fisher 精确检验 p</th><th>Wilcoxon 符号秩 p</th></tr></thead>
+                    <tr><th></th><th>置换检验 p</th><th>Wilcoxon 符号秩 p</th><th>置换检验 p</th><th>Wilcoxon 符号秩 p</th><th>置换检验 p</th><th>Wilcoxon 符号秩 p</th></tr></thead>
                     <tbody id="pv-other"><tr><td colspan="7" style="text-align:center;color:var(--text-secondary)">—</td></tr></tbody>
                 </table>
             </div>
