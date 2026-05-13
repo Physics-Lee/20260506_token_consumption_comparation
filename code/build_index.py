@@ -445,7 +445,18 @@ def build_index():
     
     conclusion_html_en = f"""<div class=\"summary-table-wrap\" style=\"margin-top:2rem\"><h3 style=\"text-align:center;color:var(--accent);margin-bottom:0.5rem\">结论：文言文是否比英语更省 token？</h3><table class=\"summary-table\"><thead><tr><th>分词器</th><th>原文为文言（n={len(cc_articles)}）<br><small style=\"color:var(--text-secondary);font-weight:400\">文言 vs English</small></th><th>原文为非文言（n={len(other_articles)}）<br><small style=\"color:var(--text-secondary);font-weight:400\">文言 vs English</small></th></tr></thead><tbody>{''.join(conclusion_rows_en)}</tbody></table><p style=\"text-align:center;color:var(--text-secondary);font-size:0.75rem;margin-top:0.8rem;padding:0 1rem;line-height:1.6\"><b>注释</b>：对号（✓）代表，在原假设成立的条件下，出现现有数据或者更极端数据的概率小于 0.10（BH-FDR 校正后），可以认为文言文比英语更省 token。错号（✗）代表证据不足。</p></div>"""
     
-    stats_section = stats_section.replace('        </section>', conclusion_html + conclusion_html_en + '\n        </section>')
+    # Build Spanish conclusion table
+    conclusion_rows_es = []
+    for name in sorted(pvalue_data['cc'].keys()):
+        cc_bh = pvalue_data['cc'][name].get('spanish', {}).get('fisher_bh', float('nan'))
+        other_bh = pvalue_data['other'][name].get('spanish', {}).get('fisher_bh', float('nan'))
+        cc_mark = '✓' if cc_bh < 0.10 else '✗'
+        other_mark = '✓' if other_bh < 0.10 else '✗'
+        conclusion_rows_es.append(f'<tr><td class="summary-article-name">{name}</td><td>{cc_mark}</td><td>{other_mark}</td></tr>')
+    
+    conclusion_html_es = f"""<div class=\"summary-table-wrap\" style=\"margin-top:2rem\"><h3 style=\"text-align:center;color:var(--accent);margin-bottom:0.5rem\">结论：文言文是否比西班牙语更省 token？</h3><table class=\"summary-table\"><thead><tr><th>分词器</th><th>原文为文言（n={len(cc_articles)}）<br><small style=\"color:var(--text-secondary);font-weight:400\">文言 vs Español</small></th><th>原文为非文言（n={len(other_articles)}）<br><small style=\"color:var(--text-secondary);font-weight:400\">文言 vs Español</small></th></tr></thead><tbody>{''.join(conclusion_rows_es)}</tbody></table><p style=\"text-align:center;color:var(--text-secondary);font-size:0.75rem;margin-top:0.8rem;padding:0 1rem;line-height:1.6\"><b>注释</b>：对号（✓）代表，在原假设成立的条件下，出现现有数据或者更极端数据的概率小于 0.10（BH-FDR 校正后），可以认为文言文比西班牙语更省 token。错号（✗）代表证据不足。</p></div>"""
+    
+    stats_section = stats_section.replace('        </section>', conclusion_html + conclusion_html_en + conclusion_html_es + '\n        </section>')
     
     # Build article sections
     sections = [summary_section, totals_section, stats_section]
